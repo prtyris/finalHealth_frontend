@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { registerUser } from "../../../lib/user-api/userApi.js";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -18,6 +19,16 @@ export default function RegisterPage() {
   });
 
   const [msg, setMsg] = useState("");
+
+  useEffect(() => {
+    if (!msg) return;
+
+    const timer = setTimeout(() => {
+      setMsg("");
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [msg]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -55,6 +66,11 @@ export default function RegisterPage() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-blue-500 to-teal-400 px-4">
       <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md h-[90vh] overflow-y-auto">
+        {msg && (
+          <div className="fixed top-0 left-0 w-full bg-red-500 text-white text-center py-2 shadow-md z-50">
+            {msg}
+          </div>
+        )}
         <h2 className="text-2xl font-semibold text-center mb-6">
           Create Account
         </h2>
@@ -204,10 +220,6 @@ export default function RegisterPage() {
           <button className="w-full bg-blue-600 text-white py-2 rounded mt-2">
             Create Account
           </button>
-
-          {msg && (
-            <p className="text-center text-sm text-red-600 mt-2">{msg}</p>
-          )}
         </form>
       </div>
     </div>
