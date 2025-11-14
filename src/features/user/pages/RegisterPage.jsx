@@ -220,6 +220,12 @@ export default function RegisterPage() {
           <button className="w-full bg-blue-600 text-white py-2 rounded mt-2">
             Create Account
           </button>
+          <div
+            onClick={() => navigate("/")}
+            className="w-full border-2 text-center border-black text-black py-2 rounded mt-2"
+          >
+            Back to login
+          </div>
         </form>
       </div>
     </div>
