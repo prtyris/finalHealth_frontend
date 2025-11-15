@@ -3,7 +3,7 @@ const API_BASE = import.meta.env.VITE_API_BASE;
 // Example simple auth calls for testing
 export const loginUser = async (email, password) => {
   try {
-    const res = await fetch(`${API_BASE}/users/login`, {
+    const res = await fetch(`${API_BASE}/api/users/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
