@@ -1,12 +1,10 @@
 import { Routes, Route } from "react-router-dom";
-import LoginPage from "./pages/LoginPage.jsx";
-import RegisterPage from "./pages/RegisterPage.jsx";
+import Dashboard from "./pages/dashboard/Dashboard";
 
 export default function UserRoutes() {
   return (
     <Routes>
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/dashboard" element={<Dashboard />} />
     </Routes>
   );
 }

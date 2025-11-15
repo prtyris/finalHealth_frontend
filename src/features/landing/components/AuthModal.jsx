@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { loginUser, registerUser } from "../../../lib/user-api/userApi";
+import { useNavigate } from "react-router-dom";
 
 const AuthModal = ({ mode, onClose, onSwitchMode }) => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     firstName: "",
     middleName: "",
     lastName: "",
     email: "",
     contactNumber: "",
+    address: "",
+    birthDate: "",
     password: "",
     confirmPassword: "",
   });
@@ -67,12 +72,20 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
       if (!formData.middleName)
         newErrors.middleName = "Middle name is required";
       if (!formData.lastName) newErrors.lastName = "Last name is required";
+
       if (!formData.email || !formData.email.includes("@"))
         newErrors.email = "Enter a valid email";
+
       if (!formData.contactNumber)
         newErrors.contactNumber = "Contact number is required";
-      if (formData.password.length < 6)
-        newErrors.password = "Minimum 6 characters";
+
+      if (!formData.address) newErrors.address = "Address is required";
+
+      if (!formData.birthDate) newErrors.birthDate = "Birth date is required";
+
+      if (formData.password.length < 8)
+        newErrors.password = "Minimum 8 characters";
+
       if (formData.password !== formData.confirmPassword)
         newErrors.confirmPassword = "Passwords do not match";
     }
@@ -102,6 +115,7 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
 
       setLoading(false);
       onClose();
+      navigate("/user/dashboard");
       return;
     }
 
@@ -113,6 +127,8 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
         l_name: formData.lastName,
         email: formData.email,
         contact_num: formData.contactNumber,
+        address: formData.address,
+        birth_date: formData.birthDate,
         password: formData.password,
       };
 
@@ -124,7 +140,6 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
         return;
       }
 
-      // Switch to login after successful registration
       setLoading(false);
       onSwitchMode("login");
       return;
@@ -245,12 +260,17 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
                 <div key={field}>
                   <label
                     htmlFor={field}
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                   >
                     {field.charAt(0).toUpperCase() +
                       field.slice(1).replace(/([A-Z])/g, " $1")}
                     *
                   </label>
+                  <p className="text-xs text-gray-500 mb-1">
+                    {field === "firstName" && "Enter your given name."}
+                    {field === "middleName" && "Use N/A if not applicable."}
+                    {field === "lastName" && "Your family name or surname."}
+                  </p>
                   <input
                     type="text"
                     id={field}
@@ -271,13 +291,17 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
                 </div>
               ))}
 
+              {/* Email */}
               <div>
                 <label
                   htmlFor="registerEmail"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                 >
                   Email*
                 </label>
+                <p className="text-xs text-gray-500 mb-1">
+                  This will be your login email.
+                </p>
                 <input
                   type="email"
                   id="registerEmail"
@@ -295,13 +319,17 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
                 )}
               </div>
 
+              {/* Contact Number */}
               <div>
                 <label
                   htmlFor="contactNumber"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                 >
                   Contact Number*
                 </label>
+                <p className="text-xs text-gray-500 mb-1">
+                  Use a valid phone number.
+                </p>
                 <input
                   type="tel"
                   id="contactNumber"
@@ -321,13 +349,74 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
                 )}
               </div>
 
+              {/* Address */}
+              <div>
+                <label
+                  htmlFor="address"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                >
+                  Address*
+                </label>
+                <p className="text-xs text-gray-500 mb-1">
+                  Format: Street, City, Province, Country.
+                </p>
+                <input
+                  type="text"
+                  id="address"
+                  value={formData.address}
+                  onChange={handleInputChange}
+                  className={`w-full px-4 py-3 border rounded-lg dark:bg-gray-700 dark:text-white ${
+                    errors.address
+                      ? "border-red-500"
+                      : "border-gray-300 dark:border-gray-600"
+                  }`}
+                  placeholder="Enter your address"
+                />
+                {errors.address && (
+                  <p className="text-red-500 text-sm mt-1">{errors.address}</p>
+                )}
+              </div>
+
+              {/* Birth Date */}
+              <div>
+                <label
+                  htmlFor="birthDate"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                >
+                  Birth Date*
+                </label>
+                <p className="text-xs text-gray-500 mb-1">
+                  Select date of birth.
+                </p>
+                <input
+                  type="date"
+                  id="birthDate"
+                  value={formData.birthDate}
+                  onChange={handleInputChange}
+                  className={`w-full px-4 py-3 border rounded-lg dark:bg-gray-700 dark:text-white ${
+                    errors.birthDate
+                      ? "border-red-500"
+                      : "border-gray-300 dark:border-gray-600"
+                  }`}
+                />
+                {errors.birthDate && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.birthDate}
+                  </p>
+                )}
+              </div>
+
+              {/* Password */}
               <div>
                 <label
                   htmlFor="registerPassword"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                 >
                   Password*
                 </label>
+                <p className="text-xs text-gray-500 mb-1">
+                  Minimum of 8 characters.
+                </p>
                 <input
                   type="password"
                   id="registerPassword"
@@ -345,13 +434,17 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
                 )}
               </div>
 
+              {/* Confirm Password */}
               <div>
                 <label
                   htmlFor="confirmPassword"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                 >
                   Confirm Password*
                 </label>
+                <p className="text-xs text-gray-500 mb-1">
+                  Make sure both passwords match.
+                </p>
                 <input
                   type="password"
                   id="confirmPassword"
