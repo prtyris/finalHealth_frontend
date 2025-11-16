@@ -1,54 +1,26 @@
-import React from 'react'
-
-const ChartSection = ({ appointments, onViewAppointment }) => {
-  const chartData = [
-    { label: 'Week 1', height: '55%' },
-    { label: 'Week 2', height: '80%' },
-    { label: 'Week 3', height: '75%' },
-    { label: 'Week 4', height: '45%' }
-  ]
+export default function ChartSection() {
+  const bars = [40, 70, 60, 35];
 
   return (
-    <div className="chart-section">
-      {/* Chart Card */}
-      <div className="chart-card">
-        <div className="chart-header">
-          <span className="chart-title">Appointments - This Month (% week)</span>
-          <span className="chart-filter">Bar Chart</span>
-        </div>
-        <div className="chart">
-          {chartData.map((data, index) => (
-            <div 
-              key={index}
-              className="bar" 
-              style={{ height: data.height }}
-            >
-              <span className="bar-label">{data.label}</span>
-            </div>
-          ))}
-        </div>
+    <div className="bg-white shadow rounded-xl p-6 border border-gray-100 h-full">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-sm font-semibold text-gray-700">
+          Appointments – This Month (% week)
+        </h2>
+        <span className="text-xs text-gray-500">Bar Chart</span>
       </div>
 
-      {/* Appointments Card */}
-      <div className="chart-card" id="appointmentsCard">
-        <div className="appointments-header">Upcoming Appointments</div>
-        {appointments.map((appointment) => (
-          <div key={appointment.id} className="appointment-item">
-            <div>
-              <div className="appointment-date">{appointment.date}</div>
-              <div className="appointment-time">{appointment.time}</div>
-            </div>
-            <button 
-              className="view-btn"
-              onClick={() => onViewAppointment(appointment)}
-            >
-              View
-            </button>
+      <div className="flex items-end justify-between h-52 mt-4">
+        {bars.map((height, i) => (
+          <div key={i} className="flex flex-col items-center w-full">
+            <div
+              className="bg-blue-600 rounded-md w-12"
+              style={{ height: `${height * 0.5}px` }}
+            ></div>
+            <p className="text-xs text-gray-500 mt-2">Week {i + 1}</p>
           </div>
         ))}
       </div>
     </div>
-  )
+  );
 }
-
-export default ChartSection

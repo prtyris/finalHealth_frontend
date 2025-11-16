@@ -1,25 +1,20 @@
-import React from "react";
+import { Bars3Icon } from "@heroicons/react/24/solid";
 
-const Navbar = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-
+export default function Navbar({ setIsSidebarOpen }) {
   return (
-    <header className="h-16 bg-white shadow-md flex items-center justify-between px-6 ml-64 fixed top-0 right-0 left-64 z-20">
-      <span className="font-semibold text-gray-700">
-        {user ? user.f_name + " " + user.l_name : "User"}
-      </span>
-
-      <button
-        onClick={() => {
-          localStorage.clear();
-          window.location.href = "/";
-        }}
-        className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 text-sm"
-      >
-        Logout
+    <header className="fixed top-0 left-0 right-0 h-16 bg-white shadow z-40 flex items-center px-4 md:px-6">
+      {/* Hamburger for mobile */}
+      <button className="md:hidden mr-4" onClick={() => setIsSidebarOpen(true)}>
+        <Bars3Icon className="h-7 text-gray-700" />
       </button>
+
+      {/* Logo */}
+      <div className="flex items-center space-x-2">
+        <div className="text-blue-600 text-2xl">🏥</div>
+        <span className="font-semibold text-lg text-blue-600">
+          FinaleHealth
+        </span>
+      </div>
     </header>
   );
-};
-
-export default Navbar;
+}
