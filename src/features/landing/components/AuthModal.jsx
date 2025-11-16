@@ -5,12 +5,13 @@ import { useNavigate } from "react-router-dom";
 const AuthModal = ({ mode, onClose, onSwitchMode }) => {
   const navigate = useNavigate();
 
+  // camelCase DTO-ready state
   const [formData, setFormData] = useState({
-    firstName: "",
-    middleName: "",
-    lastName: "",
+    fName: "",
+    mName: "",
+    lName: "",
     email: "",
-    contactNumber: "",
+    contactNum: "",
     address: "",
     birthDate: "",
     password: "",
@@ -20,17 +21,16 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
-  // Close modal on Escape key
+  // Close modal on Escape
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === "Escape") onClose();
     };
-
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
   }, [onClose]);
 
-  // Prevent background scrolling when modal is open
+  // Lock scroll when modal is open
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
@@ -38,29 +38,33 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
     };
   }, []);
 
+  // Map IDs → camelCase DTO fields
   const handleInputChange = (e) => {
     const { id, value } = e.target;
 
-    // Map login fields to correct keys
     const keyMap = {
       loginEmail: "email",
       loginPassword: "password",
       registerEmail: "email",
       registerPassword: "password",
+
+      fName: "fName",
+      mName: "mName",
+      lName: "lName",
+      contactNum: "contactNum",
+      birthDate: "birthDate",
     };
 
     const fieldKey = keyMap[id] || id;
 
-    setFormData((prev) => ({
-      ...prev,
-      [fieldKey]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [fieldKey]: value }));
 
     if (errors[fieldKey]) {
       setErrors((prev) => ({ ...prev, [fieldKey]: "" }));
     }
   };
 
+  // Validation aligned to camelCase
   const validateForm = () => {
     const newErrors = {};
 
@@ -68,16 +72,15 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
       if (!formData.email) newErrors.email = "Email is required";
       if (!formData.password) newErrors.password = "Password is required";
     } else {
-      if (!formData.firstName) newErrors.firstName = "First name is required";
-      if (!formData.middleName)
-        newErrors.middleName = "Middle name is required";
-      if (!formData.lastName) newErrors.lastName = "Last name is required";
+      if (!formData.fName) newErrors.fName = "First name is required";
+      if (!formData.mName) newErrors.mName = "Middle name is required";
+      if (!formData.lName) newErrors.lName = "Last name is required";
 
       if (!formData.email || !formData.email.includes("@"))
         newErrors.email = "Enter a valid email";
 
-      if (!formData.contactNumber)
-        newErrors.contactNumber = "Contact number is required";
+      if (!formData.contactNum)
+        newErrors.contactNum = "Contact number is required";
 
       if (!formData.address) newErrors.address = "Address is required";
 
@@ -94,13 +97,14 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Submit handler for login/register
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
 
     setLoading(true);
 
-    // LOGIN FLOW
+    // ---------- LOGIN ----------
     if (mode === "login") {
       const res = await loginUser(formData.email, formData.password);
 
@@ -119,16 +123,16 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
       return;
     }
 
-    // REGISTER FLOW
+    // ---------- REGISTER ----------
     if (mode === "register") {
       const payload = {
-        f_name: formData.firstName,
-        m_name: formData.middleName,
-        l_name: formData.lastName,
+        fName: formData.fName,
+        mName: formData.mName,
+        lName: formData.lName,
         email: formData.email,
-        contact_num: formData.contactNumber,
+        contactNum: formData.contactNum,
         address: formData.address,
-        birth_date: formData.birthDate,
+        birthDate: formData.birthDate,
         password: formData.password,
       };
 
@@ -156,7 +160,7 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
       onClick={handleBackdropClick}
     >
       <div className="bg-white dark:bg-gray-800 rounded-xl p-8 max-w-md w-full max-h-[90vh] overflow-y-auto relative">
-        {/* Close Button */}
+        {/* Close */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-2xl w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
@@ -176,10 +180,11 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
           </span>
         </div>
 
-        {/* LOGIN */}
+        {/* ---------- LOGIN FORM ---------- */}
         {mode === "login" && (
           <form onSubmit={handleSubmit}>
             <div className="space-y-4">
+              {/* Email */}
               <div>
                 <label
                   htmlFor="loginEmail"
@@ -204,6 +209,7 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
                 )}
               </div>
 
+              {/* Password */}
               <div>
                 <label
                   htmlFor="loginPassword"
@@ -231,7 +237,7 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors duration-300 font-semibold"
+                className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors"
               >
                 {loading ? "Logging in..." : "Login"}
               </button>
@@ -252,41 +258,52 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
           </form>
         )}
 
-        {/* REGISTER */}
+        {/* ---------- REGISTER FORM ---------- */}
         {mode === "register" && (
           <form onSubmit={handleSubmit}>
             <div className="space-y-4">
-              {["firstName", "middleName", "lastName"].map((field) => (
-                <div key={field}>
+              {/* First / Middle / Last Names */}
+              {[
+                {
+                  id: "fName",
+                  label: "First Name",
+                  hint: "Enter your given name.",
+                },
+                {
+                  id: "mName",
+                  label: "Middle Name",
+                  hint: "Use N/A if not applicable.",
+                },
+                {
+                  id: "lName",
+                  label: "Last Name",
+                  hint: "Your surname or family name.",
+                },
+              ].map((item) => (
+                <div key={item.id}>
                   <label
-                    htmlFor={field}
+                    htmlFor={item.id}
                     className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                   >
-                    {field.charAt(0).toUpperCase() +
-                      field.slice(1).replace(/([A-Z])/g, " $1")}
-                    *
+                    {item.label}*
                   </label>
-                  <p className="text-xs text-gray-500 mb-1">
-                    {field === "firstName" && "Enter your given name."}
-                    {field === "middleName" && "Use N/A if not applicable."}
-                    {field === "lastName" && "Your family name or surname."}
-                  </p>
+                  <p className="text-xs text-gray-500 mb-1">{item.hint}</p>
                   <input
                     type="text"
-                    id={field}
-                    value={formData[field]}
+                    id={item.id}
+                    value={formData[item.id]}
                     onChange={handleInputChange}
                     className={`w-full px-4 py-3 border rounded-lg dark:bg-gray-700 dark:text-white ${
-                      errors[field]
+                      errors[item.id]
                         ? "border-red-500"
                         : "border-gray-300 dark:border-gray-600"
                     }`}
-                    placeholder={`Enter your ${field
-                      .replace(/([A-Z])/g, " $1")
-                      .toLowerCase()}`}
+                    placeholder={`Enter ${item.label.toLowerCase()}`}
                   />
-                  {errors[field] && (
-                    <p className="text-red-500 text-sm mt-1">{errors[field]}</p>
+                  {errors[item.id] && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors[item.id]}
+                    </p>
                   )}
                 </div>
               ))}
@@ -312,7 +329,6 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
                       ? "border-red-500"
                       : "border-gray-300 dark:border-gray-600"
                   }`}
-                  placeholder="Enter your email"
                 />
                 {errors.email && (
                   <p className="text-red-500 text-sm mt-1">{errors.email}</p>
@@ -322,7 +338,7 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
               {/* Contact Number */}
               <div>
                 <label
-                  htmlFor="contactNumber"
+                  htmlFor="contactNum"
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                 >
                   Contact Number*
@@ -332,19 +348,18 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
                 </p>
                 <input
                   type="tel"
-                  id="contactNumber"
-                  value={formData.contactNumber}
+                  id="contactNum"
+                  value={formData.contactNum}
                   onChange={handleInputChange}
                   className={`w-full px-4 py-3 border rounded-lg dark:bg-gray-700 dark:text-white ${
-                    errors.contactNumber
+                    errors.contactNum
                       ? "border-red-500"
                       : "border-gray-300 dark:border-gray-600"
                   }`}
-                  placeholder="Enter your contact number"
                 />
-                {errors.contactNumber && (
+                {errors.contactNum && (
                   <p className="text-red-500 text-sm mt-1">
-                    {errors.contactNumber}
+                    {errors.contactNum}
                   </p>
                 )}
               </div>
@@ -358,7 +373,7 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
                   Address*
                 </label>
                 <p className="text-xs text-gray-500 mb-1">
-                  Format: Street, City, Province, Country.
+                  Format: Street, City, Province.
                 </p>
                 <input
                   type="text"
@@ -370,7 +385,6 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
                       ? "border-red-500"
                       : "border-gray-300 dark:border-gray-600"
                   }`}
-                  placeholder="Enter your address"
                 />
                 {errors.address && (
                   <p className="text-red-500 text-sm mt-1">{errors.address}</p>
@@ -385,9 +399,6 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
                 >
                   Birth Date*
                 </label>
-                <p className="text-xs text-gray-500 mb-1">
-                  Select date of birth.
-                </p>
                 <input
                   type="date"
                   id="birthDate"
@@ -414,9 +425,6 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
                 >
                   Password*
                 </label>
-                <p className="text-xs text-gray-500 mb-1">
-                  Minimum of 8 characters.
-                </p>
                 <input
                   type="password"
                   id="registerPassword"
@@ -427,7 +435,6 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
                       ? "border-red-500"
                       : "border-gray-300 dark:border-gray-600"
                   }`}
-                  placeholder="Create a password"
                 />
                 {errors.password && (
                   <p className="text-red-500 text-sm mt-1">{errors.password}</p>
@@ -442,9 +449,6 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
                 >
                   Confirm Password*
                 </label>
-                <p className="text-xs text-gray-500 mb-1">
-                  Make sure both passwords match.
-                </p>
                 <input
                   type="password"
                   id="confirmPassword"
@@ -455,7 +459,6 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
                       ? "border-red-500"
                       : "border-gray-300 dark:border-gray-600"
                   }`}
-                  placeholder="Confirm your password"
                 />
                 {errors.confirmPassword && (
                   <p className="text-red-500 text-sm mt-1">
@@ -467,12 +470,13 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors duration-300 font-semibold"
+                className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
               >
                 {loading ? "Creating..." : "Create Account"}
               </button>
             </div>
 
+            {/* Switch to login */}
             <div className="text-center mt-6">
               <span className="text-gray-600 dark:text-gray-400">
                 Already have an account?{" "}
