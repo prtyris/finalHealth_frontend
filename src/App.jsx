@@ -4,6 +4,8 @@ import UserRoutes from "./features/user/routes.jsx";
 
 import GuestRoute from "./features/landing/components/GuestRoutes.jsx";
 import ProtectedRoutes from "./features/user/components/ProtectedRoutes.jsx";
+
+import AdminRoutes from "./features/admin/routes.jsx";
 export default function App() {
   return (
     <BrowserRouter>
@@ -24,6 +26,7 @@ export default function App() {
             </ProtectedRoutes>
           }
         />
+        <Route path="/admin/*" element={<AdminRoutes />} />
       </Routes>
     </BrowserRouter>
   );

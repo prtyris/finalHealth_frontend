@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { registerUser } from "../../../lib/user-api/userApi.js";
+import { registerUser } from "../api/userApi.js";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 

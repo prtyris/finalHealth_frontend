@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { loginUser, registerUser } from "../../../lib/user-api/userApi";
+import { loginUser, registerUser } from "../../user/api/userApi";
 import { useNavigate } from "react-router-dom";
 
 const AuthModal = ({ mode, onClose, onSwitchMode }) => {
