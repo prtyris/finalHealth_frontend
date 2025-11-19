@@ -254,6 +254,16 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
                   Create Account
                 </button>
               </span>
+              <br />
+              <span className="text-gray-600 dark:text-gray-400">
+                <button
+                  type="button"
+                  onClick={() => navigate("/admin/admin-login")}
+                  className="text-blue-600 dark:text-blue-400 hover:underline font-bold text-sm"
+                >
+                  Login as ADMIN
+                </button>
+              </span>
             </div>
           </form>
         )}
@@ -486,6 +496,16 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
                   className="text-blue-600 dark:text-blue-400 hover:underline font-semibold"
                 >
                   Login
+                </button>
+              </span>
+              <br />
+              <span className="text-gray-600 dark:text-gray-400">
+                <button
+                  type="button"
+                  onClick={() => navigate("/admin/admin-register")}
+                  className="text-blue-600 dark:text-blue-400 hover:underline font-bold text-sm"
+                >
+                  Register as ADMIN
                 </button>
               </span>
             </div>
