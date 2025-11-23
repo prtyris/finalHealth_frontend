@@ -21,7 +21,7 @@ const Footer = () => {
       links: [
         "Email: support@finalHealth.com",
         "Phone: 09 920 922 8257",
-        "Address: Davao St, X Village City",
+        "Address: Abreeza Place, Davao City",
       ],
     },
   ];

@@ -15,8 +15,23 @@ const Header = ({ darkMode, toggleDarkMode, openAuthModal }) => {
       <div className="container mx-auto px-4 py-4">
         <div className="flex justify-between items-center">
           {/* Logo */}
-          <div className="flex items-center space-x-2">
-            <div className="text-2xl">⚕</div>
+          <div className="flex items-center space-x-3">
+            {/* Circular Logo */}
+            <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center overflow-hidden">
+              <img 
+                src="/src/assets/logo.png" 
+                alt="FinalHealth Logo" 
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'flex';
+                }}
+              />
+              {/* Fallback if image doesn't load */}
+              <div className="w-full h-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm hidden">
+                FH
+              </div>
+            </div>
             <span className="text-xl font-bold text-blue-600 dark:text-blue-400">
               FinalHealth
             </span>
@@ -24,7 +39,7 @@ const Header = ({ darkMode, toggleDarkMode, openAuthModal }) => {
 
           {/* Hamburger (Mobile Only) */}
           <button
-            className="md:hidden text-2xl focus:outline-none"
+            className="md:hidden text-2xl focus:outline-none text-gray-700 dark:text-gray-300"
             onClick={() => setMenuOpen(!menuOpen)}
           >
             {menuOpen ? "✖" : "☰"}

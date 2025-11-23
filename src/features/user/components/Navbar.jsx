@@ -10,9 +10,13 @@ export default function Navbar({ setIsSidebarOpen }) {
 
       {/* Logo */}
       <div className="flex items-center space-x-2">
-        <div className="text-blue-600 text-2xl">🏥</div>
+        <img 
+          src="/logo.png" 
+          alt="FinaleHealth Logo" 
+          className="h-8 w-8 rounded-full object-cover"
+        />
         <span className="font-semibold text-lg text-blue-600">
-          FinaleHealth
+          FinalHealth
         </span>
       </div>
     </header>

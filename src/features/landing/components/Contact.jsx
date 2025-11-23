@@ -23,8 +23,8 @@ const Contact = () => {
             <div className="space-y-4">
               <p className="flex items-center">
                 <span className="text-2xl mr-4">📍</span>
-                Suite 17, Lorma Ave., corner Aguila, Lapu-lapu City, 9923
-                Palawan de Sur, Philippines
+                Suite 17, Abreeza Place, J.P. Laurel Avenue, Davao City, 8000
+                Davao del Sur, Philippines
               </p>
               <p className="flex items-center">
                 <span className="text-2xl mr-4">📞</span>
