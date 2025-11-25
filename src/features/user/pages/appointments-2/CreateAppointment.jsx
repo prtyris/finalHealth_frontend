@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getDoctors, getClinicsOfDoctor } from "../../../../api/doctorApi"; // API calls
+import { getDoctors } from "../../../../api/doctorApi"; // API calls
+import { getClinicsOfDoctor } from "../../../../api/doctorApi"; // Get clinics for a doctor
 import { getAllPatients } from "../../../../api/patientApi"; // Fetch patients
 import { registerAppointment } from "../../../../api/appointmentApi"; // API call for creating appointment
 import Layout from "../../components/Layout";
@@ -73,6 +74,7 @@ const CreateAppointment = () => {
       const fetchClinics = async () => {
         try {
           const res = await getClinicsOfDoctor(formData.doctorId);
+          console.log("Clinics fetched for doctor", formData.doctorId, res); // Log the fetched clinics data
           if (res?.success) {
             setClinics(res.clinics || []);
           } else {
@@ -94,6 +96,11 @@ const CreateAppointment = () => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  // Handle clinic selection from the list of buttons
+  const handleClinicSelect = (clinicId) => {
+    setFormData((prev) => ({ ...prev, clinicId }));
+  };
+
   // Submit the appointment
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -106,28 +113,26 @@ const CreateAppointment = () => {
       !formData.clinicId ||
       !formData.appointmentDate
     ) {
-      alert(
-        "Please fill in all required fields: Patient, Doctor, Clinic, and Date"
-      );
       setSubmitting(false);
       return;
     }
 
     // Format the data according to API requirements
     const appointmentData = {
-      patientId: parseInt(formData.patientId),
-      doctorId: parseInt(formData.doctorId),
-      clinical: parseInt(formData.clinicId), // Changed from clinicId to clinical
+      patientId: parseInt(formData.patientId), // Ensure it's an integer
+      doctorId: parseInt(formData.doctorId), // Ensure it's an integer
+      clinicId: parseInt(formData.clinicId), // Ensure it's an integer
       appointmentDate: formData.appointmentDate,
       appointmentType: formData.appointmentType,
       priorityId: 2,
     };
 
+    console.log("Appointment Data to Submit:", appointmentData); // Log the final appointment data
+
     try {
       const res = await registerAppointment(appointmentData);
       if (res?.success) {
-        alert("Appointment created successfully!");
-        navigate("/appointments"); // Redirect back to appointments page
+        navigate("/user/appointments"); // Redirect back to appointments page
       } else {
         alert(
           "Failed to create appointment: " + (res?.error || "Unknown error")
@@ -146,7 +151,7 @@ const CreateAppointment = () => {
       <div className="flex justify-center items-center p-5 bg-gray-50">
         <div className="w-full max-w-2xl bg-white p-6 rounded-lg shadow-md">
           <button
-            onClick={() => navigate("/appointments")}
+            onClick={() => navigate("/user/appointments")}
             className="text-blue-600 underline mb-4"
           >
             Back
@@ -206,27 +211,27 @@ const CreateAppointment = () => {
             {/* Clinic Selection */}
             <div className="mb-4">
               <label className="block text-gray-700">Select Clinic</label>
-              <select
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                value={formData.clinicId}
-                onChange={(e) => handleInputChange("clinicId", e.target.value)}
-                disabled={loadingClinics || !formData.doctorId}
-              >
-                <option value="">
-                  {!formData.doctorId
-                    ? "Select doctor first"
-                    : loadingClinics
-                    ? "Loading clinics..."
-                    : clinicFetchError
-                    ? clinicFetchError
-                    : "Select Clinic"}
-                </option>
-                {clinics.map((clinic) => (
-                  <option key={clinic.clinicId} value={clinic.clinicId}>
-                    {clinic.clinicName}
-                  </option>
-                ))}
-              </select>
+              <div className="flex flex-wrap gap-2">
+                {/* Render clinic buttons instead of a dropdown */}
+                {clinics.length === 0 ? (
+                  <span className="text-sm text-gray-500">
+                    No clinics available
+                  </span>
+                ) : (
+                  clinics.map((clinic) => (
+                    <button
+                      key={clinic.clinic_id}
+                      value={clinic.clinic_id}
+                      onClick={() =>
+                        handleInputChange("clinicId", clinic.clinic_id)
+                      }
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+                    >
+                      {clinic.clinic_name}
+                    </button>
+                  ))
+                )}
+              </div>
             </div>
 
             {/* Appointment Date */}

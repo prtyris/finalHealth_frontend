@@ -21,7 +21,7 @@ import { addToQueue, getQueue } from "../../../../api/queueApi";
 
 const Appointments = () => {
   const [modals, setModals] = useState({
-    addAppointment: true,
+    addAppointment: false,
     editAppointment: false,
     viewAppointment: false,
     reschedule: false,
