@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 
+import Logo from "../../../assets/logo.png";
+
 const Header = ({ darkMode, toggleDarkMode, openAuthModal }) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -18,18 +20,18 @@ const Header = ({ darkMode, toggleDarkMode, openAuthModal }) => {
           <div className="flex items-center space-x-3">
             {/* Circular Logo */}
             <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center overflow-hidden">
-              <img 
-                src="/src/assets/logo.png" 
-                alt="FinalHealth Logo" 
+              <img
+                src="/src/assets/logo.png"
+                alt="FinalHealth Logo"
                 className="w-full h-full object-cover"
                 onError={(e) => {
-                  e.target.style.display = 'none';
-                  e.target.nextSibling.style.display = 'flex';
+                  e.target.style.display = "none";
+                  e.target.nextSibling.style.display = "flex";
                 }}
               />
               {/* Fallback if image doesn't load */}
               <div className="w-full h-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm hidden">
-                FH
+                <img src={Logo} />
               </div>
             </div>
             <span className="text-xl font-bold text-blue-600 dark:text-blue-400">
