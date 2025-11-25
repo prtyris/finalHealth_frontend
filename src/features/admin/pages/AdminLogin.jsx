@@ -15,7 +15,7 @@ export default function AdminLogin() {
     if (res?.token) {
       localStorage.setItem("admin_token", res.token);
       localStorage.setItem("admin", JSON.stringify(res.admin));
-      navigate("/admin/dashboard");
+      navigate("/admin/admin-dashboard");
     } else {
       setMsg(res?.error || "Login failed");
     }

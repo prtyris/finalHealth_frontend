@@ -14,10 +14,38 @@ export default function AdminRoutes() {
     <Routes>
       <Route path="/admin-login" element={<AdminLogin />} />
       <Route path="/admin-register" element={<AdminRegister />} />
-      <Route path="/admin-dashboard" element={<AdminDashboard />} />
-      <Route path="/subscribers" element={<Subscribers />} />
-      <Route path="/users" element={<Users />} />
-      <Route path="/verify-doctors" element={<VerifyDoctors />} />
+      <Route
+        path="/admin-dashboard"
+        element={
+          <ProtectedRoutes>
+            <AdminDashboard />
+          </ProtectedRoutes>
+        }
+      />
+      <Route
+        path="/admin-subscribers"
+        element={
+          <ProtectedRoutes>
+            <Subscribers />
+          </ProtectedRoutes>
+        }
+      />
+      <Route
+        path="/admin-users"
+        element={
+          <ProtectedRoutes>
+            <Users />
+          </ProtectedRoutes>
+        }
+      />
+      <Route
+        path="/admin-verify-doctors"
+        element={
+          <ProtectedRoutes>
+            <VerifyDoctors />
+          </ProtectedRoutes>
+        }
+      />
     </Routes>
   );
 }

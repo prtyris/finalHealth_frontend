@@ -5,7 +5,7 @@ export default function ProtectedRoutes({ children }) {
 
   // No token → kick them out and send to landing
   if (!token) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/admin/admin-login" replace />;
   }
 
   return children;

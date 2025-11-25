@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import ContactForm from "../components/ContactForm"; // Import the ContactForm component
 
 const Contact = () => {
   return (
@@ -13,7 +14,6 @@ const Contact = () => {
         <p className="text-center text-blue-100 mb-12 max-w-2xl mx-auto">
           Get in touch with our team for any questions or support
         </p>
-
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
           {/* Contact Info */}
           <div>
@@ -50,6 +50,8 @@ const Contact = () => {
             ></iframe>
           </div>
         </div>
+        {/* Contact Form Section */}
+        <ContactForm /> {/* Add the ContactForm component here */}
       </div>
     </section>
   );

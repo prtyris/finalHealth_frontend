@@ -1,6 +1,7 @@
 // Subscribers.jsx
 import React from "react";
 import Header from "../../components/Header";
+import AdminLayout from "../../components/AdminLayout";
 
 export default function Subscribers() {
   const subscribers = [
@@ -21,36 +22,40 @@ export default function Subscribers() {
   ];
 
   return (
-    <div className="p-6">
-      <Header title="Subscription Management" />
+    <AdminLayout>
+      <div className="p-6">
+        <Header title="Subscription Management" />
 
-      <div className="mt-6 bg-white rounded-xl shadow-sm p-6">
-        <h2 className="text-3xl font-bold mb-6">Subscription Management</h2>
+        <div className="mt-6 bg-white rounded-xl shadow-sm p-6">
+          <h2 className="text-3xl font-bold mb-6">Subscription Management</h2>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-[#2133ff] text-white">
-                <th className="p-4">Name</th>
-                <th className="p-4">Email</th>
-                <th className="p-4">Status</th>
-                <th className="p-4">Subscription Date</th>
-              </tr>
-            </thead>
-
-            <tbody className="bg-white">
-              {subscribers.map((s, i) => (
-                <tr key={i} className="border-b">
-                  <td className="p-4">{s.name}</td>
-                  <td className="p-4">{s.email}</td>
-                  <td className={`p-4 font-semibold ${s.color}`}>{s.status}</td>
-                  <td className="p-4">{s.date}</td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-[#2133ff] text-white">
+                  <th className="p-4">Name</th>
+                  <th className="p-4">Email</th>
+                  <th className="p-4">Status</th>
+                  <th className="p-4">Subscription Date</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+
+              <tbody className="bg-white">
+                {subscribers.map((s, i) => (
+                  <tr key={i} className="border-b">
+                    <td className="p-4">{s.name}</td>
+                    <td className="p-4">{s.email}</td>
+                    <td className={`p-4 font-semibold ${s.color}`}>
+                      {s.status}
+                    </td>
+                    <td className="p-4">{s.date}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 }

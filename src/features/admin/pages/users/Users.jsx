@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import Header from "../../components/Header";
 import DeactivateModal from "./modal/DeactivateModal";
 import NotifyModal from "./modal/NotifyModal";
-
+import AdminLayout from "../../components/AdminLayout";
 
 function UserRow({ name, onDeactivateClick, onNotifyClick }) {
   return (
@@ -47,44 +47,46 @@ export default function Users() {
   };
 
   return (
-    <div className="p-6">
-      <Header title="Users" />
+    <AdminLayout>
+      <div className="p-6">
+        <Header title="Users" />
 
-      <div className="mt-6 bg-white rounded-xl shadow-sm p-6">
-        <h2 className="text-3xl font-bold mb-6">User Management</h2>
+        <div className="mt-6 bg-white rounded-xl shadow-sm p-6">
+          <h2 className="text-3xl font-bold mb-6">User Management</h2>
 
-        <div className="space-y-4">
-          {users.map((u, i) => (
-            <UserRow
-              key={i}
-              name={u.name}
-              onDeactivateClick={handleDeactivate}
-              onNotifyClick={handleNotify}
-            />
-          ))}
+          <div className="space-y-4">
+            {users.map((u, i) => (
+              <UserRow
+                key={i}
+                name={u.name}
+                onDeactivateClick={handleDeactivate}
+                onNotifyClick={handleNotify}
+              />
+            ))}
+          </div>
         </div>
+
+        {/* MODALS */}
+        <DeactivateModal
+          isOpen={openDeactivate}
+          onClose={() => setOpenDeactivate(false)}
+          onConfirm={() => {
+            console.log("Deactivated:", selectedUser);
+            setOpenDeactivate(false);
+          }}
+          user={selectedUser}
+        />
+
+        <NotifyModal
+          isOpen={openNotify}
+          onClose={() => setOpenNotify(false)}
+          onSend={(msg) => {
+            console.log("Notification sent to", selectedUser, ":", msg);
+            setOpenNotify(false);
+          }}
+          user={selectedUser}
+        />
       </div>
-
-      {/* MODALS */}
-      <DeactivateModal
-        isOpen={openDeactivate}
-        onClose={() => setOpenDeactivate(false)}
-        onConfirm={() => {
-          console.log("Deactivated:", selectedUser);
-          setOpenDeactivate(false);
-        }}
-        user={selectedUser}
-      />
-
-      <NotifyModal
-        isOpen={openNotify}
-        onClose={() => setOpenNotify(false)}
-        onSend={(msg) => {
-          console.log("Notification sent to", selectedUser, ":", msg);
-          setOpenNotify(false);
-        }}
-        user={selectedUser}
-      />
-    </div>
+    </AdminLayout>
   );
 }
