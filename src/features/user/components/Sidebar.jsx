@@ -8,6 +8,8 @@ import {
   ArrowLeftOnRectangleIcon,
 } from "@heroicons/react/24/solid";
 
+import Logo from "../../../assets/logo.png";
+
 export default function Sidebar({ isOpen, setIsOpen, isMobile = false }) {
   const user = JSON.parse(localStorage.getItem("user"));
 
@@ -30,7 +32,7 @@ export default function Sidebar({ isOpen, setIsOpen, isMobile = false }) {
     {
       name: "Doctor Schedule",
       icon: <ClockIcon className="h-5" />,
-      link: "/user/schedule",
+      link: "/user/doctor-schedule",
     },
     {
       name: "Subscription",
@@ -59,23 +61,23 @@ export default function Sidebar({ isOpen, setIsOpen, isMobile = false }) {
       {/* SIDEBAR */}
       <aside
         className={`
-          bg-white h-screen shadow-lg
+          bg-white h-full shadow-lg
           
           ${
             isMobile
               ? `fixed inset-y-0 left-0 w-64 z-30
                  transform ${isOpen ? "translate-x-0" : "-translate-x-full"}
                  transition-transform duration-200 md:hidden`
-              : `hidden md:block w-64 border-r`
+              : `hidden md:block w-64`
           }
         `}
       >
         {/* HEADER */}
-        <div className="p-4 flex items-center space-x-3 border-b">
-          <div className="w-10 h-10 bg-blue-600 text-white flex items-center justify-center rounded-lg font-bold text-xl">
-            {user?.f_name?.charAt(0)}
+        <div className="p-4 flex items-center space-x-3">
+          <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center  font-bold text-xl">
+            <img src={Logo} className="rounded-full" />
           </div>
-          <p className="font-semibold">{user?.f_name}</p>
+          <p className="font-semibold">{user?.email}</p>
         </div>
 
         {/* MENU */}
@@ -94,7 +96,7 @@ export default function Sidebar({ isOpen, setIsOpen, isMobile = false }) {
         </nav>
 
         {/* LOGOUT */}
-        <div className="absolute bottom-4 w-full px-4">
+        <div className="absolute bottom-0 w-full px-4">
           <button
             className="flex items-center space-x-3 px-3 py-2 hover:bg-gray-100"
             onClick={() => {

@@ -1,4 +1,5 @@
 import { Bars3Icon } from "@heroicons/react/24/solid";
+import finalHealthLogo from "../../../assets/logo.png";
 
 export default function Navbar({ setIsSidebarOpen }) {
   return (
@@ -10,14 +11,12 @@ export default function Navbar({ setIsSidebarOpen }) {
 
       {/* Logo */}
       <div className="flex items-center space-x-2">
-        <img 
-          src="/logo.png" 
-          alt="FinaleHealth Logo" 
+        <img
+          src={finalHealthLogo}
+          alt="FinaleHealth Logo"
           className="h-8 w-8 rounded-full object-cover"
         />
-        <span className="font-semibold text-lg text-blue-600">
-          FinalHealth
-        </span>
+        <span className="font-semibold text-lg text-blue-600">FinalHealth</span>
       </div>
     </header>
   );

@@ -9,9 +9,9 @@ export default function Layout({ children }) {
     <div className="min-h-screen">
       <Navbar setIsSidebarOpen={setIsSidebarOpen} />
 
-      <div className="grid grid-cols-12 pt-16 min-h-screen">
+      <div className="grid grid-cols-12 pt-16 h-full">
         {/* SIDEBAR — 2 COLUMNS ON DESKTOP */}
-        <div className="hidden md:block md:col-span-2 border-r">
+        <div className="hidden md:block md:col-span-2 ">
           <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
         </div>
 
@@ -23,7 +23,7 @@ export default function Layout({ children }) {
         />
 
         {/* MAIN CONTENT — 10 COLUMNS */}
-        <main className="col-span-12 md:col-span-10 px-6 pb-10">
+        <main className="col-span-12 p-5 md:col-span-10 md:pl-8 pb-10">
           {children}
         </main>
       </div>
