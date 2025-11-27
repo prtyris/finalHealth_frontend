@@ -6,6 +6,11 @@ import Layout from "../../components/Layout";
 
 import logo from "../../../../assets/logo.png";
 
+const user = JSON.parse(localStorage.getItem("user"));
+const profileImage = user?.profileImgUrl; // or whatever key you stored
+const userName = user?.firstName + " " + user?.lastName;
+const userEmail = user?.email;
+
 const ProfileView = () => {
   const [activeTab, setActiveTab] = useState("personal");
 
@@ -22,16 +27,15 @@ const ProfileView = () => {
           {/* Profile Header */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6 mb-6">
             <div className="flex flex-col sm:flex-row items-center gap-6">
-              <div className="w-20 h-20 bg-gradient-to-br rounded-full from-blue-600 to-green-500 rounded-2xl flex items-center justify-center text-white font-semibold text-3xl">
-                <img src={logo} className="rounded-full" />
-              </div>
+              <img
+                src={profileImage || logo}
+                className="rounded-full w-40 h-40"
+              />
               <div className="text-center sm:text-left">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  Kristine Olaivar
+                  {userName}
                 </h2>
-                <p className="text-gray-600 dark:text-gray-300">
-                  kristineolaivar@gmail.com
-                </p>
+                <p className="text-gray-600 dark:text-gray-300">{userEmail}</p>
               </div>
             </div>
           </div>

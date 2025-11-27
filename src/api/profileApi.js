@@ -1,52 +1,72 @@
 const API_BASE = import.meta.env.VITE_API_BASE;
+const getAuthToken = () => {
+  return localStorage.getItem("user_token"); // Adjust as per your token storage method
+};
 
+const getUser = () => {
+  return localStorage.getItem("user");
+};
 // apiCalls.js
 export const updateProfile = async (userId, profileData) => {
   try {
-    const response = await fetch(`${API_BASE}/api/users/${userId}/profile`, {
-      method: "PUT", // Using PUT to update profile
+    const token = getAuthToken();
+
+    const res = await fetch(`${API_BASE}/api/users/${userId}/profile`, {
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(profileData), // Send the profile data as JSON
+      body: JSON.stringify(profileData),
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || "Failed to update profile");
-    }
+    return await res.json();
+  } catch (err) {
+    console.error("❌ updateProfile error:", err.message);
+    return { success: false, error: "Network error" };
+  }
+};
+// apiCalls.js
 
-    const data = await response.json();
-    return data; // Return the updated profile data
-  } catch (error) {
-    console.error("Error updating profile:", error);
-    throw error; // Throw the error to be caught in the component
+export const getPersonalInfo = async (userId) => {
+  try {
+    const token = getAuthToken();
+
+    const res = await fetch(`${API_BASE}/api/users/${userId}/personal-info`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return await res.json();
+  } catch (err) {
+    console.error("❌ getPersonalInfo error:", err.message);
+    return { success: false, error: "Network error" };
   }
 };
 
-// apiCalls.js
-
-export const getUserPersonalInfo = async (userId) => {
+export const updateUserSettings = async (data) => {
   try {
-    const response = await fetch(
-      `${API_BASE}/api/users/${userId}/personal-info`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const token = localStorage.getItem("user_token");
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || "Failed to fetch user info");
-    }
+    const formData = new FormData();
 
-    const data = await response.json();
-    return data.userInfo; // Return the personal info data
-  } catch (error) {
-    console.error("Error fetching user info:", error);
-    throw error;
+    if (data.currentPassword)
+      formData.append("currentPassword", data.currentPassword);
+    if (data.newPassword) formData.append("newPassword", data.newPassword);
+    if (data.imageFile) formData.append("profileImg", data.imageFile); // MUST match multer name
+
+    const res = await fetch(`${API_BASE}/api/users/update-settings`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`, // NO content-type on purpose
+      },
+      body: formData,
+    });
+
+    return await res.json();
+  } catch (err) {
+    console.error("❌ updateUserSettings error:", err);
+    return { success: false, error: "Network error" };
   }
 };

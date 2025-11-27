@@ -1,166 +1,191 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef } from "react";
+import { updateUserSettings } from "../../../../../api/profileApi";
+import AlertModal from "../../../../../components/AlertModal";
 
-const ChangePassword = () => {
+const AccountSettings = () => {
   const [showPassword, setShowPassword] = useState({
     current: false,
     new: false,
-    confirm: false
+    confirm: false,
   });
-  const [profileImage, setProfileImage] = useState(null);
+
+  const [current, setCurrent] = useState("");
+  const [newPass, setNewPass] = useState("");
+  const [confirm, setConfirm] = useState("");
+
+  const [profileImage, setProfileImage] = useState(null); // preview only
+  const [imageFile, setImageFile] = useState(null); // real file to send
   const fileInputRef = useRef(null);
 
-  const togglePasswordVisibility = (field) => {
-    setShowPassword(prev => ({
-      ...prev,
-      [field]: !prev[field]
-    }));
+  const [alert, setAlert] = useState({
+    show: false,
+    type: "success",
+    message: "",
+  });
+
+  const showAlert = (type, message) => {
+    setAlert({ show: true, type, message });
+    setTimeout(() => setAlert({ show: false }), 3000);
   };
+
+  const togglePasswordVisibility = (field) =>
+    setShowPassword((prev) => ({ ...prev, [field]: !prev[field] }));
+
+  const triggerFileInput = () => fileInputRef.current?.click();
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setProfileImage(e.target.result);
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    setImageFile(file);
+
+    const reader = new FileReader();
+    reader.onload = (e) => setProfileImage(e.target.result);
+    reader.readAsDataURL(file);
+  };
+
+  const handleSave = async () => {
+    // Conditional password validation
+    if (current || newPass || confirm) {
+      if (!current || !newPass || !confirm)
+        return showAlert("error", "Fill all password fields");
+
+      if (newPass !== confirm)
+        return showAlert("error", "New password and confirm do not match");
+
+      if (newPass.length < 8)
+        return showAlert("error", "Password must be at least 8 characters");
     }
-  };
 
-  const triggerFileInput = () => {
-    fileInputRef.current?.click();
-  };
+    const payload = {
+      currentPassword: current || undefined,
+      newPassword: newPass || undefined,
+      imageFile: imageFile || undefined,
+    };
 
-  const handlePasswordChange = () => {
-    alert('Password changed successfully!');
+    const res = await updateUserSettings(payload);
+
+    if (!res.success) return showAlert("error", res.error);
+
+    showAlert("success", "Settings updated");
+
+    // Clear only password fields
+    setCurrent("");
+    setNewPass("");
+    setConfirm("");
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      {/* Password Form */}
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 relative">
+      <AlertModal
+        show={alert.show}
+        type={alert.type}
+        message={alert.message}
+        onClose={() => setAlert({ ...alert, show: false })}
+      />
+
+      {/* Password Section */}
       <div className="space-y-6">
+        {/* CURRENT PASSWORD */}
         <div className="relative">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Enter Current Password
+          <label className="block text-sm font-medium text-gray-300 mb-2">
+            Current Password
           </label>
           <input
-            type={showPassword.current ? 'text' : 'password'}
+            type={showPassword.current ? "text" : "password"}
+            value={current}
+            onChange={(e) => setCurrent(e.target.value)}
+            className="w-full px-3 py-2 rounded-lg dark:bg-gray-700 border dark:border-gray-600"
             placeholder="••••"
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white pr-10"
           />
           <button
             type="button"
-            onClick={() => togglePasswordVisibility('current')}
-            className="absolute right-3 top-9 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+            onClick={() => togglePasswordVisibility("current")}
+            className="absolute right-3 top-9 text-gray-400"
           >
-            {showPassword.current ? (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
-            ) : (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-              </svg>
-            )}
+            👁
           </button>
         </div>
 
+        {/* NEW PASSWORD */}
         <div className="relative">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Enter New Password
+          <label className="block text-sm font-medium text-gray-300 mb-2">
+            New Password
           </label>
           <input
-            type={showPassword.new ? 'text' : 'password'}
+            type={showPassword.new ? "text" : "password"}
+            value={newPass}
+            onChange={(e) => setNewPass(e.target.value)}
+            className="w-full px-3 py-2 rounded-lg dark:bg-gray-700 border dark:border-gray-600"
             placeholder="••••"
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white pr-10"
           />
           <button
             type="button"
-            onClick={() => togglePasswordVisibility('new')}
-            className="absolute right-3 top-9 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+            onClick={() => togglePasswordVisibility("new")}
+            className="absolute right-3 top-9 text-gray-400"
           >
-            {showPassword.new ? (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
-            ) : (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-              </svg>
-            )}
+            👁
           </button>
         </div>
 
+        {/* CONFIRM PASSWORD */}
         <div className="relative">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-300 mb-2">
             Confirm New Password
           </label>
           <input
-            type={showPassword.confirm ? 'text' : 'password'}
+            type={showPassword.confirm ? "text" : "password"}
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+            className="w-full px-3 py-2 rounded-lg dark:bg-gray-700 border dark:border-gray-600"
             placeholder="••••"
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white pr-10"
           />
           <button
             type="button"
-            onClick={() => togglePasswordVisibility('confirm')}
-            className="absolute right-3 top-9 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+            onClick={() => togglePasswordVisibility("confirm")}
+            className="absolute right-3 top-9 text-gray-400"
           >
-            {showPassword.confirm ? (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
-            ) : (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-              </svg>
-            )}
-          </button>
-        </div>
-
-        <div className="pt-4">
-          <button
-            onClick={handlePasswordChange}
-            className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-lg transition-colors font-medium"
-          >
-            Save Changes
+            👁
           </button>
         </div>
       </div>
 
-      {/* Profile Image Section */}
+      {/* Image Section */}
       <div className="flex flex-col items-center justify-center space-y-6">
-        <div className="w-48 h-48 bg-gradient-to-br from-blue-600 to-green-500 rounded-3xl flex items-center justify-center text-white font-semibold text-7xl relative overflow-hidden">
+        <div className="w-48 h-48 bg-gradient-to-br from-blue-600 to-green-500 rounded-3xl overflow-hidden">
           {profileImage ? (
-            <img 
-              src={profileImage} 
-              alt="Profile" 
-              className="w-full h-full object-cover"
-            />
+            <img src={profileImage} className="w-full h-full object-cover" />
           ) : (
-            'K'
+            <div className="w-full h-full flex items-center justify-center text-7xl text-white font-bold">
+              K
+            </div>
           )}
         </div>
-        
+
         <input
           type="file"
           ref={fileInputRef}
-          onChange={handleImageUpload}
           accept="image/*"
           className="hidden"
+          onChange={handleImageUpload}
         />
-        
+
         <button
           onClick={triggerFileInput}
-          className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-lg transition-colors font-medium"
+          className="bg-blue-600 px-6 py-2 rounded-lg text-white hover:bg-blue-700"
         >
           Upload Photo
+        </button>
+
+        <button
+          onClick={handleSave}
+          className="bg-green-600 px-6 py-2 rounded-lg text-white hover:bg-green-700"
+        >
+          Save Changes
         </button>
       </div>
     </div>
   );
 };
 
-export default ChangePassword;
+export default AccountSettings;
