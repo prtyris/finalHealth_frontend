@@ -10,9 +10,31 @@ export default function LoginPage() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
     const data = await loginUser(email, password);
+
     if (data?.token) {
+      // HARD RESET — remove old user data
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      localStorage.removeItem("userInformations");
+
+      // SAVE NEW TOKEN
       localStorage.setItem("token", data.token);
+
+      // SAVE NEW USER OBJECT
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      // SAVE NEW USER INFORMATIONS (used by Sidebar + Profile page)
+      localStorage.setItem(
+        "userInformations",
+        JSON.stringify({
+          email: data.user.email,
+          fullName: data.user.fullName,
+          profileImage: data.user.profileImage,
+        })
+      );
+
       setMsg("✅ Login success!");
       navigate("/");
     } else {

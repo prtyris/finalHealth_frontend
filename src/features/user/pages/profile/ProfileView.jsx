@@ -13,24 +13,30 @@ const ProfileView = () => {
   const [userInfo, setUserInfo] = useState({
     fullName: "N/A",
     email: "N/A",
-    profileImage: null,
+    profileImgUrl: null,
   });
 
   // Load localStorage safely AFTER first render
   useEffect(() => {
-    try {
-      const stored = JSON.parse(localStorage.getItem("userInformations"));
+    function loadUserInfo() {
+      try {
+        const stored = JSON.parse(localStorage.getItem("user")) || {};
 
-      if (stored) {
+        const fullName = `${stored.firstName || ""} ${
+          stored.middleName || ""
+        } ${stored.lastName || ""}`.trim();
+
         setUserInfo({
-          fullName: stored.fullName || "N/A",
+          fullName: fullName || "N/A",
           email: stored.email || "N/A",
-          profileImage: stored.profileImage || null,
+          profileImgUrl: stored.profileImgUrl || null,
         });
+      } catch (err) {
+        console.error("Failed to load userInformations:", err);
       }
-    } catch (err) {
-      console.error("Failed to load userInformations:", err);
     }
+
+    loadUserInfo(); // call the wrapper function
   }, []);
 
   const tabs = [
@@ -47,7 +53,7 @@ const ProfileView = () => {
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6 mb-6">
             <div className="flex flex-col sm:flex-row items-center gap-6">
               <img
-                src={userInfo.profileImage || logo}
+                src={userInfo.profileImgUrl || logo}
                 className="rounded-full w-40 h-40"
                 alt="Profile"
               />

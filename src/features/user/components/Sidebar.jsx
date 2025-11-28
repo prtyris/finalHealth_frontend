@@ -15,23 +15,29 @@ export default function Sidebar({ isOpen, setIsOpen, isMobile = false }) {
   const [userInfo, setUserInfo] = useState({
     fullName: "N/A",
     email: "N/A",
-    profileImage: null,
+    profileImgUrl: null,
   });
 
-  // Load saved user info safely
   useEffect(() => {
-    try {
-      const stored = JSON.parse(localStorage.getItem("userInformations"));
-      if (stored) {
+    function loadUserInfo() {
+      try {
+        const stored = JSON.parse(localStorage.getItem("user")) || {};
+
+        const fullName = `${stored.firstName || ""} ${
+          stored.middleName || ""
+        } ${stored.lastName || ""}`.trim();
+
         setUserInfo({
-          fullName: stored.fullName || "N/A",
+          fullName: fullName || "N/A",
           email: stored.email || "N/A",
-          profileImage: stored.profileImage || null,
+          profileImgUrl: stored.profileImgUrl || null,
         });
+      } catch (err) {
+        console.error("Failed to load userInformations:", err);
       }
-    } catch (err) {
-      console.error("Failed to load userInformations:", err);
     }
+
+    loadUserInfo(); // call the wrapper function
   }, []);
 
   // Also load user for email at bottom
@@ -98,7 +104,7 @@ export default function Sidebar({ isOpen, setIsOpen, isMobile = false }) {
         {/* HEADER */}
         <div className="p-4 flex items-center space-x-3">
           <img
-            src={userInfo.profileImage || Logo}
+            src={userInfo.profileImgUrl || Logo}
             className="w-14 h-14 rounded-full"
             alt="Profile"
           />
@@ -127,6 +133,7 @@ export default function Sidebar({ isOpen, setIsOpen, isMobile = false }) {
             onClick={() => {
               localStorage.removeItem("user_token");
               localStorage.removeItem("user");
+              localStorage.removeItem("userInformations");
               window.location.href = "/";
             }}
           >

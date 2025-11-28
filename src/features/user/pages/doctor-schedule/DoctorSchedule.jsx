@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AddDoctorModal from "./components/modals/AddDoctorModal";
 import AddClinicModal from "./components/modals/AddClinicModal";
 import EditClinicModal from "./components/modals/EditClinicModal";
@@ -7,6 +7,8 @@ import EditSessionModal from "./components/modals/EditSessionModal";
 import ScheduleListView from "./components/ScheduleListView";
 import ManageDoctorView from "./components/ManageDoctorView";
 import Layout from "../../components/Layout";
+
+import { getDoctors } from "../../../../api/doctorApi";
 
 const DoctorSchedule = ({ darkMode }) => {
   const [currentView, setCurrentView] = useState("scheduleList");
@@ -21,30 +23,39 @@ const DoctorSchedule = ({ darkMode }) => {
     editSession: false,
   });
 
-  const [doctors, setDoctors] = useState([
-    {
-      id: 1,
-      name: "Dr. Arias Reyes",
-      specialization: "Internal Medicine",
-      license: "PRC-175803",
-      contact: "0917-345-6789",
-      education: "UST Faculty of Medicine",
-      gender: "Male",
-      dob: "1988-03-10",
-      experience: "15 years",
-    },
-    {
-      id: 2,
-      name: "Dr. Adrian Reyes",
-      specialization: "General Practice",
-      license: "MED-123456",
-      contact: "0917-234-4567",
-      education: "University of the Philippines",
-      gender: "Male",
-      dob: "1985-07-15",
-      experience: "12 years",
-    },
-  ]);
+  const [doctors, setDoctors] = useState([]);
+
+  useEffect(() => {
+    async function loadDoctors() {
+      try {
+        const data = await getDoctors();
+
+        if (data?.success && Array.isArray(data.doctors)) {
+          const mapped = data.doctors.map((d) => ({
+            id: d.doctorId,
+            name: `Dr. ${d.fName} ${d.lName}`,
+            specialization: d.specialization,
+            license: d.licenseNumber,
+            contact: "N/A", // backend does NOT provide contact yet
+            education: d.education,
+            gender: d.gender,
+            dob: "N/A", // backend does NOT provide birthday
+            experience: `${d.yearsExperience} years`,
+            address: d.address,
+            status: d.verificationStatus,
+          }));
+
+          setDoctors(mapped);
+        } else {
+          console.error("Invalid doctor API response:", data);
+        }
+      } catch (error) {
+        console.error("Failed to load doctors:", error);
+      }
+    }
+
+    loadDoctors();
+  }, []);
 
   const [clinics, setClinics] = useState([
     {

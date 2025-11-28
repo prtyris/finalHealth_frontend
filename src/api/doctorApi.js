@@ -1,5 +1,32 @@
 const API_BASE = import.meta.env.VITE_API_BASE;
 
+function authHeaders() {
+  return {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${localStorage.getItem("user_token")}`,
+  };
+}
+
+export const registerDoctor = async (payload) => {
+  try {
+    const res = await fetch(`${API_BASE}/api/doctor-routes`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || "Doctor registration failed");
+    }
+
+    return data;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 // Get all doctors
 export const getDoctors = async () => {
   try {
