@@ -8,7 +8,8 @@ import ScheduleListView from "./components/ScheduleListView";
 import ManageDoctorView from "./components/ManageDoctorView";
 import Layout from "../../components/Layout";
 
-import { getDoctors } from "../../../../api/doctorApi";
+import { getDoctors, getClinicsOfDoctor } from "../../../../api/doctorApi";
+import { getAllClinics } from "../../../../api/clinicApi";
 
 const DoctorSchedule = ({ darkMode }) => {
   const [currentView, setCurrentView] = useState("scheduleList");
@@ -22,6 +23,35 @@ const DoctorSchedule = ({ darkMode }) => {
     addSession: false,
     editSession: false,
   });
+
+  const [affiliatedClinics, setAffiliatedClinics] = useState([]);
+
+  useEffect(() => {
+    async function loadAffiliated() {
+      if (!selectedDoctor?.id) return;
+
+      const data = await getClinicsOfDoctor(selectedDoctor.id);
+
+      if (data?.success && Array.isArray(data.clinics)) {
+        const mapped = data.clinics.map((c) => {
+          return {
+            id: c.clinic_id,
+            name: c.clinic_name,
+            address: c.address,
+            openHours: c.open_hours,
+            openDays: c.open_days,
+            contact: c.contact_num || "N/A",
+          };
+        });
+
+        setAffiliatedClinics(mapped);
+      } else {
+        setAffiliatedClinics([]);
+      }
+    }
+
+    loadAffiliated();
+  }, [selectedDoctor]);
 
   const [doctors, setDoctors] = useState([]);
 
@@ -57,16 +87,44 @@ const DoctorSchedule = ({ darkMode }) => {
     loadDoctors();
   }, []);
 
-  const [clinics, setClinics] = useState([
-    {
-      id: 1,
-      name: "CityHealth Clinic",
-      address: "Makati City",
-      opening: "08:00",
-      closing: "17:00",
-      contact: "0917-321-1111",
-    },
-  ]);
+  const [clinics, setClinics] = useState();
+  // =======================
+  // LOAD ALL CLINICS
+  // =======================
+  useEffect(() => {
+    async function loadClinics() {
+      try {
+        const data = await getAllClinics();
+
+        if (data?.success && Array.isArray(data.clinics)) {
+          const mapped = data.clinics.map((c) => ({
+            id: c.clinicId,
+            name: c.clinicName,
+            address: c.address,
+            opening: c.openHours || "N/A",
+            closing: c.openHours?.split("-")[1]?.trim() || "N/A",
+            contact: c.contactNum || "N/A",
+
+            // Optional fields (backend gives them), not breaking frontend
+            backup: c.backupNum,
+            days: c.openDays,
+            businessPermit: c.businessPermitNo,
+            owner: c.ownerName,
+            image: c.profileImagePath,
+            status: c.verificationStatus,
+          }));
+
+          setClinics(mapped);
+        } else {
+          console.error("Invalid clinic API response:", data);
+        }
+      } catch (err) {
+        console.error("Failed to load clinics:", err);
+      }
+    }
+
+    loadClinics();
+  }, []);
 
   const [sessions, setSessions] = useState([
     {
@@ -216,6 +274,7 @@ const DoctorSchedule = ({ darkMode }) => {
             darkMode={darkMode}
             doctor={selectedDoctor}
             clinics={clinics}
+            allClinics={affiliatedClinics}
             sessions={sessions}
             onBack={() => setCurrentView("scheduleList")}
             onAddClinic={() => openModal("addClinic")}

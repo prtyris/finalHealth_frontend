@@ -30,7 +30,10 @@ export const registerDoctor = async (payload) => {
 // Get all doctors
 export const getDoctors = async () => {
   try {
-    const res = await fetch(`${API_BASE}/api/doctor-routes/doctors`);
+    const res = await fetch(`${API_BASE}/api/doctor-routes/doctors`, {
+      method: "GET",
+      headers: authHeaders(),
+    });
     return await res.json();
   } catch (err) {
     console.error("❌ getDoctors error:", err.message);
@@ -42,7 +45,11 @@ export const getDoctors = async () => {
 export const getClinicsOfDoctor = async (doctorId) => {
   try {
     const res = await fetch(
-      `${API_BASE}/api/doctor-routes/doctors/${doctorId}/clinics`
+      `${API_BASE}/api/doctor-routes/doctors/${doctorId}/clinics`,
+      {
+        method: "GET",
+        headers: authHeaders,
+      }
     );
     return await res.json();
   } catch (err) {
@@ -50,3 +57,19 @@ export const getClinicsOfDoctor = async (doctorId) => {
     return { error: "Network error" };
   }
 };
+
+export async function assignClinicToDoctor(doctorId, clinicId) {
+  try {
+    const res = await fetch(`${API_BASE}/api/clinic-routes/assign-clinic`, {
+      method: "POST",
+      headers: authHeaders,
+      body: JSON.stringify({ doctorId, clinicId }),
+    });
+
+    const data = await res.json();
+    return data; // { success, error? }
+  } catch (err) {
+    console.error("assignClinicToDoctor error:", err);
+    throw err;
+  }
+}
