@@ -10,6 +10,11 @@ import {
 
 import Logo from "../../../assets/logo.png";
 
+const userInformations = JSON.parse(localStorage.getItem("userInformations"));
+const fullName = userInformations.fullName;
+const email = userInformations.email;
+const profileImage = userInformations.profileImage;
+
 export default function Sidebar({ isOpen, setIsOpen, isMobile = false }) {
   const user = JSON.parse(localStorage.getItem("user"));
 
@@ -74,10 +79,8 @@ export default function Sidebar({ isOpen, setIsOpen, isMobile = false }) {
       >
         {/* HEADER */}
         <div className="p-4 flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center  font-bold text-xl">
-            <img src={Logo} className="rounded-full" />
-          </div>
-          <p className="font-semibold">{user?.email}</p>
+          <img src={profileImage || Logo} className=" w-14 h-14 rounded-full" />
+          <p className="font-semibold">{fullName || "N/A"}</p>
         </div>
 
         {/* MENU */}

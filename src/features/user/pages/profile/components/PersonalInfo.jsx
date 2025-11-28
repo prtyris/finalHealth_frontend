@@ -19,6 +19,25 @@ const PersonalInfo = () => {
   useEffect(() => {
     async function loadData() {
       const response = await getPersonalInfo(user.userId);
+      console.log(response);
+
+      const fullName =
+        `${response.userInfo.profile.fName} ${response.userInfo.profile.mName} ${response.userInfo.profile.lName}`.replace(
+          /\s+/g,
+          " "
+        );
+
+      const userInformations = {
+        email: response.userInfo.user.email,
+        profileImage: response.userInfo.profile.profileImgPath,
+        fullName: fullName.trim(),
+      };
+
+      // MUST stringify before saving
+      localStorage.setItem(
+        "userInformations",
+        JSON.stringify(userInformations)
+      );
 
       if (response.success) {
         const u = response.userInfo.user;

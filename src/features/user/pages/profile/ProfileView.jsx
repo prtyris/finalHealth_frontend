@@ -6,10 +6,10 @@ import Layout from "../../components/Layout";
 
 import logo from "../../../../assets/logo.png";
 
-const user = JSON.parse(localStorage.getItem("user"));
-const profileImage = user?.profileImgUrl; // or whatever key you stored
-const userName = user?.firstName + " " + user?.lastName;
-const userEmail = user?.email;
+const userInformations = JSON.parse(localStorage.getItem("userInformations"));
+const fullName = userInformations.fullName;
+const email = userInformations.email;
+const profileImage = userInformations.profileImage;
 
 const ProfileView = () => {
   const [activeTab, setActiveTab] = useState("personal");
@@ -33,9 +33,11 @@ const ProfileView = () => {
               />
               <div className="text-center sm:text-left">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {userName}
+                  {fullName || "N/A"}
                 </h2>
-                <p className="text-gray-600 dark:text-gray-300">{userEmail}</p>
+                <p className="text-gray-600 dark:text-gray-300">
+                  {email || "N/A"}
+                </p>
               </div>
             </div>
           </div>
