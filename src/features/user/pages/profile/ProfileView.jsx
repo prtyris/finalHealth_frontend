@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PersonalInfo from "./components/PersonalInfo";
 import ChangePassword from "./components/ChangePassword";
 import ActivityHistory from "./components/ActivityHistory";
@@ -6,13 +6,32 @@ import Layout from "../../components/Layout";
 
 import logo from "../../../../assets/logo.png";
 
-const userInformations = JSON.parse(localStorage.getItem("userInformations"));
-const fullName = userInformations.fullName;
-const email = userInformations.email;
-const profileImage = userInformations.profileImage;
-
 const ProfileView = () => {
   const [activeTab, setActiveTab] = useState("personal");
+
+  // NEW: Safe state for user info
+  const [userInfo, setUserInfo] = useState({
+    fullName: "N/A",
+    email: "N/A",
+    profileImage: null,
+  });
+
+  // Load localStorage safely AFTER first render
+  useEffect(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem("userInformations"));
+
+      if (stored) {
+        setUserInfo({
+          fullName: stored.fullName || "N/A",
+          email: stored.email || "N/A",
+          profileImage: stored.profileImage || null,
+        });
+      }
+    } catch (err) {
+      console.error("Failed to load userInformations:", err);
+    }
+  }, []);
 
   const tabs = [
     { id: "personal", label: "Personal Information" },
@@ -22,21 +41,22 @@ const ProfileView = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gray-50  py-8 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           {/* Profile Header */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6 mb-6">
             <div className="flex flex-col sm:flex-row items-center gap-6">
               <img
-                src={profileImage || logo}
+                src={userInfo.profileImage || logo}
                 className="rounded-full w-40 h-40"
+                alt="Profile"
               />
               <div className="text-center sm:text-left">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {fullName || "N/A"}
+                  {userInfo.fullName}
                 </h2>
                 <p className="text-gray-600 dark:text-gray-300">
-                  {email || "N/A"}
+                  {userInfo.email}
                 </p>
               </div>
             </div>

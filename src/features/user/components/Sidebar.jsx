@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import {
   HomeIcon,
   CalendarIcon,
@@ -10,12 +11,30 @@ import {
 
 import Logo from "../../../assets/logo.png";
 
-const userInformations = JSON.parse(localStorage.getItem("userInformations"));
-const fullName = userInformations.fullName;
-const email = userInformations.email;
-const profileImage = userInformations.profileImage;
-
 export default function Sidebar({ isOpen, setIsOpen, isMobile = false }) {
+  const [userInfo, setUserInfo] = useState({
+    fullName: "N/A",
+    email: "N/A",
+    profileImage: null,
+  });
+
+  // Load saved user info safely
+  useEffect(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem("userInformations"));
+      if (stored) {
+        setUserInfo({
+          fullName: stored.fullName || "N/A",
+          email: stored.email || "N/A",
+          profileImage: stored.profileImage || null,
+        });
+      }
+    } catch (err) {
+      console.error("Failed to load userInformations:", err);
+    }
+  }, []);
+
+  // Also load user for email at bottom
   const user = JSON.parse(localStorage.getItem("user"));
 
   const menu = [
@@ -67,7 +86,6 @@ export default function Sidebar({ isOpen, setIsOpen, isMobile = false }) {
       <aside
         className={`
           bg-white h-full shadow-lg
-          
           ${
             isMobile
               ? `fixed inset-y-0 left-0 w-64 z-30
@@ -79,8 +97,12 @@ export default function Sidebar({ isOpen, setIsOpen, isMobile = false }) {
       >
         {/* HEADER */}
         <div className="p-4 flex items-center space-x-3">
-          <img src={profileImage || Logo} className=" w-14 h-14 rounded-full" />
-          <p className="font-semibold">{fullName || "N/A"}</p>
+          <img
+            src={userInfo.profileImage || Logo}
+            className="w-14 h-14 rounded-full"
+            alt="Profile"
+          />
+          <p className="font-semibold">{userInfo.fullName}</p>
         </div>
 
         {/* MENU */}
@@ -112,7 +134,7 @@ export default function Sidebar({ isOpen, setIsOpen, isMobile = false }) {
             <span>Logout</span>
           </button>
 
-          <p className="mt-4 text-xs text-gray-500">{user?.email}</p>
+          <p className="mt-4 text-xs text-gray-500">{userInfo.email}</p>
         </div>
       </aside>
     </>
