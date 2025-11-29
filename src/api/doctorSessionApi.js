@@ -31,7 +31,7 @@ export const addDoctorSession = async (payload) => {
 export async function getDoctorSessions(doctorId) {
   try {
     const res = await fetch(
-      `http://localhost:5000/api/doctor-session-routes/doctor/${doctorId}`,
+      `${API_BASE}/api/doctor-session-routes/doctor/${doctorId}`,
       {
         method: "GET",
         headers: authHeaders(),
