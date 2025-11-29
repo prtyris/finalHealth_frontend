@@ -6,8 +6,8 @@ import { assignClinicToDoctor } from "../../../../../api/doctorApi";
 const ManageDoctorView = ({
   darkMode,
   doctor,
-  clinics,
-  allClinics,
+  unassignedClinics,
+  affiliatedClinics,
   sessions,
   onBack,
   onAddClinic,
@@ -207,14 +207,13 @@ const ManageDoctorView = ({
             Link Existing Clinic
           </h3>
         </div>
-
-        {clinics.length === 0 ? (
+        {unassignedClinics?.length === 0 ? (
           <p className={darkMode ? "text-gray-400" : "text-gray-600"}>
             No clinics available. Add a new one.
           </p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {clinics.map((c) => (
+            {unassignedClinics.map((c) => (
               <button
                 key={c.id}
                 onClick={() => handleSelectExistingClinic(c.id)}
@@ -225,16 +224,19 @@ const ManageDoctorView = ({
                 }`}
               >
                 <div className="font-semibold text-blue-600">
-                  {c?.name || "N/A"}
+                  {c.name || "N/A"}
                 </div>
+
                 <div className="font-semibold text-blue-600">
-                  {c?.businessPermit || "N/A"}
+                  {c.businessPermit || "N/A"}
                 </div>
+
                 <div className={darkMode ? "text-gray-300" : "text-gray-600"}>
-                  {c?.address || "N/A"}
+                  {c.address || "N/A"}
                 </div>
+
                 <div className="text-sm mt-1 opacity-70">
-                  {c?.opening || "N/A"} · {c?.days || "N/A"}
+                  {c.opening || "N/A"} · {c.days || "N/A"}
                 </div>
               </button>
             ))}
@@ -313,7 +315,7 @@ const ManageDoctorView = ({
               </tr>
             </thead>
             <tbody>
-              {allClinics.length === 0 ? (
+              {affiliatedClinics.length === 0 ? (
                 <tr>
                   <td
                     colSpan={6}
@@ -325,7 +327,7 @@ const ManageDoctorView = ({
                   </td>
                 </tr>
               ) : (
-                allClinics.map((clinic) => (
+                affiliatedClinics.map((clinic) => (
                   <tr
                     key={clinic.id}
                     className={`border-b ${

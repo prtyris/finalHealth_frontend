@@ -48,7 +48,7 @@ export const getClinicsOfDoctor = async (doctorId) => {
       `${API_BASE}/api/doctor-routes/doctors/${doctorId}/clinics`,
       {
         method: "GET",
-        headers: authHeaders,
+        headers: authHeaders(),
       }
     );
     return await res.json();
@@ -60,9 +60,9 @@ export const getClinicsOfDoctor = async (doctorId) => {
 
 export async function assignClinicToDoctor(doctorId, clinicId) {
   try {
-    const res = await fetch(`${API_BASE}/api/clinic-routes/assign-clinic`, {
+    const res = await fetch(`${API_BASE}/api/doctor-routes/assign-clinic`, {
       method: "POST",
-      headers: authHeaders,
+      headers: authHeaders(),
       body: JSON.stringify({ doctorId, clinicId }),
     });
 

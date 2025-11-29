@@ -9,7 +9,7 @@ import ManageDoctorView from "./components/ManageDoctorView";
 import Layout from "../../components/Layout";
 
 import { getDoctors, getClinicsOfDoctor } from "../../../../api/doctorApi";
-import { getAllClinics } from "../../../../api/clinicApi";
+import { getAllClinics, getUnassignedClinics } from "../../../../api/clinicApi";
 
 const DoctorSchedule = ({ darkMode }) => {
   const [currentView, setCurrentView] = useState("scheduleList");
@@ -87,44 +87,45 @@ const DoctorSchedule = ({ darkMode }) => {
     loadDoctors();
   }, []);
 
-  const [clinics, setClinics] = useState();
+  const [unassignedClinics, setUnassignedClinics] = useState([]);
+
   // =======================
-  // LOAD ALL CLINICS
+  // LOAD ALL UNASSIGNED CLINICS
   // =======================
   useEffect(() => {
-    async function loadClinics() {
-      try {
-        const data = await getAllClinics();
+    async function loadUnassigned() {
+      if (!selectedDoctor?.id) return;
 
-        if (data?.success && Array.isArray(data.clinics)) {
-          const mapped = data.clinics.map((c) => ({
-            id: c.clinicId,
-            name: c.clinicName,
-            address: c.address,
-            opening: c.openHours || "N/A",
-            closing: c.openHours?.split("-")[1]?.trim() || "N/A",
-            contact: c.contactNum || "N/A",
+      const data = await getUnassignedClinics(selectedDoctor.id);
 
-            // Optional fields (backend gives them), not breaking frontend
-            backup: c.backupNum,
-            days: c.openDays,
-            businessPermit: c.businessPermitNo,
-            owner: c.ownerName,
-            image: c.profileImagePath,
-            status: c.verificationStatus,
-          }));
+      if (data?.success && Array.isArray(data.clinics)) {
+        const mapped = data.clinics.map((c) => ({
+          id: c.clinicId,
+          name: c.clinicName,
+          address: c.address,
 
-          setClinics(mapped);
-        } else {
-          console.error("Invalid clinic API response:", data);
-        }
-      } catch (err) {
-        console.error("Failed to load clinics:", err);
+          opening: c.openHours?.split("-")[0]?.trim() || "N/A",
+          closing: c.openHours?.split("-")[1]?.trim() || "N/A",
+          days: c.openDays || "N/A",
+
+          contact: c.contactNum || "N/A",
+          backup: c.backupNum || "N/A",
+          businessPermit: c.businessPermitNo || "N/A",
+
+          owner: c.ownerName || "N/A",
+          image: c.profileImagePath || null,
+          status: c.verificationStatus || "N/A",
+        }));
+
+        setUnassignedClinics(mapped);
+      } else {
+        setUnassignedClinics([]);
       }
     }
 
-    loadClinics();
-  }, []);
+    loadUnassigned();
+    console.log(loadUnassigned());
+  }, [selectedDoctor]);
 
   const [sessions, setSessions] = useState([
     {
@@ -273,8 +274,8 @@ const DoctorSchedule = ({ darkMode }) => {
           <ManageDoctorView
             darkMode={darkMode}
             doctor={selectedDoctor}
-            clinics={clinics}
-            allClinics={affiliatedClinics}
+            unassignedClinics={unassignedClinics}
+            affiliatedClinics={affiliatedClinics}
             sessions={sessions}
             onBack={() => setCurrentView("scheduleList")}
             onAddClinic={() => openModal("addClinic")}

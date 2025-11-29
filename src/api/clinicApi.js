@@ -19,3 +19,20 @@ export const getAllClinics = async () => {
     return { error: "Network error" };
   }
 };
+
+export const getUnassignedClinics = async (doctorId) => {
+  try {
+    const res = await fetch(
+      `${API_BASE}/api/clinic-routes/unassigned/${doctorId}`,
+      {
+        method: "GET",
+        headers: authHeaders(),
+      }
+    );
+    console.log(res);
+    return await res.json();
+  } catch (err) {
+    console.error("getUnassignedClinics error:", err);
+    return { success: false, error: "Network error" };
+  }
+};

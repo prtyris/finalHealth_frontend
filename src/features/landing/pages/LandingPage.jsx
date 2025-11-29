@@ -19,8 +19,11 @@ export default function LandingPage() {
   const [authMode, setAuthMode] = useState("login");
 
   useEffect(() => {
-    const savedDarkMode = localStorage.getItem("darkMode") === "enabled";
-    setDarkMode(savedDarkMode);
+    const darkmode = async () => {
+      const savedDarkMode = localStorage.getItem("darkMode") === "enabled";
+      setDarkMode(savedDarkMode);
+    };
+    darkmode();
   }, []);
 
   useEffect(() => {
