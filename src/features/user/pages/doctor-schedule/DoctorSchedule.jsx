@@ -8,17 +8,18 @@ import ScheduleListView from "./components/ScheduleListView";
 import ManageDoctorView from "./components/ManageDoctorView";
 import Layout from "../../components/Layout";
 
-import { useNavigate } from "react-router-dom";
-
 import { getDoctors, getClinicsOfDoctor } from "../../../../api/doctorApi";
 import {
-  getAllClinics,
+  addDoctorSession,
+  getDoctorSessions,
+} from "../../../../api/doctorSessionApi";
+
+import {
   getUnassignedClinics,
   registerClinic,
 } from "../../../../api/clinicApi";
 
 const DoctorSchedule = ({ darkMode }) => {
-  const navigate = useNavigate();
   const [currentView, setCurrentView] = useState("scheduleList");
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [selectedClinic, setSelectedClinic] = useState(null);
@@ -134,24 +135,33 @@ const DoctorSchedule = ({ darkMode }) => {
     console.log(loadUnassigned());
   }, [selectedDoctor]);
 
-  const [sessions, setSessions] = useState([
-    {
-      id: 1,
-      day: "Monday",
-      clinic: "CityHealth Clinic",
-      sessionType: "morning",
-      startTime: "08:00",
-      endTime: "12:00",
-    },
-    {
-      id: 2,
-      day: "Tuesday",
-      clinic: "MediCare Center",
-      sessionType: "afternoon",
-      startTime: "14:00",
-      endTime: "18:00",
-    },
-  ]);
+  const [sessions, setSessions] = useState([]);
+
+  useEffect(() => {
+    async function loadDoctorSessions() {
+      if (!selectedDoctor?.id) return;
+
+      const data = await getDoctorSessions(selectedDoctor.id);
+
+      if (data?.success && Array.isArray(data.sessions)) {
+        const mapped = data.sessions.map((s) => ({
+          id: s.sessionId,
+          day: s.dayOfWeek,
+          clinic:
+            affiliatedClinics.find((c) => c.id === s.clinicId)?.name ||
+            "Unknown Clinic",
+          startTime: s.startTime.slice(0, 5), // "09:00:00" → "09:00"
+          endTime: s.endTime.slice(0, 5),
+        }));
+
+        setSessions(mapped);
+      } else {
+        setSessions([]);
+      }
+    }
+
+    loadDoctorSessions();
+  }, [selectedDoctor, affiliatedClinics]);
 
   const openModal = (modalName) => {
     setModals((prev) => ({ ...prev, [modalName]: true }));
@@ -218,22 +228,29 @@ const DoctorSchedule = ({ darkMode }) => {
     }
   }, [clinicAdded]);
 
-  const handleAddSession = (sessionData) => {
-    const newSession = {
-      id: sessions.length + 1,
-      day:
-        sessionData.dayOfWeek.charAt(0).toUpperCase() +
-        sessionData.dayOfWeek.slice(1),
-      clinic:
-        sessionData.clinic === "cityhealth"
-          ? "CityHealth Clinic"
-          : "MediCare Center",
-      sessionType: sessionData.sessionType,
-      startTime: sessionData.startTime,
-      endTime: sessionData.endTime,
-    };
-    setSessions((prev) => [...prev, newSession]);
-    closeModal("addSession");
+  const handleAddSession = async (sessionData) => {
+    try {
+      const payload = {
+        doctorId: selectedDoctor.id,
+        clinicId: sessionData.clinicId,
+        dayOfWeek: sessionData.dayOfWeek,
+        startTime: sessionData.startTime,
+        endTime: sessionData.endTime,
+      };
+
+      const result = await addDoctorSession(payload);
+
+      if (!result?.success) {
+        alert(result?.error || "Failed to add doctor session.");
+        return;
+      }
+
+      alert("Session added successfully.");
+      window.location.reload();
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong while adding the session.");
+    }
   };
 
   const handleEditClinicSubmit = (clinicData) => {
@@ -335,6 +352,7 @@ const DoctorSchedule = ({ darkMode }) => {
           onClose={() => closeModal("addSession")}
           onSubmit={handleAddSession}
           darkMode={darkMode}
+          affiliatedClinics={affiliatedClinics}
         />
 
         <EditSessionModal

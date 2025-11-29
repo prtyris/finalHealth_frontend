@@ -424,13 +424,7 @@ const ManageDoctorView = ({
                 >
                   Clinic
                 </th>
-                <th
-                  className={`text-left py-3 px-4 text-sm font-medium ${
-                    darkMode ? "text-gray-400" : "text-gray-500"
-                  }`}
-                >
-                  Session
-                </th>
+
                 <th
                   className={`text-left py-3 px-4 text-sm font-medium ${
                     darkMode ? "text-gray-400" : "text-gray-500"
@@ -476,13 +470,7 @@ const ManageDoctorView = ({
                   >
                     {session.clinic}
                   </td>
-                  <td
-                    className={`py-3 px-4 ${
-                      darkMode ? "text-gray-300" : "text-gray-700"
-                    }`}
-                  >
-                    {formatSessionType(session.sessionType)}
-                  </td>
+
                   <td
                     className={`py-3 px-4 ${
                       darkMode ? "text-gray-300" : "text-gray-700"
