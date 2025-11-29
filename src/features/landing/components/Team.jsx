@@ -8,7 +8,7 @@ const Team = () => {
       description:
         "Leading the development team with expertise in healthcare technology solutions and system architecture",
       gradient: "from-blue-500 to-blue-700",
-      photo: "../../../../public/team/carl.jpg", // Updated path
+      photo: "../../../../team/carl.jpg", // Updated path
     },
     {
       name: "Carl Joseph Orence",
@@ -16,7 +16,7 @@ const Team = () => {
       description:
         "Specializing in server-side development, database design, and API integration for healthcare systems",
       gradient: "from-blue-400 to-blue-600",
-      photo: "../../../../public/team/carlj.jpg", // Updated path
+      photo: "../../../../team/carlj.jpg", // Updated path
     },
     {
       name: "Engr. Elvi Lito Ubas",
@@ -24,7 +24,7 @@ const Team = () => {
       description:
         "Guiding the team with technical expertise and industry knowledge in software engineering principles",
       gradient: "from-purple-500 to-purple-700",
-      photo: "../../../../public/team/teacher.jpg", // Updated path
+      photo: "../../../../team/teacher.jpg", // Updated path
     },
     {
       name: "Mariz Esparago",
@@ -32,7 +32,7 @@ const Team = () => {
       description:
         "Creating intuitive user interfaces and ensuring seamless user experiences across all platforms",
       gradient: "from-blue-300 to-blue-500",
-      photo: "../../../../public/team/mariz.jpg", // Updated path
+      photo: "../../../../team/mariz.jpg", // Updated path
     },
     {
       name: "Elena May Olaivar",
@@ -40,7 +40,7 @@ const Team = () => {
       description:
         "Designing user-centric interfaces and ensuring product quality through comprehensive testing",
       gradient: "from-blue-200 to-blue-400",
-      photo: "../../../../public/team/elena.jpg", // Updated path
+      photo: "../../../../team/elena.jpg", // Updated path
     },
   ];
 
