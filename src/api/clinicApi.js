@@ -7,6 +7,27 @@ function authHeaders() {
   };
 }
 
+export const registerClinic = async (payload) => {
+  try {
+    const res = await fetch(`${API_BASE}/api/clinic-routes/`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || "Doctor registration failed");
+    }
+
+    return data;
+  } catch (err) {
+    console.log(err.message);
+    return { error: err.message };
+  }
+};
+
 export const getAllClinics = async () => {
   try {
     const res = await fetch(`${API_BASE}/api/clinic-routes/all-clinics`, {

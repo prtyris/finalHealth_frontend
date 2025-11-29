@@ -10,7 +10,6 @@ const ManageDoctorView = ({
   affiliatedClinics,
   sessions,
   onBack,
-  onAddClinic,
   onEditClinic,
   onAddSession,
   onEditSession,
@@ -258,12 +257,6 @@ const ManageDoctorView = ({
           >
             Affiliated Clinics
           </h3>
-          <button
-            onClick={onAddClinic}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
-          >
-            + Add Clinic
-          </button>
         </div>
 
         <div className="overflow-x-auto">

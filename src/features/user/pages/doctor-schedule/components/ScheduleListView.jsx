@@ -4,6 +4,7 @@ const ScheduleListView = ({
   darkMode,
   doctors,
   onAddDoctor,
+  onAddClinic,
   onManageDoctor,
 }) => {
   return (
@@ -20,12 +21,21 @@ const ScheduleListView = ({
         >
           Doctor Schedule
         </h1>
-        <button
-          onClick={onAddDoctor}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors"
-        >
-          + Add Doctor
-        </button>
+        <div className="flex gap-3">
+          <button
+            onClick={onAddClinic}
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
+          >
+            + Add Clinic
+          </button>
+
+          <button
+            onClick={onAddDoctor}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+          >
+            + Add Doctor
+          </button>
+        </div>
       </div>
 
       <h3

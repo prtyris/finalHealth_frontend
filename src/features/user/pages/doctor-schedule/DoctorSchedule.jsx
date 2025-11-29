@@ -8,10 +8,17 @@ import ScheduleListView from "./components/ScheduleListView";
 import ManageDoctorView from "./components/ManageDoctorView";
 import Layout from "../../components/Layout";
 
+import { useNavigate } from "react-router-dom";
+
 import { getDoctors, getClinicsOfDoctor } from "../../../../api/doctorApi";
-import { getAllClinics, getUnassignedClinics } from "../../../../api/clinicApi";
+import {
+  getAllClinics,
+  getUnassignedClinics,
+  registerClinic,
+} from "../../../../api/clinicApi";
 
 const DoctorSchedule = ({ darkMode }) => {
+  const navigate = useNavigate();
   const [currentView, setCurrentView] = useState("scheduleList");
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [selectedClinic, setSelectedClinic] = useState(null);
@@ -185,18 +192,31 @@ const DoctorSchedule = ({ darkMode }) => {
     closeModal("addDoctor");
   };
 
-  const handleAddClinic = (clinicData) => {
-    const newClinic = {
-      id: clinics.length + 1,
-      name: clinicData.name,
-      address: clinicData.address,
-      opening: clinicData.openingHours,
-      closing: clinicData.closingHours,
-      contact: clinicData.contactNumber,
-    };
-    setClinics((prev) => [...prev, newClinic]);
-    closeModal("addClinic");
+  const [clinicAdded, setClinicAdded] = useState(false);
+
+  const handleAddClinic = async (clinicData) => {
+    try {
+      const result = await registerClinic(clinicData);
+
+      if (!result?.success) {
+        alert(result?.error || "Failed to add clinic.");
+        return;
+      }
+
+      alert("Clinic added successfully.");
+      setClinicAdded(true); // trigger useEffect
+      closeModal("addClinic");
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong while adding the clinic.");
+    }
   };
+
+  useEffect(() => {
+    if (clinicAdded) {
+      window.location.reload();
+    }
+  }, [clinicAdded]);
 
   const handleAddSession = (sessionData) => {
     const newSession = {
@@ -217,7 +237,7 @@ const DoctorSchedule = ({ darkMode }) => {
   };
 
   const handleEditClinicSubmit = (clinicData) => {
-    setClinics((prev) =>
+    setClinicAdded((prev) =>
       prev.map((clinic) =>
         clinic.id === selectedClinic?.id ? { ...clinic, ...clinicData } : clinic
       )
@@ -250,7 +270,7 @@ const DoctorSchedule = ({ darkMode }) => {
 
   const handleDeleteClinic = (clinicId) => {
     if (window.confirm("Are you sure you want to delete this clinic?")) {
-      setClinics((prev) => prev.filter((clinic) => clinic.id !== clinicId));
+      setClinicAdded((prev) => prev.filter((clinic) => clinic.id !== clinicId));
     }
   };
 
@@ -268,6 +288,7 @@ const DoctorSchedule = ({ darkMode }) => {
             darkMode={darkMode}
             doctors={doctors}
             onAddDoctor={() => openModal("addDoctor")}
+            onAddClinic={() => openModal("addClinic")}
             onManageDoctor={handleManageDoctor}
           />
         ) : (
@@ -278,7 +299,6 @@ const DoctorSchedule = ({ darkMode }) => {
             affiliatedClinics={affiliatedClinics}
             sessions={sessions}
             onBack={() => setCurrentView("scheduleList")}
-            onAddClinic={() => openModal("addClinic")}
             onEditClinic={handleEditClinic}
             onAddSession={() => openModal("addSession")}
             onEditSession={handleEditSession}
