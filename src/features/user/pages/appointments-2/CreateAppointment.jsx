@@ -4,6 +4,7 @@ import { getDoctors } from "../../../../api/doctorApi"; // API calls
 import { getClinicsOfDoctor } from "../../../../api/doctorApi"; // Get clinics for a doctor
 import { getAllPatients } from "../../../../api/patientApi"; // Fetch patients
 import { registerAppointment } from "../../../../api/appointmentApi"; // API call for creating appointment
+import { getDoctorSessions } from "../../../../api/doctorSessionApi"; // API to get doctor sessions
 import Layout from "../../components/Layout";
 import { Link } from "react-router-dom"; // For navigation to RegisterPatient
 
@@ -21,6 +22,7 @@ const CreateAppointment = () => {
   const [doctors, setDoctors] = useState([]);
   const [clinics, setClinics] = useState([]); // Stores fetched clinics
   const [patients, setPatients] = useState([]); // To store list of patients
+  const [sessions, setSessions] = useState([]); // Store doctor sessions
   const [loadingDoctors, setLoadingDoctors] = useState(true);
   const [loadingClinics, setLoadingClinics] = useState(false);
   const [loadingPatients, setLoadingPatients] = useState(false); // For loading patients
@@ -74,7 +76,6 @@ const CreateAppointment = () => {
       const fetchClinics = async () => {
         try {
           const res = await getClinicsOfDoctor(formData.doctorId);
-          console.log("Clinics fetched for doctor", formData.doctorId, res); // Log the fetched clinics data
           if (res?.success) {
             setClinics(res.clinics || []);
           } else {
@@ -91,6 +92,25 @@ const CreateAppointment = () => {
     }
   }, [formData.doctorId]); // Depend on doctorId
 
+  // Fetch doctor sessions when doctor and clinic are selected
+  useEffect(() => {
+    if (formData.doctorId && formData.clinicId) {
+      const fetchDoctorSessions = async () => {
+        const res = await getDoctorSessions(
+          formData.doctorId,
+          formData.clinicId
+        );
+        if (res?.success) {
+          setSessions(res.sessions || []);
+        } else {
+          console.error("Failed to load doctor sessions:", res?.error);
+        }
+      };
+
+      fetchDoctorSessions();
+    }
+  }, [formData.doctorId, formData.clinicId]);
+
   // Handle form input change
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -99,6 +119,14 @@ const CreateAppointment = () => {
   // Handle clinic selection from the list of buttons
   const handleClinicSelect = (clinicId) => {
     setFormData((prev) => ({ ...prev, clinicId }));
+  };
+
+  // Handle session selection and auto-fill date
+  const handleSessionSelect = (session) => {
+    setFormData((prev) => ({
+      ...prev,
+      appointmentDate: session.dayOfWeek, // or session date if it's a specific date
+    }));
   };
 
   // Submit the appointment
@@ -126,8 +154,6 @@ const CreateAppointment = () => {
       appointmentType: formData.appointmentType,
       priorityId: 2,
     };
-
-    console.log("Appointment Data to Submit:", appointmentData); // Log the final appointment data
 
     try {
       const res = await registerAppointment(appointmentData);
@@ -232,6 +258,32 @@ const CreateAppointment = () => {
                   ))
                 )}
               </div>
+            </div>
+
+            {/* Session Selection */}
+            <div className="mb-4">
+              <label className="block text-gray-700">
+                Select Doctor Session
+              </label>
+              <select
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                value={formData.appointmentDate}
+                onChange={(e) =>
+                  handleInputChange("appointmentDate", e.target.value)
+                }
+                disabled={!sessions.length}
+              >
+                <option value="">Select Session</option>
+                {sessions.map((session) => (
+                  <option
+                    key={session.sessionId}
+                    value={session.dayOfWeek}
+                    onClick={() => handleSessionSelect(session)}
+                  >
+                    {`${session.dayOfWeek} — ${session.startTime} to ${session.endTime}`}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* Appointment Date */}

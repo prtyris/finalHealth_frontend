@@ -19,6 +19,8 @@ import {
 } from "../../../../api/appointmentApi";
 import { addToQueue, getQueue } from "../../../../api/queueApi";
 
+import { getDoctorSessions } from "../../../../api/doctorSessionApi";
+
 const Appointments = () => {
   const [modals, setModals] = useState({
     addAppointment: false,
@@ -27,6 +29,30 @@ const Appointments = () => {
     reschedule: false,
     medicalRecord: false,
   });
+
+  const [sessions, setSessions] = useState([]);
+  const [selectedSession, setSelectedSession] = useState(null);
+  const [loadingSessions, setLoadingSessions] = useState(false);
+
+  const loadDoctorSessions = async (doctorId, clinicId) => {
+    if (!doctorId || !clinicId) return;
+
+    setLoadingSessions(true);
+
+    const res = await getDoctorSessions(doctorId);
+
+    if (res?.success) {
+      const filtered = res.sessions.filter(
+        (s) => s.clinicId === Number(clinicId)
+      );
+      setSessions(filtered);
+    } else {
+      setSessions([]);
+      console.error("Failed to load doctor sessions:", res?.error);
+    }
+
+    setLoadingSessions(false);
+  };
 
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [activeTab, setActiveTab] = useState("appointments");
@@ -71,11 +97,6 @@ const Appointments = () => {
   const onRescheduleSuccess = () => {
     setShowSuccessModal(true); // Show success modal after reschedule
     fetchAllAppointments(selectedDoctorId, selectedClinicId); // Re-fetch all appointments
-  };
-
-  const handleConfirmSuccess = () => {
-    setShowSuccessModal(false); // Close success modal
-    // Optionally refresh or perform other actions
   };
 
   const openModal = (modalName, appointment = null) => {
@@ -205,50 +226,62 @@ const Appointments = () => {
     setLoadingQueue(false);
   };
 
-  const handleConfirmAppointmentLocal = (appointment) => {
-    // backend confirm endpoint not yet defined; update UI only
-    if (!appointment?.appointmentId) return;
-    setTodayAppointments((prev) =>
-      prev.map((apt) =>
-        apt.appointmentId === appointment.appointmentId
-          ? { ...apt, status: "Confirmed" }
-          : apt
-      )
-    );
-  };
-
   // =============================
   // Actions: Add to Queue
   // =============================
   const handleAddToQueue = async (appointment) => {
     if (queueActionLoading) return;
+
+    // Validate the essential fields
     if (
       !appointment?.patientId ||
       !appointment?.doctorId ||
-      !appointment?.clinicId ||
-      !appointment?.priorityId
+      !appointment?.clinicId
     ) {
-      console.error("Missing appointment fields required for queueing");
+      console.error("Missing required appointment fields for queueing.");
       return;
     }
 
     setQueueActionLoading(true);
+
+    // Determine priorityId
+    // Backend priority table:
+    // 1 = Normal
+    // 2 = Senior
+    // 3 = PWD
+    // 4 = Emergency
+    // 5 = Follow-up
+    let priorityId = appointment.priorityId;
+
+    // If no priority ID exists (most common case), default to NORMAL (1)
+    if (!priorityId) {
+      const type = (appointment.appointmentType || "").toLowerCase();
+
+      if (type.includes("emergency")) priorityId = 4;
+      else if (type.includes("follow")) priorityId = 5;
+      else priorityId = 1; // Normal
+    }
+
     const payload = {
       patientId: appointment.patientId,
       doctorId: appointment.doctorId,
       clinicId: appointment.clinicId,
-      priorityId: appointment.priorityId,
+      priorityId,
       status: "Waiting",
     };
 
     const res = await addToQueue(payload);
+
     if (res?.success) {
+      // Refresh queue immediately
       if (selectedDoctorId && selectedClinicId) {
         await fetchQueue(selectedDoctorId, selectedClinicId);
       }
     } else {
       console.error("Add to queue failed:", res?.error);
+      alert(res?.error || "Failed to add to queue.");
     }
+
     setQueueActionLoading(false);
   };
 
@@ -275,14 +308,12 @@ const Appointments = () => {
     const s = (status || "").toLowerCase();
     const statusClasses = {
       scheduled: "bg-blue-100 text-blue-800",
-      confirmed: "bg-yellow-100 text-yellow-800",
       completed: "bg-green-100 text-green-800",
       cancelled: "bg-red-100 text-red-800",
     };
 
     const statusText = {
       scheduled: "Scheduled",
-      confirmed: "Confirmed",
       completed: "Completed",
       cancelled: "Cancelled",
     };
@@ -416,7 +447,6 @@ const Appointments = () => {
             >
               <option value="all">All Status</option>
               <option value="scheduled">Scheduled</option>
-              <option value="confirmed">Confirmed</option>
               <option value="completed">Completed</option>
               <option value="cancelled">Cancelled</option>
             </select>
@@ -526,20 +556,6 @@ const Appointments = () => {
                                   ? "Queueing..."
                                   : "Add to Queue"}
                               </button>
-
-                              {apt.status?.toLowerCase() === "scheduled" && (
-                                <>
-                                  <button
-                                    className="bg-green-100 hover:bg-green-200 text-green-800 px-3 py-1 rounded text-xs"
-                                    onClick={() =>
-                                      handleConfirmAppointmentLocal(apt)
-                                    }
-                                    disabled={actionLoading}
-                                  >
-                                    Confirm
-                                  </button>
-                                </>
-                              )}
 
                               {apt.status?.toLowerCase() === "completed" && (
                                 <button

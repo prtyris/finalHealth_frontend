@@ -1,16 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { registerAppointment } from "../../../../../api/appointmentApi.js"; // API call for appointment creation
-import { getAllPatients } from "../../../../../api/patientApi.js"; // API call for fetching patients
-import { getDoctors } from "../../../../../api/doctorApi.js"; // API call to get all doctors
-import { getClinicsOfDoctor } from "../../../../../api/doctorApi.js"; // API call to get clinic of a doctor
+import { registerAppointment } from "../../../../../api/appointmentApi.js";
+import { getAllPatients } from "../../../../../api/patientApi.js";
+import {
+  getDoctors,
+  getClinicsOfDoctor,
+} from "../../../../../api/doctorApi.js";
+import { getDoctorSessions } from "../../../../../api/doctorSessionApi.js";
 
 const AddAppointmentModal = ({ isOpen, onClose }) => {
-  const [patientType, setPatientType] = useState(""); // New or Returning Patient
-  const [isLoading, setIsLoading] = useState(false); // For loading state
-  const [searchTerm, setSearchTerm] = useState(""); // Search term for returning patients
-  const [patients, setPatients] = useState([]); // Store list of matching patients
-  const [doctors, setDoctors] = useState([]); // Store list of doctors
-  const [clinics, setClinics] = useState([]); // Store list of clinics
+  const [patientType, setPatientType] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [patients, setPatients] = useState([]);
+  const [doctors, setDoctors] = useState([]);
+  const [clinics, setClinics] = useState([]);
+
+  // NEW: sessions
+  const [sessions, setSessions] = useState([]);
+  const [loadingSessions, setLoadingSessions] = useState(false);
+
   const [formData, setFormData] = useState({
     firstName: "",
     middleName: "",
@@ -21,50 +29,66 @@ const AddAppointmentModal = ({ isOpen, onClose }) => {
     email: "",
     clinicId: "",
     doctorId: "",
+    sessionId: "", // NEW: add sessionId
     appointmentDate: "",
-    patientId: "", // Initially empty for new patients
-    patientTypeId: 1, // Default to normal type for new patients
-    address: "", // Add the address for new patients
+    patientId: "",
+    patientTypeId: 1,
+    address: "",
   });
 
-  // Fetch all patients and doctors on mount
+  // Load patients and doctors
   useEffect(() => {
     const fetchPatients = async () => {
-      const res = await getAllPatients(); // Fetch patients from the backend
-      if (res.success) {
-        setPatients(res.patients); // Store the fetched patients
-      } else {
-        console.error("Failed to load patients:", res?.error);
-      }
+      const res = await getAllPatients();
+      if (res.success) setPatients(res.patients);
     };
     fetchPatients();
 
-    // Fetch all doctors
     const fetchDoctors = async () => {
       const res = await getDoctors();
-      if (res.success) {
-        setDoctors(res.doctors);
-      } else {
-        console.error("Failed to load doctors:", res?.error);
-      }
+      if (res.success) setDoctors(res.doctors);
     };
     fetchDoctors();
   }, []);
 
-  // Fetch clinics of selected doctor
+  // Load doctor sessions after doctor+clinic is selected
+  const loadDoctorSessions = async (doctorId, clinicId) => {
+    if (!doctorId || !clinicId) return;
+    setLoadingSessions(true);
+
+    const res = await getDoctorSessions(doctorId);
+    if (res?.success) {
+      const filtered = res.sessions.filter(
+        (s) => s.clinicId === Number(clinicId)
+      );
+      setSessions(filtered);
+    } else {
+      setSessions([]);
+    }
+
+    setLoadingSessions(false);
+  };
+
+  // doctor change → load clinics
   const handleDoctorChange = async (e) => {
     const doctorId = e.target.value;
-    setFormData((prev) => ({ ...prev, doctorId }));
+    setFormData((prev) => ({ ...prev, doctorId, clinicId: "", sessionId: "" }));
+    setClinics([]);
+    setSessions([]);
 
     if (doctorId) {
       const res = await getClinicsOfDoctor(doctorId);
-      if (res.success) {
-        setClinics(res.clinics); // Set clinics based on selected doctor
-      } else {
-        console.error("Failed to load clinics:", res?.error);
-      }
-    } else {
-      setClinics([]); // Clear clinics if no doctor is selected
+      if (res.success) setClinics(res.clinics);
+    }
+  };
+
+  // clinic change → load sessions
+  const handleClinicSelect = async (e) => {
+    const clinicId = e.target.value;
+    setFormData((prev) => ({ ...prev, clinicId, sessionId: "" }));
+
+    if (formData.doctorId && clinicId) {
+      await loadDoctorSessions(formData.doctorId, clinicId);
     }
   };
 
@@ -85,27 +109,32 @@ const AddAppointmentModal = ({ isOpen, onClose }) => {
     }));
   };
 
-  const handlePatientTypeChange = (type) => {
-    setPatientType(type); // Switch between New and Returning Patient
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const response = await registerAppointment(formData); // API call to save the appointment
+      const response = await registerAppointment(formData);
       if (response.success) {
         alert("Appointment created successfully!");
-        onClose(); // Close the modal
+        onClose();
       } else {
-        alert("Failed to create appointment.");
+        alert(response.error || "Failed to create appointment.");
       }
     } catch (error) {
       alert("Error occurred while creating appointment.");
     }
 
     setIsLoading(false);
+  };
+
+  const formatTime = (time) => {
+    if (!time) return "";
+    const [h, m] = time.split(":");
+    const hour = parseInt(h);
+    const ampm = hour >= 12 ? "PM" : "AM";
+    const display = hour % 12 || 12;
+    return `${display}:${m} ${ampm}`;
   };
 
   if (!isOpen) return null;
@@ -126,18 +155,18 @@ const AddAppointmentModal = ({ isOpen, onClose }) => {
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {/* Patient Type Selection */}
+          {/* Patient Type */}
           <div>
             <button
               type="button"
-              onClick={() => handlePatientTypeChange("New")}
+              onClick={() => setPatientType("New")}
               className="w-full px-4 py-2 text-white bg-blue-600 rounded-lg"
             >
               New Patient
             </button>
             <button
               type="button"
-              onClick={() => handlePatientTypeChange("Returning")}
+              onClick={() => setPatientType("Returning")}
               className="w-full px-4 py-2 text-blue-600 border border-blue-600 rounded-lg mt-2"
             >
               Returning Patient
@@ -154,39 +183,32 @@ const AddAppointmentModal = ({ isOpen, onClose }) => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
-              {isLoading ? (
-                <p>Loading...</p>
-              ) : (
-                <div>
-                  {patients
-                    .filter(
-                      (patient) =>
-                        patient.fName
-                          .toLowerCase()
-                          .includes(searchTerm.toLowerCase()) ||
-                        patient.contactNumber.includes(searchTerm)
-                    )
-                    .map((patient) => (
-                      <div
-                        key={patient.patientId}
-                        className="flex justify-between items-center p-2 mt-2 border border-gray-300 rounded-lg"
-                      >
-                        <div>{`${patient.fName} ${patient.lName}`}</div>
-                        <button
-                          type="button"
-                          className="px-4 py-2 bg-blue-600 text-white rounded-lg"
-                          onClick={() => handlePatientSelection(patient)}
-                        >
-                          Select
-                        </button>
-                      </div>
-                    ))}
-                </div>
-              )}
+
+              {patients
+                .filter(
+                  (p) =>
+                    p.fName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    p.contactNumber.includes(searchTerm)
+                )
+                .map((patient) => (
+                  <div
+                    key={patient.patientId}
+                    className="flex justify-between items-center p-2 mt-2 border border-gray-300 rounded-lg"
+                  >
+                    <div>{`${patient.fName} ${patient.lName}`}</div>
+                    <button
+                      type="button"
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+                      onClick={() => handlePatientSelection(patient)}
+                    >
+                      Select
+                    </button>
+                  </div>
+                ))}
             </div>
           )}
 
-          {/* New Patient Form */}
+          {/* New Patient Inputs */}
           {patientType === "New" && (
             <>
               <div>
@@ -200,6 +222,7 @@ const AddAppointmentModal = ({ isOpen, onClose }) => {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                 />
               </div>
+
               <div>
                 <label>Middle Name</label>
                 <input
@@ -211,6 +234,7 @@ const AddAppointmentModal = ({ isOpen, onClose }) => {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                 />
               </div>
+
               <div>
                 <label>Last Name</label>
                 <input
@@ -222,6 +246,7 @@ const AddAppointmentModal = ({ isOpen, onClose }) => {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                 />
               </div>
+
               <div>
                 <label>Gender</label>
                 <select
@@ -233,6 +258,7 @@ const AddAppointmentModal = ({ isOpen, onClose }) => {
                   <option value="Female">Female</option>
                 </select>
               </div>
+
               <div>
                 <label>Date of Birth</label>
                 <input
@@ -244,6 +270,7 @@ const AddAppointmentModal = ({ isOpen, onClose }) => {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                 />
               </div>
+
               <div>
                 <label>Contact Number</label>
                 <input
@@ -255,6 +282,7 @@ const AddAppointmentModal = ({ isOpen, onClose }) => {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                 />
               </div>
+
               <div>
                 <label>Email</label>
                 <input
@@ -264,6 +292,7 @@ const AddAppointmentModal = ({ isOpen, onClose }) => {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                 />
               </div>
+
               <div>
                 <label>Address</label>
                 <input
@@ -276,7 +305,7 @@ const AddAppointmentModal = ({ isOpen, onClose }) => {
             </>
           )}
 
-          {/* Doctor Selection */}
+          {/* Doctor */}
           <div>
             <label>Doctor</label>
             <select
@@ -294,12 +323,12 @@ const AddAppointmentModal = ({ isOpen, onClose }) => {
             </select>
           </div>
 
-          {/* Clinic Selection */}
+          {/* Clinic */}
           <div>
             <label>Clinic</label>
             <select
               value={formData.clinicId}
-              onChange={(e) => handleInputChange("clinicId", e.target.value)}
+              onChange={handleClinicSelect}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg"
               required
             >
@@ -312,6 +341,38 @@ const AddAppointmentModal = ({ isOpen, onClose }) => {
             </select>
           </div>
 
+          {/* Doctor Session (NEW) */}
+          {formData.doctorId && formData.clinicId && (
+            <div>
+              <label>Available Session</label>
+              {loadingSessions ? (
+                <p className="text-gray-500">Loading sessions...</p>
+              ) : sessions.length === 0 ? (
+                <p className="text-red-500">
+                  No sessions available for this doctor at this clinic.
+                </p>
+              ) : (
+                <select
+                  value={formData.sessionId}
+                  onChange={(e) =>
+                    handleInputChange("sessionId", e.target.value)
+                  }
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                  required
+                >
+                  <option value="">Select Session</option>
+                  {sessions.map((s) => (
+                    <option key={s.sessionId} value={s.sessionId}>
+                      {s.dayOfWeek} — {formatTime(s.startTime)} to{" "}
+                      {formatTime(s.endTime)}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+          )}
+
+          {/* Appointment Date */}
           <div>
             <label>Appointment Date</label>
             <input
