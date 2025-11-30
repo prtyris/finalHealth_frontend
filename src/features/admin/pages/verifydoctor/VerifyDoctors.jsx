@@ -1,38 +1,26 @@
-// VerifyDoctors.jsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../../components/Header";
 import VerifyDoctorsModal from "./modal/VerifyDoctorsModal";
 import AdminLayout from "../../components/AdminLayout";
+import { getVerificationList } from "../../../../api/adminApi";
 
 export default function VerifyDoctors() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedDoctor, setSelectedDoctor] = useState(null);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [items, setItems] = useState([]);
 
-  const doctors = [
-    {
-      name: "Dr. Michael Cruz",
-      clinic: "Davao Clinic",
-      license: "D-123456678",
-      contact: "+63 962 3764 8726",
-      status: "Pending",
-    },
-    {
-      name: "CityHealth Clinic",
-      clinic: "CityHealth Clinic",
-      license: "C-987654321",
-      contact: "+63 912 3456 789",
-      status: "Pending",
-    },
-  ];
+  // LOAD DOCTORS + CLINICS
+  useEffect(() => {
+    async function load() {
+      const res = await getVerificationList();
+      if (res.success) setItems(res.data);
+    }
+    load();
+  }, []);
 
-  const openModal = (doctor) => {
-    setSelectedDoctor(doctor);
+  const openModal = (item) => {
+    setSelectedItem(item);
     setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setSelectedDoctor(null);
-    setIsModalOpen(false);
   };
 
   return (
@@ -46,21 +34,22 @@ export default function VerifyDoctors() {
           </h2>
 
           <div className="space-y-4">
-            {doctors.map((doctor, index) => (
+            {items.map((item, index) => (
               <div
                 key={index}
                 className="flex flex-col md:flex-row md:justify-between md:items-center border-b pb-4 gap-2"
               >
                 <div
                   className="cursor-pointer hover:text-blue-600"
-                  onClick={() => openModal(doctor)}
+                  onClick={() => openModal(item)}
                 >
-                  {doctor.name} – {doctor.clinic}
+                  {item.type === "doctor" ? `Dr. ${item.name}` : item.name} –{" "}
+                  {item.address}
                 </div>
 
                 <button
                   className="bg-[#2133ff] text-white px-6 py-2 rounded-xl hover:bg-blue-700 cursor-pointer"
-                  onClick={() => openModal(doctor)}
+                  onClick={() => openModal(item)}
                 >
                   Verify
                 </button>
@@ -71,10 +60,10 @@ export default function VerifyDoctors() {
 
         {isModalOpen && (
           <VerifyDoctorsModal
-            doctor={selectedDoctor}
-            onClose={closeModal}
-            onApprove={closeModal}
-            onReject={closeModal}
+            doctor={selectedItem}
+            onClose={() => setIsModalOpen(false)}
+            onApprove={() => setIsModalOpen(false)}
+            onReject={() => setIsModalOpen(false)}
           />
         )}
       </div>

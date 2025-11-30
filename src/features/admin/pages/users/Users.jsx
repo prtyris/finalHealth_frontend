@@ -1,49 +1,48 @@
 // Users.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../../components/Header";
 import DeactivateModal from "./modal/DeactivateModal";
-import NotifyModal from "./modal/NotifyModal";
 import AdminLayout from "../../components/AdminLayout";
+import { getAllAdminUsers, deactivateUser } from "../../../../api/adminApi";
 
-function UserRow({ name, onDeactivateClick, onNotifyClick }) {
+function UserRow({ name, onDeactivateClick }) {
   return (
     <div className="flex justify-between items-center border-b pb-4">
       <div className="text-lg">User: {name}</div>
 
-      <div className="flex gap-4">
-        <button
-          className="bg-[#2133ff] text-white px-4 py-2 rounded-xl cursor-pointer"
-          onClick={() => onDeactivateClick(name)}
-        >
-          Deactivate
-        </button>
-
-        <button
-          className="border border-gray-200 px-4 py-2 rounded-xl cursor-pointer"
-          onClick={() => onNotifyClick(name)}
-        >
-          Notify
-        </button>
-      </div>
+      <button
+        className="bg-[#2133ff] text-white px-4 py-2 rounded-xl cursor-pointer"
+        onClick={() => onDeactivateClick(name)}
+      >
+        Deactivate
+      </button>
     </div>
   );
 }
 
 export default function Users() {
-  const users = [{ name: "John Doe" }, { name: "Jane Smith" }];
-
+  const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [openDeactivate, setOpenDeactivate] = useState(false);
-  const [openNotify, setOpenNotify] = useState(false);
+
+  // Load users from backend
+  useEffect(() => {
+    async function loadUsers() {
+      const res = await getAllAdminUsers();
+      if (res.success) setUsers(res.users);
+    }
+    loadUsers();
+  }, []);
 
   const handleDeactivate = (name) => {
     setSelectedUser(name);
     setOpenDeactivate(true);
   };
 
-  const handleNotify = (name) => {
-    setSelectedUser(name);
-    setOpenNotify(true);
+  const confirmDeactivate = async () => {
+    await deactivateUser(selectedUser);
+    setUsers((prev) => prev.filter((u) => u.name !== selectedUser));
+    setOpenDeactivate(false);
   };
 
   return (
@@ -60,30 +59,16 @@ export default function Users() {
                 key={i}
                 name={u.name}
                 onDeactivateClick={handleDeactivate}
-                onNotifyClick={handleNotify}
               />
             ))}
           </div>
         </div>
 
-        {/* MODALS */}
+        {/* MODAL */}
         <DeactivateModal
           isOpen={openDeactivate}
           onClose={() => setOpenDeactivate(false)}
-          onConfirm={() => {
-            console.log("Deactivated:", selectedUser);
-            setOpenDeactivate(false);
-          }}
-          user={selectedUser}
-        />
-
-        <NotifyModal
-          isOpen={openNotify}
-          onClose={() => setOpenNotify(false)}
-          onSend={(msg) => {
-            console.log("Notification sent to", selectedUser, ":", msg);
-            setOpenNotify(false);
-          }}
+          onConfirm={confirmDeactivate}
           user={selectedUser}
         />
       </div>
