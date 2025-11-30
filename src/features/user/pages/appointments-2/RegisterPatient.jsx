@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { registerPatient } from "../../../../api/patientApi"; // API call for registering patient
+import { registerPatient } from "../../../../api/patientApi";
 import Layout from "../../components/Layout";
 
 const RegisterPatient = () => {
@@ -15,7 +15,7 @@ const RegisterPatient = () => {
     backupContact: "",
     email: "",
     address: "",
-    patientTypeId: 1, // Default to normal
+    patientTypeId: 1, // Default to Normal
   });
 
   const handleInputChange = (field, value) => {
@@ -27,7 +27,7 @@ const RegisterPatient = () => {
     const res = await registerPatient(formData);
     if (res?.success) {
       alert("Patient registered successfully!");
-      navigate("/user/appointments/create"); // Redirect back to appointments page
+      navigate("/user/appointments/create");
     } else {
       alert("Failed to register patient.");
     }
@@ -145,6 +145,25 @@ const RegisterPatient = () => {
               className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               required
             />
+          </div>
+
+          {/* Patient Type Dropdown */}
+          <div className="input-group col-span-2">
+            <label className="font-semibold mb-2">Patient Type</label>
+            <select
+              value={formData.patientTypeId}
+              onChange={(e) =>
+                handleInputChange("patientTypeId", e.target.value)
+              }
+              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              required
+            >
+              <option value="1">Normal</option>
+              <option value="2">Senior Citizen</option>
+              <option value="3">PWD</option>
+              <option value="4">Emergency</option>
+              <option value="5">Follow-up</option>
+            </select>
           </div>
 
           <button

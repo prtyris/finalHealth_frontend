@@ -40,19 +40,19 @@ export const getQueue = async (doctorId, clinicId) => {
   }
 };
 
-export const updateQueueStatus = async (queueEntryId, status) => {
-  try {
-    const res = await fetch(
-      `${API_BASE}/api/queue-routes/${queueEntryId}/status`,
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
-      }
-    );
-    return await res.json();
-  } catch (err) {
-    console.error("❌ updateQueueStatus error:", err.message);
-    return { error: "Network error" };
-  }
-};
+// export const updateQueueStatus = async (queueEntryId, status) => {
+//   try {
+//     const res = await fetch(
+//       `${API_BASE}/api/queue-routes/${queueEntryId}/status`,
+//       {
+//         method: "PUT",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify({ status }),
+//       }
+//     );
+//     return await res.json();
+//   } catch (err) {
+//     console.error("❌ updateQueueStatus error:", err.message);
+//     return { error: "Network error" };
+//   }
+// };

@@ -9,12 +9,15 @@ import RescheduleModal from "./modals/RescheduleModal";
 import MedicalRecordModal from "./modals/MedicalRecordModal";
 import SuccessModal from "./modals/SuccessModal"; // We'll create this new modal
 
+import { updateQueueStatus } from "../../../../api/fastQueue.js";
+
 import { getDoctors, getClinicsOfDoctor } from "../../../../api/doctorApi";
 import {
   getTodayAppointments,
   getAllAppointments,
   completeAppointment as apiCompleteAppointment,
   cancelAppointment,
+  updateAppointmentStatus,
   // confirmAppointment as apiConfirmAppointment, // backend not ready yet
 } from "../../../../api/appointmentApi";
 import { addToQueue, getQueue } from "../../../../api/queueApi";
@@ -244,16 +247,9 @@ const Appointments = () => {
 
     setQueueActionLoading(true);
 
-    // Determine priorityId
-    // Backend priority table:
-    // 1 = Normal
-    // 2 = Senior
-    // 3 = PWD
-    // 4 = Emergency
-    // 5 = Follow-up
+    // Determine priorityId based on the appointment type
     let priorityId = appointment.priorityId;
 
-    // If no priority ID exists (most common case), default to NORMAL (1)
     if (!priorityId) {
       const type = (appointment.appointmentType || "").toLowerCase();
 
@@ -262,18 +258,20 @@ const Appointments = () => {
       else priorityId = 1; // Normal
     }
 
+    // Construct the payload from the appointment
     const payload = {
       patientId: appointment.patientId,
       doctorId: appointment.doctorId,
       clinicId: appointment.clinicId,
-      priorityId,
-      status: "Waiting",
+      priorityId, // priority is dynamically assigned based on appointment type
+      status: "Waiting", // Assuming the default is 'Waiting'
     };
 
+    // Call your add to queue API
     const res = await addToQueue(payload);
 
     if (res?.success) {
-      // Refresh queue immediately
+      // Refresh the queue immediately after adding the appointment
       if (selectedDoctorId && selectedClinicId) {
         await fetchQueue(selectedDoctorId, selectedClinicId);
       }
@@ -302,6 +300,40 @@ const Appointments = () => {
 
       return matchesSearch && matchesStatus;
     });
+  };
+
+  const handleUpdateStatus = async (entry, newStatus) => {
+    // Update the queue entry status first
+    const res = await updateQueueStatus(entry.queueEntryId, newStatus);
+
+    if (res.success) {
+      // Update the queue state to reflect the new status
+      const updatedQueue = queuePriority.map((item) =>
+        item.queueEntryId === entry.queueEntryId
+          ? { ...item, status: newStatus } // Update queue status
+          : item
+      );
+      setQueuePriority(updatedQueue); // Update the state with new queue data
+
+      // If the status is "Completed", also update the corresponding appointment status
+      if (newStatus === "Completed") {
+        const appointment = allAppointments.find(
+          (apt) =>
+            apt.patientId === entry.patientId && apt.status !== "Completed"
+        );
+
+        if (appointment) {
+          // Update the appointment status to 'Completed'
+          await updateAppointmentStatus(appointment.appointmentId, "Completed");
+
+          // Optionally, refresh the appointment list
+          fetchAllAppointments(selectedDoctorId, selectedClinicId); // Re-fetch appointments
+          window.location.reload(); // Refresh the page
+        }
+      }
+    } else {
+      console.error("Failed to update status:", res.error);
+    }
   };
 
   const getStatusBadge = (status) => {
@@ -713,6 +745,9 @@ const Appointments = () => {
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
                         Status
                       </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                        Actions
+                      </th>
                     </tr>
                   </thead>
 
@@ -732,6 +767,27 @@ const Appointments = () => {
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
                           {entry.status}
+                        </td>
+                        <td className="px-4 py-3 text-sm">
+                          <div className="flex flex-wrap gap-2">
+                            {/* Status Update Buttons */}
+                            <button
+                              className="bg-yellow-100 hover:bg-yellow-200 text-yellow-800 px-3 py-1 rounded text-xs"
+                              onClick={() =>
+                                handleUpdateStatus(entry, "In Progress")
+                              }
+                            >
+                              In Progress
+                            </button>
+                            <button
+                              className="bg-green-100 hover:bg-green-200 text-green-800 px-3 py-1 rounded text-xs"
+                              onClick={() =>
+                                handleUpdateStatus(entry, "Completed")
+                              }
+                            >
+                              Complete
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -765,20 +821,23 @@ const Appointments = () => {
               </p>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full min-w-[650px]">
+                <table className="w-full min-w-[600px]">
                   <thead className="bg-gray-50 dark:bg-gray-700">
                     <tr>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
                         Patient
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
-                        Priority
+                        Priority Level
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
                         Arrival Time
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
                         Status
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                        Actions
                       </th>
                     </tr>
                   </thead>
@@ -793,9 +852,7 @@ const Appointments = () => {
                           {entry.patientName || `Patient #${entry.patientId}`}
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                          {entry.priorityLevel ||
-                            entry.priority_level ||
-                            "Priority"}
+                          {entry.priorityLevel || "Priority"}
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
                           {entry.arrivalTime
@@ -804,6 +861,27 @@ const Appointments = () => {
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
                           {entry.status}
+                        </td>
+                        <td className="px-4 py-3 text-sm">
+                          <div className="flex flex-wrap gap-2">
+                            {/* Status Update Buttons */}
+                            <button
+                              className="bg-yellow-100 hover:bg-yellow-200 text-yellow-800 px-3 py-1 rounded text-xs"
+                              onClick={() =>
+                                handleUpdateStatus(entry, "In Progress")
+                              }
+                            >
+                              In Progress
+                            </button>
+                            <button
+                              className="bg-green-100 hover:bg-green-200 text-green-800 px-3 py-1 rounded text-xs"
+                              onClick={() =>
+                                handleUpdateStatus(entry, "Completed")
+                              }
+                            >
+                              Complete
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}

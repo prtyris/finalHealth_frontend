@@ -135,3 +135,34 @@ export const registerAppointment = async (appointmentData) => {
     return { error: "Network error" };
   }
 };
+
+// Update Appointment Status API Call
+// Update Appointment Status to "Completed"
+export const updateAppointmentStatus = async (appointmentId, status) => {
+  try {
+    const token = getAuthToken(); // Get the auth token
+    const res = await fetch(
+      `${API_BASE}/api/appointment-routes/${appointmentId}/status`, // Assuming this is the correct endpoint
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // Add the token here
+        },
+        body: JSON.stringify({ status }),
+      }
+    );
+
+    if (!res.ok) {
+      const errorResponse = await res.json();
+      throw new Error(
+        errorResponse.message || "Failed to update appointment status"
+      );
+    }
+
+    return await res.json(); // Return the successful response
+  } catch (err) {
+    console.error("❌ updateAppointmentStatus error:", err.message);
+    return { error: err.message || "Network error" }; // Return the error message if something goes wrong
+  }
+};
