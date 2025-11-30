@@ -197,9 +197,10 @@ const CreateAppointment = () => {
                 <option value="">
                   {loadingPatients ? "Loading patients..." : "Select Patient"}
                 </option>
+
                 {patients.map((patient) => (
-                  <option key={patient.patientId} value={patient.patientId}>
-                    {patient.fName} {patient.lName}
+                  <option key={patient.patient_id} value={patient.patient_id}>
+                    {patient.f_name} {patient.l_name}
                   </option>
                 ))}
               </select>
