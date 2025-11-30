@@ -7,6 +7,7 @@ import SubscriptionView from "./pages/subscription/SubscriptionView";
 import ProfileView from "./pages/profile/ProfileView";
 import CreateAppointment from "./pages/appointments-2/CreateAppointment";
 import RegisterPatient from "./pages/appointments-2/RegisterPatient";
+import MedicalHistoryPage from "./pages/patients/pages/MedicalHistoryPage";
 
 export default function UserRoutes() {
   return (
@@ -20,6 +21,10 @@ export default function UserRoutes() {
       />
       <Route path="/doctor-schedule" element={<DoctorSchedule />} />
       <Route path="/patients" element={<Patients />} />
+      <Route
+        path="/patients/:patientId/medical-history"
+        element={<MedicalHistoryPage />}
+      />
       <Route path="/subscription" element={<SubscriptionView />} />
       <Route path="/profile" element={<ProfileView />} />
     </Routes>

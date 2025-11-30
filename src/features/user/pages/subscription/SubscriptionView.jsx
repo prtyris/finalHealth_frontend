@@ -31,13 +31,46 @@ const SubscriptionView = () => {
   // -------------------------------------
   useEffect(() => {
     async function loadPlans() {
-      try {
-        const list = await getSubscriptionPlans();
-        setPlans(list);
-      } catch (error) {
-        console.error("Failed loading plans:", error);
-      }
+      // HARDCODED PLANS (same as your Postman output)
+      const hardcodedPlans = [
+        {
+          planId: 1,
+          planName: "Free Trial",
+          planType: "free",
+          price: 0,
+          maxNumberUsers: 1,
+          maxNumberPatient: 10,
+          description: "Free 7-day trial, 1 user, 10 patients",
+          isActive: true,
+          createdAt: "2025-11-28T01:24:03.437Z",
+        },
+        {
+          planId: 2,
+          planName: "Monthly Plan",
+          planType: "monthly",
+          price: 499,
+          maxNumberUsers: 2,
+          maxNumberPatient: 50,
+          description: "Monthly plan, up to 2 users and 50 patients",
+          isActive: true,
+          createdAt: "2025-11-28T01:24:03.437Z",
+        },
+        {
+          planId: 3,
+          planName: "Annual Plan",
+          planType: "yearly",
+          price: 4999,
+          maxNumberUsers: 5,
+          maxNumberPatient: 100,
+          description: "Annual plan, up to 5 users and 100 patients",
+          isActive: true,
+          createdAt: "2025-11-28T01:24:03.437Z",
+        },
+      ];
+
+      setPlans(hardcodedPlans);
     }
+
     loadPlans();
   }, []);
 
