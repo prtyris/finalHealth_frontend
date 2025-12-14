@@ -1,24 +1,50 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { adminLogin } from "../api/adminApi";
+import { loginAdmin } from "../api/adminApi.js";
 
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [msg, setMsg] = useState("");
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    const res = await adminLogin(email, password);
+    setErrors({});
+    setLoading(true);
 
-    if (res?.token) {
-      localStorage.setItem("admin_token", res.token);
-      localStorage.setItem("admin", JSON.stringify(res.admin));
-      navigate("/admin/admin-dashboard");
-    } else {
-      setMsg(res?.error || "Login failed");
+    const res = await loginAdmin(email, password);
+
+    if (!res || res.status === "error") {
+      switch (res?.code) {
+        case "INVALID_CREDENTIALS":
+          setErrors({ form: "Invalid email or password" });
+          break;
+
+        case "ADMIN_INACTIVE":
+          setErrors({ form: "Admin account is inactive" });
+          break;
+
+        case "RATE_LIMITED":
+          setErrors({ form: "Too many attempts. Try again later." });
+          break;
+
+        default:
+          setErrors({ form: res?.message || "Login failed" });
+      }
+
+      setLoading(false);
+      return;
     }
+
+    // SUCCESS
+    localStorage.setItem("admin_token", res.data.token);
+    localStorage.setItem("admin", JSON.stringify(res.data.admin));
+
+    setLoading(false);
+    navigate("/admin/admin-dashboard");
   };
 
   return (
@@ -36,6 +62,13 @@ export default function AdminLogin() {
 
         {/* Login Form */}
         <form onSubmit={handleLogin} className="space-y-4">
+          {/* FORM-LEVEL ERROR */}
+          {errors.form && (
+            <div className="bg-red-100 text-red-700 p-3 rounded text-sm">
+              {errors.form}
+            </div>
+          )}
+
           <input
             type="email"
             value={email}
@@ -54,9 +87,14 @@ export default function AdminLogin() {
             required
           />
 
-          <button className="w-full py-3 bg-blue-700 hover:bg-blue-800 text-white font-semibold rounded-lg transition">
-            Login
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-3 bg-blue-700 hover:bg-blue-800 text-white font-semibold rounded-lg transition disabled:opacity-60"
+          >
+            {loading ? "Logging in..." : "Login"}
           </button>
+
           <p className="text-center text-blue-700 mt-3">
             Don’t have an admin account?{" "}
             <span
@@ -67,8 +105,6 @@ export default function AdminLogin() {
             </span>
           </p>
         </form>
-
-        {msg && <p className="text-center text-sm text-red-600 mt-4">{msg}</p>}
       </div>
     </div>
   );

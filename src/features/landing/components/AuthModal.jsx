@@ -108,19 +108,23 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
     if (mode === "login") {
       const res = await loginUser(formData.email, formData.password);
 
-      if (!res || res.error || res.message === "Invalid credentials") {
-        setErrors({ password: "Invalid email or password" });
+      if (!res.ok) {
+        if (res.code === "INVALID_CREDENTIALS") {
+          setErrors({ password: "Invalid email or password" });
+        } else {
+          setErrors({ form: res.message });
+        }
+
         setLoading(false);
         return;
       }
 
-      localStorage.setItem("user_token", res.token);
-      localStorage.setItem("user", JSON.stringify(res.user));
+      localStorage.setItem("user_token", res.data.token);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
 
       setLoading(false);
       onClose();
       navigate("/user/dashboard");
-      return;
     }
 
     // ---------- REGISTER ----------
@@ -138,8 +142,13 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
 
       const res = await registerUser(payload);
 
-      if (!res?.success) {
-        setErrors({ email: res.error || "Registration failed" });
+      if (!res.ok) {
+        if (res.code === "EMAIL_EXISTS") {
+          setErrors({ email: "Email already exists" });
+        } else {
+          setErrors({ form: res.message });
+        }
+
         setLoading(false);
         return;
       }
@@ -183,6 +192,12 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
         {/* ---------- LOGIN FORM ---------- */}
         {mode === "login" && (
           <form onSubmit={handleSubmit}>
+            {errors.form && (
+              <div className="bg-red-100 text-red-700 p-3 rounded mb-4 text-sm">
+                {errors.form}
+              </div>
+            )}
+
             <div className="space-y-4">
               {/* Email */}
               <div>
@@ -271,6 +286,12 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
         {/* ---------- REGISTER FORM ---------- */}
         {mode === "register" && (
           <form onSubmit={handleSubmit}>
+            {errors.form && (
+              <div className="bg-red-100 text-red-700 p-3 rounded mb-4 text-sm">
+                {errors.form}
+              </div>
+            )}
+
             <div className="space-y-4">
               {/* First / Middle / Last Names */}
               {[
