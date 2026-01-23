@@ -1,75 +1,179 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Layout from "../../components/Layout";
-import { getAllPatients } from "../../../../api/patientApi"; // API call to fetch all patients
-import { Link } from "react-router-dom"; // Import Link for routing
+import { useNavigate } from "react-router-dom";
 
-const Patients = () => {
-  const [patients, setPatients] = useState([]); // Store patients
+import { useMedicalRecords } from "../../context/medical-records/useMedicalRecords";
+import { useClinics } from "../../context/clinics/useClinics";
+import { useDoctors } from "../../context/doctors/useDoctors";
 
-  // Fetch patients when the component is mounted
+export default function Patients() {
+  const navigate = useNavigate();
+
+  const {
+    patients,
+    getPatientOfDoctorInClinic,
+    loading,
+    error,
+    clearPatients,
+  } = useMedicalRecords();
+  const { clinics, getAllClinicsOfDoctor } = useClinics();
+  const { approvedDoctors, getAllApprovedDoctorsOfUser } = useDoctors();
+
+  const [doctorId, setDoctorId] = useState(
+    localStorage.getItem("selectedDoctorIdPatientPage") || ""
+  );
+  const [clinicId, setClinicId] = useState(
+    localStorage.getItem("selectedClinicIdPatientPage") || ""
+  );
+  const [search, setSearch] = useState("");
+
+  /* ---------------- LOAD DOCTORS (ONCE) ---------------- */
+
   useEffect(() => {
-    const fetchPatients = async () => {
-      const res = await getAllPatients();
-      if (res.success) {
-        setPatients(res.patients); // Update state with the fetched patients
-      }
-    };
-    fetchPatients(); // Fetch patients
-  }, []);
+    getAllApprovedDoctorsOfUser();
+  }, []); // SAFE: runs once
+
+  /* ---------------- LOAD CLINICS (WHEN DOCTOR CHANGES) ---------------- */
+
+  useEffect(() => {
+    if (!doctorId) return;
+
+    getAllClinicsOfDoctor(doctorId);
+  }, [doctorId]); // SAFE: primitive dependency only
+
+  /* ---------------- LOAD PATIENTS (WHEN BOTH CHANGE) ---------------- */
+
+  useEffect(() => {
+    if (!doctorId || !clinicId) return;
+
+    getPatientOfDoctorInClinic(doctorId, clinicId);
+  }, [doctorId, clinicId]); // SAFE: primitive dependencies only
+
+  /* ---------------- HANDLERS ---------------- */
+
+  const handleDoctorChange = (id) => {
+    setDoctorId(id);
+    setClinicId("");
+
+    clearPatients(); // 🔥 REQUIRED
+
+    if (id) {
+      localStorage.setItem("selectedDoctorIdPatientPage", id);
+    } else {
+      localStorage.removeItem("selectedDoctorIdPatientPage");
+    }
+
+    localStorage.removeItem("selectedClinicIdPatientPage");
+  };
+
+  const handleClinicChange = (id) => {
+    setClinicId(id);
+
+    if (!id) {
+      clearPatients(); // 🔥 REQUIRED
+      localStorage.removeItem("selectedClinicIdPatientPage");
+    } else {
+      localStorage.setItem("selectedClinicIdPatientPage", id);
+    }
+  };
+
+  /* ---------------- SEARCH ---------------- */
+
+  const filteredPatients = useMemo(() => {
+    if (!search) return patients;
+
+    const keyword = search.toLowerCase();
+    return patients.filter((p) => p.full_name.toLowerCase().includes(keyword));
+  }, [patients, search]);
+
+  /* ---------------- UI ---------------- */
 
   return (
     <Layout>
-      <div className="min-h-screen p-4 md:p-6 bg-gray-50">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">
-          Patient Records
-        </h2>
+      <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
+        <h2 className="text-xl font-semibold">Patient Records</h2>
 
-        {/* Patient records table */}
-        <div className="overflow-x-auto bg-white shadow-sm rounded-lg">
-          <table className="w-full min-w-[600px]">
-            <thead className="bg-gray-50">
+        {/* Filters */}
+        <div className="flex gap-4 flex-wrap">
+          <select
+            className="border px-3 py-2 rounded"
+            value={doctorId}
+            onChange={(e) => handleDoctorChange(e.target.value)}
+          >
+            <option value="">Select Doctor</option>
+            {approvedDoctors.map((d) => (
+              <option key={d.doctor_id} value={d.doctor_id}>
+                Dr. {d.f_name} {d.l_name}
+              </option>
+            ))}
+          </select>
+
+          <select
+            className="border px-3 py-2 rounded"
+            value={clinicId}
+            disabled={!doctorId}
+            onChange={(e) => handleClinicChange(e.target.value)}
+          >
+            <option value="">Select Clinic</option>
+            {clinics.map((c) => (
+              <option key={c.clinic_id} value={c.clinic_id}>
+                {c.clinic_name}
+              </option>
+            ))}
+          </select>
+
+          <input
+            type="text"
+            placeholder="Search patient name..."
+            className="border px-3 py-2 rounded"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+
+        {/* Table */}
+        <div className="bg-white rounded shadow overflow-hidden">
+          <table className="w-full">
+            <thead className="bg-blue-600 text-white">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Patient
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Gender
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Age
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Actions
-                </th>
+                <th className="p-3 text-left">Patient</th>
+                <th className="p-3 text-left">Gender</th>
+                <th className="p-3 text-left">Age</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
-              {patients.map((patient) => (
-                <tr key={patient.patient_id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 text-sm">{`${patient.f_name} ${patient.l_name}`}</td>
-                  <td className="px-4 py-3 text-sm">{patient.gender}</td>
-                  <td className="px-4 py-3 text-sm">
-                    {new Date().getFullYear() -
-                      new Date(patient.date_of_birth).getFullYear()}
-                    {console.log(patient)}
-                  </td>
-                  <td className="px-4 py-3 text-sm">
-                    <Link
-                      to={`/user/patients/${patient.patient_id}/medical-history`}
-                    >
-                      <button className="bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-1 rounded text-xs">
-                        View Patient
-                      </button>
-                    </Link>
+
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan="3" className="p-4 text-center">
+                    Loading...
                   </td>
                 </tr>
-              ))}
+              ) : filteredPatients.length === 0 ? (
+                <tr>
+                  <td colSpan="3" className="p-4 text-center text-gray-500">
+                    No patients found
+                  </td>
+                </tr>
+              ) : (
+                filteredPatients.map((p) => (
+                  <tr
+                    key={p.patient_id}
+                    className="hover:bg-gray-100 cursor-pointer"
+                    onClick={() => navigate(`/user/patients/${p.patient_id}`)}
+                  >
+                    <td className="p-3 font-medium">{p.full_name}</td>
+                    <td className="p-3">{p.gender}</td>
+                    <td className="p-3">{p.age}</td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
+
+        {error && <p className="text-sm text-red-600">Error: {error}</p>}
       </div>
     </Layout>
   );
-};
-
-export default Patients;
+}

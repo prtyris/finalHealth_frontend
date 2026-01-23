@@ -1,0 +1,183 @@
+import { useState } from "react";
+import { MedicalRecordsContext } from "./MedicalRecordsContext.jsx";
+import {
+  getPatientOfDoctorInClinicApi,
+  getPatientInfoApi,
+  getPatientMedRecordApi,
+  getMedicalRecordsFullDetailsAPi,
+  createMedicalRecordApi,
+  uploadMedicalRecordDocumentApi,
+} from "../../api/medicalRecordsApi.js";
+
+export const MedicalRecordsProvider = ({ children }) => {
+  const [patients, setPatients] = useState([]);
+  const [patientMedRecords, setPatientMedRecords] = useState([]);
+  const [patientsInfo, setPatientsInfo] = useState([]);
+  const [medicalRecordsFullDetails, setMedicalRecordsFullDetails] = useState({
+    medicalRecord: null,
+    vitalSigns: [],
+    prescriptions: [],
+    labResults: [],
+    referrals: [],
+    followups: [],
+    certificates: [],
+    documents: [], // 🔥 REQUIRED
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [loadingPatientInfo, setLoadingPatientInfo] = useState(false);
+  const [loadingPatientMedRecord, setLoadingPatientMedRecord] = useState(false);
+  const [lodingMedicalRecordsFullDetails, setLoadingMedicalRecordsFullDetails] =
+    useState(false);
+  const [error, setError] = useState(null);
+
+  const getPatientOfDoctorInClinic = async (doctorId, clinicId) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await getPatientOfDoctorInClinicApi(doctorId, clinicId);
+
+      if (!res.ok) {
+        setError(res.message);
+        setLoading(false);
+        return;
+      }
+
+      setPatients(res.data.patients || []);
+    } catch (err) {
+      setError("Something went wrong");
+      setPatients([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getPatientInfo = async (patientId) => {
+    setLoadingPatientInfo(true);
+    setError(null);
+
+    try {
+      const res = await getPatientInfoApi(patientId);
+
+      if (!res.ok) {
+        setError(res.message);
+        setLoading(false);
+        return;
+      }
+
+      setPatientsInfo(res.data.patientInfo || []);
+    } catch (err) {
+      setError("Something went wrong");
+      setPatientsInfo([]);
+    } finally {
+      setLoadingPatientInfo(false);
+    }
+  };
+
+  const getPatientMedRecord = async (patientId) => {
+    setLoadingPatientMedRecord(true);
+    setError(null);
+
+    try {
+      const res = await getPatientMedRecordApi(patientId);
+
+      if (!res.ok) {
+        setError(res.message);
+        return;
+      }
+
+      // ✅ STORE THE WHOLE AGGREGATE
+      setPatientMedRecords(res.data.patientMedRec);
+    } catch (err) {
+      setError("Something went wrong");
+      setPatientMedRecords(null);
+    } finally {
+      setLoadingPatientMedRecord(false);
+    }
+  };
+
+  const getMedicalRecordsFullDetails = async (recordId) => {
+    setLoadingMedicalRecordsFullDetails(true);
+    setError(null);
+
+    try {
+      const res = await getMedicalRecordsFullDetailsAPi(recordId);
+
+      if (!res.ok) {
+        setError(res.message);
+        return;
+      }
+
+      // THIS IS THE OBJECT
+      setMedicalRecordsFullDetails(res.data.patientMedRecDetail);
+    } catch (err) {
+      setError("Something went wrong");
+      setMedicalRecordsFullDetails(null);
+    } finally {
+      setLoadingMedicalRecordsFullDetails(false);
+    }
+  };
+
+  const createMedicalRecord = async (patientId, medicalRecordData) => {
+    setError(null);
+
+    try {
+      const res = await createMedicalRecordApi(patientId, medicalRecordData);
+
+      if (!res.ok) {
+        setError(res.message);
+        return null;
+      }
+      console.log(res.data.record.recordId);
+      // ✅ RETURN RESPONSE
+      return res.data.record;
+    } catch (err) {
+      setError("Something went wrong");
+      return null;
+    }
+  };
+  const uploadMedicalRecordDocument = async (recordId, file) => {
+    setError(null);
+
+    try {
+      const res = await uploadMedicalRecordDocumentApi(recordId, file);
+
+      if (!res.ok) {
+        setError(res.message);
+        return null;
+      }
+
+      return res;
+    } catch (err) {
+      setError("Something went wrong");
+      return null;
+    }
+  };
+
+  const clearPatients = () => {
+    setPatients([]);
+  };
+
+  return (
+    <MedicalRecordsContext.Provider
+      value={{
+        getPatientOfDoctorInClinic,
+        getPatientInfo,
+        clearPatients,
+        getPatientMedRecord,
+        getMedicalRecordsFullDetails,
+        createMedicalRecord,
+        uploadMedicalRecordDocument,
+        loading,
+        error,
+        patients,
+        patientsInfo,
+        patientMedRecords,
+        medicalRecordsFullDetails,
+      }}
+    >
+      {children}
+    </MedicalRecordsContext.Provider>
+  );
+};

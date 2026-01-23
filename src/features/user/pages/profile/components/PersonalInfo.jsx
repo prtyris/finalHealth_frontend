@@ -1,64 +1,53 @@
 import React, { useEffect, useState } from "react";
-import { getPersonalInfo, updateProfile } from "../../../../../api/profileApi";
-
+import { useUser } from "../../../context/users/useUser";
+import { updateProfile } from "../../../../../api/profileApi";
 import AlertModal from "../../../../../components/AlertModal";
 
 const PersonalInfo = () => {
-  const [profileData, setProfileData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const { userInfo, loading, error, getPersonalInfo } = useUser();
 
+  const [profileData, setProfileData] = useState(null);
+  const [saving, setSaving] = useState(false);
   const [alert, setAlert] = useState({
     show: false,
     type: "",
     message: "",
   });
 
-  const user = JSON.parse(localStorage.getItem("user")); // userId from login
-
+  // Load from provider
   useEffect(() => {
-    async function loadData() {
-      const response = await getPersonalInfo(user.userId);
-      console.log(response);
-
-      const fullName =
-        `${response.userInfo.profile.fName} ${response.userInfo.profile.mName} ${response.userInfo.profile.lName}`.replace(
-          /\s+/g,
-          " "
-        );
-
-      const userInformations = {
-        email: response.userInfo.user.email,
-        profileImage: response.userInfo.profile.profileImgPath,
-        fullName: fullName.trim(),
-      };
-
-      // MUST stringify before saving
-      localStorage.setItem(
-        "userInformations",
-        JSON.stringify(userInformations)
-      );
-
-      if (response.success) {
-        const u = response.userInfo.user;
-        const p = response.userInfo.profile;
-
-        setProfileData({
-          firstName: p.fName,
-          middleName: p.mName,
-          lastName: p.lName,
-          email: u.email,
-          contactNumber: p.contactNum,
-          dateOfBirth: p.birthDate?.substring(0, 10),
-          address: p.address,
-        });
-      }
-
-      setLoading(false);
-    }
-
-    loadData();
+    getPersonalInfo();
   }, []);
+
+  // Map provider data → local form state
+  useEffect(() => {
+    if (!userInfo) return;
+
+    const { user, profile } = userInfo;
+
+    const fullName = `${profile.fName} ${profile.mName} ${profile.lName}`
+      .replace(/\s+/g, " ")
+      .trim();
+
+    localStorage.setItem(
+      "userInformations",
+      JSON.stringify({
+        email: user.email,
+        profileImage: profile.profileImgPath,
+        fullName,
+      }),
+    );
+
+    setProfileData({
+      firstName: profile.fName,
+      middleName: profile.mName,
+      lastName: profile.lName,
+      email: user.email,
+      contactNumber: profile.contactNum,
+      dateOfBirth: profile.birthDate?.substring(0, 10),
+      address: profile.address,
+    });
+  }, [userInfo]);
 
   const handleInputChange = (field, value) => {
     setProfileData((prev) => ({
@@ -68,6 +57,8 @@ const PersonalInfo = () => {
   };
 
   const handleSaveChanges = async () => {
+    if (!userInfo) return;
+
     setSaving(true);
 
     const payload = {
@@ -79,23 +70,17 @@ const PersonalInfo = () => {
       address: profileData.address,
     };
 
-    const result = await updateProfile(user.userId, payload);
+    const result = await updateProfile(userInfo.user.userId, payload);
 
     setSaving(false);
 
-    if (result.success) {
-      setAlert({
-        show: true,
-        type: "success",
-        message: "Profile updated successfully!",
-      });
-    } else {
-      setAlert({
-        show: true,
-        type: "error",
-        message: "Failed to update profile.",
-      });
-    }
+    setAlert({
+      show: true,
+      type: result.success ? "success" : "error",
+      message: result.success
+        ? "Profile updated successfully!"
+        : "Failed to update profile.",
+    });
   };
 
   if (loading || !profileData) {
@@ -104,6 +89,10 @@ const PersonalInfo = () => {
         Loading profile...
       </p>
     );
+  }
+
+  if (error) {
+    return <p className="text-red-500 text-center">{error}</p>;
   }
 
   return (
@@ -115,127 +104,97 @@ const PersonalInfo = () => {
           onClose={() => setAlert({ show: false, type: "", message: "" })}
         />
       )}
-      {/* FIRST — NAME FIELDS */}
+
+      {/* NAME FIELDS */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* First Name */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            First Name
-          </label>
-          <input
-            type="text"
-            value={profileData.firstName}
-            onChange={(e) => handleInputChange("firstName", e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-            focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-          />
-        </div>
-
-        {/* Middle Name */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Middle Name
-          </label>
-          <input
-            type="text"
-            value={profileData.middleName}
-            onChange={(e) => handleInputChange("middleName", e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-            focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-          />
-        </div>
-
-        {/* Last Name */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Last Name
-          </label>
-          <input
-            type="text"
-            value={profileData.lastName}
-            onChange={(e) => handleInputChange("lastName", e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-            focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-          />
-        </div>
+        <Field
+          label="First Name"
+          value={profileData.firstName}
+          onChange={(v) => handleInputChange("firstName", v)}
+        />
+        <Field
+          label="Middle Name"
+          value={profileData.middleName}
+          onChange={(v) => handleInputChange("middleName", v)}
+        />
+        <Field
+          label="Last Name"
+          value={profileData.lastName}
+          onChange={(v) => handleInputChange("lastName", v)}
+        />
       </div>
 
       {/* EMAIL + CONTACT */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Email */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Email
-          </label>
+          <label className="block text-sm font-medium mb-2">Email</label>
           <input
             type="email"
             disabled
             value={profileData.email}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 
-            rounded-lg bg-gray-50 dark:bg-gray-600 dark:text-gray-300 cursor-not-allowed"
+            className="w-full px-3 py-2 border rounded-lg bg-gray-100 cursor-not-allowed"
           />
         </div>
 
-        {/* Contact Number */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Contact Number
-          </label>
-          <input
-            type="tel"
-            value={profileData.contactNumber}
-            onChange={(e) => handleInputChange("contactNumber", e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 
-            rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-          />
-        </div>
-      </div>
-
-      {/* DATE OF BIRTH */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Date of Birth
-          </label>
-          <input
-            type="date"
-            value={profileData.dateOfBirth}
-            onChange={(e) => handleInputChange("dateOfBirth", e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 
-            rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-          />
-        </div>
-      </div>
-
-      {/* ADDRESS */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Address
-        </label>
-        <input
-          type="text"
-          value={profileData.address}
-          onChange={(e) => handleInputChange("address", e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-          focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+        <Field
+          label="Contact Number"
+          value={profileData.contactNumber}
+          onChange={(v) => handleInputChange("contactNumber", v)}
+          type="tel"
         />
       </div>
 
-      {/* SAVE BUTTON */}
-      <div className="">
-        <div className="flex w-6/12 items-end">
-          <button
-            disabled={saving}
-            onClick={handleSaveChanges}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 
-            rounded-lg transition-colors font-medium"
-          >
-            {saving ? "Saving..." : "Save Changes"}
-          </button>
-        </div>
+      {/* DATE OF BIRTH */}
+      <Field
+        label="Date of Birth"
+        type="date"
+        value={profileData.dateOfBirth}
+        onChange={(v) => handleInputChange("dateOfBirth", v)}
+      />
+
+      {/* ADDRESS */}
+      <Field
+        label="Address"
+        value={profileData.address}
+        onChange={(v) => handleInputChange("address", v)}
+      />
+
+      {/* SAVE */}
+      <div className="w-6/12">
+        <button
+          disabled={saving}
+          onClick={handleSaveChanges}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg"
+        >
+          {saving ? "Saving..." : "Save Changes"}
+        </button>
       </div>
     </div>
   );
 };
 
 export default PersonalInfo;
+
+/* ---------- SMALL COMPONENT ---------- */
+function Field({ label, value, onChange, type = "text" }) {
+  return (
+    <div>
+      <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+        {label}
+      </label>
+      <input
+        type={type}
+        value={value || ""}
+        onChange={(e) => onChange(e.target.value)}
+        className="
+          w-full px-3 py-2 rounded-lg border
+          border-gray-300 dark:border-gray-600
+          bg-white dark:bg-gray-700
+          text-gray-900 dark:text-white
+          focus:ring-2 focus:ring-blue-500
+          focus:outline-none
+        "
+      />
+    </div>
+  );
+}

@@ -11,3 +11,5 @@ export const registerUser = (payload) =>
     method: "POST",
     body: JSON.stringify(payload),
   });
+
+export const getPersonalInfoApi = () => apiRequest(`/api/users/personal-info`);

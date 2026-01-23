@@ -1,18 +1,33 @@
 const API_BASE = import.meta.env.VITE_API_BASE;
 
+const getAuthToken = () => localStorage.getItem("user_token");
+
 export async function apiRequest(url, options = {}) {
   try {
+    const token = getAuthToken();
+
+    const isFormData = options.body instanceof FormData;
+
     const res = await fetch(`${API_BASE}${url}`, {
+      ...options,
       headers: {
-        "Content-Type": "application/json",
+        ...(isFormData ? {} : { "Content-Type": "application/json" }),
+        ...(token && { Authorization: `Bearer ${token}` }),
         ...options.headers,
       },
-      ...options,
     });
+
+    if (res.status === 401 || res.status === 403) {
+      localStorage.removeItem("user_token");
+      localStorage.removeItem("admin_token");
+      localStorage.removeItem("user");
+      localStorage.removeItem("admin");
+      window.location.href = "/";
+      return;
+    }
 
     const body = await res.json();
 
-    // HTTP-level error (4xx / 5xx)
     if (!res.ok) {
       return {
         ok: false,
@@ -23,13 +38,12 @@ export async function apiRequest(url, options = {}) {
       };
     }
 
-    // Application-level success
     return {
       ok: true,
-      data: body.data,
-      message: body.message,
+      data: body.data ?? body,
+      message: body.message || null,
     };
-  } catch (err) {
+  } catch {
     return {
       ok: false,
       status: 0,

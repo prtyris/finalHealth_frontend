@@ -62,7 +62,7 @@ export default function Sidebar({ isOpen, setIsOpen, isMobile = false }) {
     {
       name: "Doctor Schedule",
       icon: <ClockIcon className="h-5" />,
-      link: "/user/doctor-schedule",
+      link: "/user/doctor-clinic-management",
     },
     {
       name: "Subscription",
@@ -133,7 +133,13 @@ export default function Sidebar({ isOpen, setIsOpen, isMobile = false }) {
             onClick={() => {
               localStorage.removeItem("user_token");
               localStorage.removeItem("user");
-              localStorage.removeItem("userInformations");
+
+              localStorage.removeItem("selectedDoctorId");
+              localStorage.removeItem("selectedClinicId");
+
+              localStorage.removeItem("selectedDoctorIdPatientPage");
+              localStorage.removeItem("selectedClinicIdPatientPage");
+
               window.location.href = "/";
             }}
           >

@@ -1,411 +1,268 @@
-import React, { useState, useEffect } from "react";
-import { registerAppointment } from "../../../../../api/appointmentApi.js";
-import { getAllPatients } from "../../../../../api/patientApi.js";
-import {
-  getDoctors,
-  getClinicsOfDoctor,
-} from "../../../../../api/doctorApi.js";
-import { getDoctorSessions } from "../../../../../api/doctorSessionApi.js";
+import { useState, useEffect } from "react";
+import RegisterPatientModal from "./RegisterPatientModal";
 
-const AddAppointmentModal = ({ isOpen, onClose }) => {
-  const [patientType, setPatientType] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [patients, setPatients] = useState([]);
-  const [doctors, setDoctors] = useState([]);
-  const [clinics, setClinics] = useState([]);
+import { usePatients } from "../../../context/patients/usePatients";
+import { useDoctorSessions } from "../../../context/doctor-sessions/useDoctorSessions";
+import { useAppointments } from "../../../context/appointments/useAppointments";
 
-  // NEW: sessions
-  const [sessions, setSessions] = useState([]);
-  const [loadingSessions, setLoadingSessions] = useState(false);
+export default function AddAppointmentModal({
+  isOpen,
+  onClose,
+  doctor,
+  clinic,
+}) {
+  const { patients, loading, error, getPatientOfDoctorInClinic } =
+    usePatients();
 
-  const [formData, setFormData] = useState({
-    firstName: "",
-    middleName: "",
-    lastName: "",
-    gender: "Male",
-    dateOfBirth: "",
-    contactNumber: "",
-    email: "",
-    clinicId: "",
-    doctorId: "",
-    sessionId: "", // NEW: add sessionId
-    appointmentDate: "",
-    patientId: "",
-    patientTypeId: 1,
-    address: "",
-  });
+  const {
+    doctorSessions,
+    loading: scheduleLoading,
+    error: scheduleError,
+    getDoctorScheduleInClinic,
+  } = useDoctorSessions();
 
-  // Load patients and doctors
+  const {
+    createAppointment,
+    loading: appointmentLoading,
+    error: appointmentError,
+  } = useAppointments();
+
+  // ✅ hooks ALWAYS at top
+  const [selectedSession, setSelectedSession] = useState(null);
+  const [appointmentType, setAppointmentType] = useState("Consultation");
+  const [selectedPatientId, setSelectedPatientId] = useState(null);
+  const [showRegisterPatient, setShowRegisterPatient] = useState(false);
+
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(null);
+
   useEffect(() => {
-    const fetchPatients = async () => {
-      const res = await getAllPatients();
-      if (res.success) setPatients(res.patients);
+    if (!isOpen) return;
+    if (!doctor?.doctor_id || !clinic?.clinic_id) return;
+
+    const loadPatients = async () => {
+      await getPatientOfDoctorInClinic(doctor.doctor_id, clinic.clinic_id);
     };
-    fetchPatients();
 
-    const fetchDoctors = async () => {
-      const res = await getDoctors();
-      if (res.success) setDoctors(res.doctors);
+    loadPatients();
+  }, [isOpen, doctor?.doctor_id, clinic?.clinic_id]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    if (!doctor?.doctor_id || !clinic?.clinic_id) return;
+
+    const loadSchedules = async () => {
+      await getDoctorScheduleInClinic(doctor.doctor_id, clinic.clinic_id);
     };
-    fetchDoctors();
-  }, []);
 
-  // Load doctor sessions after doctor+clinic is selected
-  const loadDoctorSessions = async (doctorId, clinicId) => {
-    if (!doctorId || !clinicId) return;
-    setLoadingSessions(true);
+    loadSchedules();
+  }, [isOpen, doctor?.doctor_id, clinic?.clinic_id]);
 
-    const res = await getDoctorSessions(doctorId);
-    if (res?.success) {
-      const filtered = res.sessions.filter(
-        (s) => s.clinicId === Number(clinicId)
-      );
-      setSessions(filtered);
-    } else {
-      setSessions([]);
+  const getDateBorderClass = (dateStr) => {
+    const day = new Date(dateStr).getDate();
+
+    const colors = [
+      "border-l-blue-400",
+      "border-l-green-400",
+      "border-l-purple-400",
+      "border-l-yellow-400",
+      "border-l-pink-400",
+      "border-l-indigo-400",
+    ];
+
+    return colors[day % colors.length];
+  };
+
+  const handleSaveAppointment = async () => {
+    if (!selectedPatientId || !selectedSession) {
+      console.warn("Missing patient or session");
+      return;
     }
 
-    setLoadingSessions(false);
-  };
+    setSaving(true);
+    setSaveError(null);
 
-  // doctor change → load clinics
-  const handleDoctorChange = async (e) => {
-    const doctorId = e.target.value;
-    setFormData((prev) => ({ ...prev, doctorId, clinicId: "", sessionId: "" }));
-    setClinics([]);
-    setSessions([]);
+    const selectedPatient = patients.find(
+      (p) => p.patient_id === selectedPatientId
+    );
 
-    if (doctorId) {
-      const res = await getClinicsOfDoctor(doctorId);
-      if (res.success) setClinics(res.clinics);
-    }
-  };
+    const localDate = new Date(selectedSession.session_date);
+    const appointmentDate = localDate.toLocaleDateString("en-CA"); // YYYY-MM-DD
 
-  // clinic change → load sessions
-  const handleClinicSelect = async (e) => {
-    const clinicId = e.target.value;
-    setFormData((prev) => ({ ...prev, clinicId, sessionId: "" }));
+    const payload = {
+      patientId: selectedPatientId,
+      doctorId: doctor.doctor_id,
+      clinicId: clinic.clinic_id,
+      appointmentDate,
+      appointmentType,
+      priorityId: selectedPatient?.priority_id ?? null,
+    };
 
-    if (formData.doctorId && clinicId) {
-      await loadDoctorSessions(formData.doctorId, clinicId);
-    }
-  };
-
-  const handleInputChange = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handlePatientSelection = (patient) => {
-    setFormData((prev) => ({
-      ...prev,
-      patientId: patient.patientId,
-      firstName: patient.fName,
-      middleName: patient.mName,
-      lastName: patient.lName,
-      contactNumber: patient.contactNumber,
-      email: patient.email,
-      patientTypeId: patient.patientTypeId,
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      const response = await registerAppointment(formData);
-      if (response.success) {
-        alert("Appointment created successfully!");
-        onClose();
-      } else {
-        alert(response.error || "Failed to create appointment.");
-      }
-    } catch (error) {
-      alert("Error occurred while creating appointment.");
-    }
-
-    setIsLoading(false);
-  };
-
-  const formatTime = (time) => {
-    if (!time) return "";
-    const [h, m] = time.split(":");
-    const hour = parseInt(h);
-    const ampm = hour >= 12 ? "PM" : "AM";
-    const display = hour % 12 || 12;
-    return `${display}:${m} ${ampm}`;
+    console.table(payload); // keep for verification
+    await createAppointment(payload);
+    setSaving(false);
+    onClose(); // close modal on success
   };
 
   if (!isOpen) return null;
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Network Error...</div>;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl shadow-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <div className="flex justify-between items-center p-6 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">
-            Add Appointment
-          </h3>
-          <button
-            className="text-gray-500 hover:text-gray-700 text-2xl"
-            onClick={onClose}
-          >
-            ×
-          </button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-auto">
+      <RegisterPatientModal
+        isOpen={showRegisterPatient}
+        onClose={() => setShowRegisterPatient(false)}
+      />
+
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+
+      {/* Modal */}
+      <div className="relative bg-white w-full max-w-lg mx-4 rounded-xl shadow-lg p-6">
+        <h2 className="text-xl font-semibold text-blue-700 mb-4">
+          Create Appointment
+        </h2>
+
+        {/* Doctor & Clinic */}
+        <div className="mb-4 text-sm">
+          <p>
+            <span className="font-medium">Doctor:</span> {doctor.f_name}
+          </p>
+          <p>
+            <span className="font-medium">Clinic:</span> {clinic.clinic_name}
+          </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {/* Patient Type */}
-          <div>
-            <button
-              type="button"
-              onClick={() => setPatientType("New")}
-              className="w-full px-4 py-2 text-white bg-blue-600 rounded-lg"
-            >
-              New Patient
-            </button>
-            <button
-              type="button"
-              onClick={() => setPatientType("Returning")}
-              className="w-full px-4 py-2 text-blue-600 border border-blue-600 rounded-lg mt-2"
-            >
-              Returning Patient
-            </button>
-          </div>
+        {/* Patient Selection */}
+        <div className="mb-4">
+          <label className="block font-medium mb-2">
+            Select Existing Patient
+          </label>
 
-          {/* Returning Patient Search */}
-          {patientType === "Returning" && (
-            <div>
-              <input
-                type="text"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                placeholder="Search by name or contact"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-
-              {patients
-                .filter(
-                  (p) =>
-                    p.fName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    p.contactNumber.includes(searchTerm)
-                )
-                .map((patient) => (
-                  <div
-                    key={patient.patientId}
-                    className="flex justify-between items-center p-2 mt-2 border border-gray-300 rounded-lg"
-                  >
-                    <div>{`${patient.fName} ${patient.lName}`}</div>
-                    <button
-                      type="button"
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg"
-                      onClick={() => handlePatientSelection(patient)}
-                    >
-                      Select
-                    </button>
-                  </div>
-                ))}
-            </div>
-          )}
-
-          {/* New Patient Inputs */}
-          {patientType === "New" && (
-            <>
-              <div>
-                <label>First Name</label>
-                <input
-                  type="text"
-                  value={formData.firstName}
-                  onChange={(e) =>
-                    handleInputChange("firstName", e.target.value)
-                  }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                />
-              </div>
-
-              <div>
-                <label>Middle Name</label>
-                <input
-                  type="text"
-                  value={formData.middleName}
-                  onChange={(e) =>
-                    handleInputChange("middleName", e.target.value)
-                  }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                />
-              </div>
-
-              <div>
-                <label>Last Name</label>
-                <input
-                  type="text"
-                  value={formData.lastName}
-                  onChange={(e) =>
-                    handleInputChange("lastName", e.target.value)
-                  }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                />
-              </div>
-
-              <div>
-                <label>Gender</label>
-                <select
-                  value={formData.gender}
-                  onChange={(e) => handleInputChange("gender", e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                >
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                </select>
-              </div>
-
-              <div>
-                <label>Date of Birth</label>
-                <input
-                  type="date"
-                  value={formData.dateOfBirth}
-                  onChange={(e) =>
-                    handleInputChange("dateOfBirth", e.target.value)
-                  }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                />
-              </div>
-
-              <div>
-                <label>Contact Number</label>
-                <input
-                  type="text"
-                  value={formData.contactNumber}
-                  onChange={(e) =>
-                    handleInputChange("contactNumber", e.target.value)
-                  }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                />
-              </div>
-
-              <div>
-                <label>Email</label>
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange("email", e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                />
-              </div>
-
-              <div>
-                <label>Address</label>
-                <input
-                  type="text"
-                  value={formData.address}
-                  onChange={(e) => handleInputChange("address", e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                />
-              </div>
-            </>
-          )}
-
-          {/* Doctor */}
-          <div>
-            <label>Doctor</label>
+          {patients.length === 0 ? (
+            <p className="text-sm text-gray-500">
+              No previous patients for this doctor and clinic.
+            </p>
+          ) : (
             <select
-              value={formData.doctorId}
-              onChange={handleDoctorChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-              required
+              className="w-full border rounded-lg px-3 py-2"
+              value={selectedPatientId || ""}
+              onChange={(e) => setSelectedPatientId(Number(e.target.value))}
             >
-              <option value="">Select Doctor</option>
-              {doctors.map((doctor) => (
-                <option key={doctor.doctorId} value={doctor.doctorId}>
-                  {doctor.fName} {doctor.lName}
+              <option value="">Select patient</option>
+
+              {patients.map((p) => (
+                <option key={p.patient_id} value={p.patient_id}>
+                  {p.full_name} — Last visit: {p.last_visit} -{" "}
+                  {p.priority_level}
                 </option>
               ))}
             </select>
-          </div>
+          )}
+        </div>
 
-          {/* Clinic */}
-          <div>
-            <label>Clinic</label>
-            <select
-              value={formData.clinicId}
-              onChange={handleClinicSelect}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-              required
-            >
-              <option value="">Select Clinic</option>
-              {clinics.map((clinic) => (
-                <option key={clinic.clinic_id} value={clinic.clinic_id}>
-                  {clinic.clinic_name}
-                </option>
-              ))}
-            </select>
-          </div>
+        {/* Schedule */}
+        <div className="mb-4">
+          <p className="font-medium mb-2">Select Schedule</p>
 
-          {/* Doctor Session (NEW) */}
-          {formData.doctorId && formData.clinicId && (
-            <div>
-              <label>Available Session</label>
-              {loadingSessions ? (
-                <p className="text-gray-500">Loading sessions...</p>
-              ) : sessions.length === 0 ? (
-                <p className="text-red-500">
-                  No sessions available for this doctor at this clinic.
-                </p>
-              ) : (
-                <select
-                  value={formData.sessionId}
-                  onChange={(e) =>
-                    handleInputChange("sessionId", e.target.value)
-                  }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                  required
-                >
-                  <option value="">Select Session</option>
-                  {sessions.map((s) => (
-                    <option key={s.sessionId} value={s.sessionId}>
-                      {s.dayOfWeek} — {formatTime(s.startTime)} to{" "}
-                      {formatTime(s.endTime)}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </div>
+          {scheduleLoading && (
+            <p className="text-sm text-gray-500">Loading schedules...</p>
           )}
 
-          {/* Appointment Date */}
-          <div>
-            <label>Appointment Date</label>
-            <input
-              type="date"
-              value={formData.appointmentDate}
-              onChange={(e) =>
-                handleInputChange("appointmentDate", e.target.value)
-              }
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-              required
-            />
-          </div>
+          {scheduleError && (
+            <p className="text-sm text-red-500">{scheduleError}</p>
+          )}
 
-          <div className="flex justify-end gap-3 pt-4">
-            <button
-              type="button"
-              className="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg"
-              onClick={onClose}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg"
-              disabled={isLoading}
-            >
-              {isLoading ? "Saving..." : "Save Appointment"}
-            </button>
+          {!scheduleLoading &&
+            !scheduleError &&
+            doctorSessions.length === 0 && (
+              <p className="text-sm text-gray-500">
+                No available schedules for this doctor and clinic.
+              </p>
+            )}
+
+          <div className="space-y-2">
+            {doctorSessions.map((s) => (
+              <button
+                key={`${s.session_id}-${s.session_date}`}
+                onClick={() => setSelectedSession(s)}
+                className={`w-full border border-l-4 rounded-lg px-3 py-2 text-left bg-white
+                  ${getDateBorderClass(s.session_date)}
+                  ${
+                    selectedSession?.session_id === s.session_id &&
+                    selectedSession?.session_date === s.session_date
+                      ? "border-blue-600 ring-2 ring-blue-200"
+                      : "hover:bg-gray-50"
+                  }
+                `}
+              >
+                <div className="flex flex-col">
+                  <span className="font-medium">
+                    {new Date(s.session_date).toLocaleDateString("en-US", {
+                      weekday: "long",
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </span>
+
+                  <span className="text-sm text-gray-600">
+                    {s.start_time} – {s.end_time} ({s.session_period})
+                  </span>
+
+                  <span className="text-xs text-gray-500">
+                    Queue: {s.queue_count}
+                  </span>
+                </div>
+              </button>
+            ))}
           </div>
-        </form>
+        </div>
+
+        {/* Appointment Type */}
+        <div className="mb-4">
+          <label className="block font-medium mb-1">Appointment Type</label>
+
+          <select
+            className="w-full border rounded-lg px-3 py-2"
+            value={appointmentType}
+            onChange={(e) => setAppointmentType(e.target.value)}
+          >
+            <option value="Consultation">Consultation</option>
+            <option value="Follow-up">Follow-up</option>
+            <option value="Emergency">Emergency</option>
+          </select>
+        </div>
+
+        {/* Patient */}
+        <button
+          type="button"
+          className="text-blue-600 text-sm underline"
+          onClick={() => setShowRegisterPatient(true)}
+        >
+          New Patient? Register new patient
+        </button>
+
+        {/* Actions */}
+        {saveError && <p className="text-sm text-red-500 mb-2">{saveError}</p>}
+
+        <div className="flex justify-end gap-2">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200"
+          >
+            Cancel
+          </button>
+          <button
+            disabled={!selectedSession || saving}
+            onClick={handleSaveAppointment}
+            className="px-4 py-2 rounded bg-blue-600 text-white disabled:bg-blue-300"
+          >
+            {saving ? "Saving..." : "Save Appointment"}
+          </button>
+        </div>
       </div>
     </div>
   );
-};
-
-export default AddAppointmentModal;
+}

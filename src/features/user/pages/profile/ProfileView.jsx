@@ -6,6 +6,8 @@ import Layout from "../../components/Layout";
 
 import logo from "../../../../assets/logo.png";
 
+import { resolveImageUrl } from "../../../../utils/resolveImageUrl.js";
+
 const ProfileView = () => {
   const [activeTab, setActiveTab] = useState("personal");
 
@@ -53,10 +55,11 @@ const ProfileView = () => {
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6 mb-6">
             <div className="flex flex-col sm:flex-row items-center gap-6">
               <img
-                src={userInfo.profileImgUrl || logo}
-                className="rounded-full w-40 h-40"
+                src={resolveImageUrl(userInfo.profileImgUrl) || logo}
+                className="rounded-full w-40 h-40 object-cover border"
                 alt="Profile"
               />
+
               <div className="text-center sm:text-left">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                   {userInfo.fullName}

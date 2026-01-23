@@ -6,7 +6,7 @@ export default function Layout({ children }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen">
+    <div className="h-full">
       <Navbar setIsSidebarOpen={setIsSidebarOpen} />
 
       <div className="grid grid-cols-12 pt-16 h-full">
@@ -23,7 +23,7 @@ export default function Layout({ children }) {
         />
 
         {/* MAIN CONTENT — 10 COLUMNS */}
-        <main className="col-span-12 p-5 md:col-span-10 md:pl-8 pb-10">
+        <main className="col-span-12 p-5 md:col-span-10 md:pl-8 pb-10 h-full">
           {children}
         </main>
       </div>
