@@ -68,6 +68,8 @@ export default function LandingPage() {
       <Testimonials />
       <Contact />
       <Footer />
+      <Footer />
+
 
       {showAuthModal && (
         <AuthModal
