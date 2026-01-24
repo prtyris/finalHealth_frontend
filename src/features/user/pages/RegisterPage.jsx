@@ -226,6 +226,12 @@ export default function RegisterPage() {
           >
             Back to login
           </div>
+          <div
+            onClick={() => alert("Mariz!")}
+            className="w-full border-2 text-center border-black text-black py-2 rounded mt-2"
+          >
+            Testing 1
+          </div>
         </form>
       </div>
     </div>
