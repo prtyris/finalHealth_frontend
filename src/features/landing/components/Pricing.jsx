@@ -1,92 +1,315 @@
-import React from 'react';
+import React from "react";
 
 const Pricing = () => {
-  const plans = [
-    {
-      name: 'Free Trial',
-      price: '₱0',
-      features: [
-        '1 user access',
-        'Basic clinic tools',
-        'Limited support',
-        'No commitment'
-      ],
-      buttonText: 'Start Free Trial',
-      featured: false
-    },
-    {
-      name: 'Monthly Plan',
-      price: '₱499',
-      features: [
-        '5 user access',
-        'Full feature access',
-        'Priority support',
-        'Cancel anytime'
-      ],
-      buttonText: 'Subscribe Now',
-      featured: true
-    },
-    {
-      name: 'Annual Plan',
-      price: '₱4,999',
-      features: [
-        'Up to 10 users',
-        'Full feature access + analytics',
-        '24/7 priority support',
-        '2 months free'
-      ],
-      buttonText: 'Subscribe Now',
-      featured: false
-    }
-  ];
-
   return (
-    <section id="pricing" className="py-16 bg-gray-50 dark:bg-gray-800">
+    <section className="py-16 bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold text-center text-blue-600 dark:text-blue-400 mb-4">
-          Choose Your Plan
-        </h2>
-        <p className="text-gray-600 dark:text-gray-300 text-center mb-12">
-          Select the plan that fits your needs best
-        </p>
+        {/* Header */}
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 dark:bg-blue-900/30 rounded-full mb-6">
+            <i className="fas fa-tags text-blue-600 dark:text-blue-400"></i>
+            <span className="text-sm font-semibold text-blue-700 dark:text-blue-300">Flexible Pricing</span>
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white mb-4">
+            Choose Your Plan
+          </h2>
+          <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto text-lg">
+            Select the plan that fits your clinic's needs best
+          </p>
+          
+          {/* Toggle for Monthly/Yearly */}
+          <div className="mt-8 flex items-center justify-center gap-4">
+            <span className="text-gray-600 dark:text-gray-400">Monthly</span>
+            <div className="relative">
+              <div className="w-14 h-8 flex items-center bg-blue-300 dark:bg-blue-700 rounded-full p-1 cursor-pointer">
+                <div className="bg-white dark:bg-gray-800 w-6 h-6 rounded-full shadow-md transform translate-x-6"></div>
+              </div>
+            </div>
+            <span className="text-gray-600 dark:text-gray-400">
+              Annual <span className="text-green-600 dark:text-green-400 font-semibold">(Save 17%)</span>
+            </span>
+          </div>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          {plans.map((plan, index) => (
-            <div
-              key={index}
-              className={`relative rounded-xl p-8 transition-all duration-300 hover:transform hover:-translate-y-2 ${
-                plan.featured
-                  ? 'bg-gradient-to-br from-teal-500 to-blue-600 text-white scale-105'
-                  : 'bg-white dark:bg-gray-700 shadow-lg'
-              }`}
-            >
-              <h3 className="text-2xl font-bold mb-4">{plan.name}</h3>
-              <div className={`text-4xl font-bold mb-6 ${
-                plan.featured ? 'text-white' : 'text-blue-600 dark:text-blue-400'
-              }`}>
-                {plan.price}
+        {/* Pricing Plans */}
+        <div className="max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Free Trial Plan */}
+            <div className="group">
+              <div className="h-full bg-white dark:bg-gray-800 rounded-2xl border-2 border-blue-100 dark:border-gray-700 p-8 shadow-lg transition-all duration-300 hover:shadow-xl hover:border-blue-200 dark:hover:border-blue-600">
+                {/* Plan Header */}
+                <div className="text-center mb-8">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-900/30 rounded-full mb-4">
+                    <i className="fas fa-gem text-blue-500 dark:text-blue-400"></i>
+                    <span className="text-sm font-semibold text-blue-700 dark:text-blue-300">Starter</span>
+                  </div>
+                  <h3 className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-2">Free Trial</h3>
+                  <div className="mb-4">
+                    <span className="text-4xl font-bold text-blue-600 dark:text-blue-400">₱0</span>
+                    <span className="text-blue-500 dark:text-blue-400">/forever</span>
+                  </div>
+                  <p className="text-blue-500 dark:text-blue-400 text-sm">Perfect for trying out our platform</p>
+                </div>
+
+                {/* Features List */}
+                <ul className="space-y-4 mb-8">
+                  <li className="flex items-center gap-3">
+                    <i className="fas fa-check-circle text-blue-500 dark:text-blue-400"></i>
+                    <span className="text-blue-700 dark:text-blue-300">1 user access</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <i className="fas fa-check-circle text-blue-500 dark:text-blue-400"></i>
+                    <span className="text-blue-700 dark:text-blue-300">Basic clinic tools</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <i className="fas fa-check-circle text-blue-500 dark:text-blue-400"></i>
+                    <span className="text-blue-700 dark:text-blue-300">Limited support</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <i className="fas fa-check-circle text-blue-500 dark:text-blue-400"></i>
+                    <span className="text-blue-700 dark:text-blue-300">No commitment</span>
+                  </li>
+                  <li className="flex items-center gap-3 opacity-50">
+                    <i className="fas fa-times-circle text-blue-300 dark:text-blue-700"></i>
+                    <span className="text-blue-400 dark:text-blue-500">Advanced analytics</span>
+                  </li>
+                  <li className="flex items-center gap-3 opacity-50">
+                    <i className="fas fa-times-circle text-blue-300 dark:text-blue-700"></i>
+                    <span className="text-blue-400 dark:text-blue-500">Priority support</span>
+                  </li>
+                </ul>
+
+                {/* CTA Button */}
+                <button className="w-full py-3 bg-gradient-to-r from-blue-100 to-blue-200 dark:from-blue-900/30 dark:to-blue-800/30 text-blue-700 dark:text-blue-300 font-semibold rounded-lg hover:from-blue-200 hover:to-blue-300 dark:hover:from-blue-800 dark:hover:to-blue-700 transition-all duration-300">
+                  <i className="fas fa-rocket mr-2"></i>
+                  Start Free Trial
+                </button>
+
+                {/* Note */}
+                <p className="text-center text-blue-500 dark:text-blue-400 text-sm mt-4">
+                  No credit card required
+                </p>
+              </div>
+            </div>
+
+            {/* Monthly Plan (Most Popular) */}
+            <div className="group relative">
+              {/* Popular Badge */}
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+                <div className="px-6 py-2 bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 text-white text-sm font-semibold rounded-full shadow-lg">
+                  <i className="fas fa-crown mr-2"></i>
+                  Most Popular
+                </div>
               </div>
               
-              <ul className="space-y-4 mb-8">
-                {plan.features.map((feature, featureIndex) => (
-                  <li key={featureIndex} className="flex items-center">
-                    <span className={`mr-3 ${plan.featured ? 'text-white' : 'text-green-500'}`}>✓</span>
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
+              <div className="h-full bg-gradient-to-b from-blue-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-2xl border-2 border-blue-300 dark:border-blue-600 p-8 shadow-xl transform hover:scale-[1.02] transition-all duration-300 relative overflow-hidden">
+                {/* Floating Elements */}
+                <div className="absolute -right-4 -top-4 w-24 h-24 bg-blue-200 dark:bg-blue-900/30 rounded-full opacity-20"></div>
+                <div className="absolute -left-4 -bottom-4 w-20 h-20 bg-blue-200 dark:bg-blue-900/30 rounded-full opacity-20"></div>
 
-              <button
-                className={`w-full py-3 rounded-lg font-semibold transition-colors duration-300 ${
-                  plan.featured
-                    ? 'bg-white text-blue-600 hover:bg-gray-100'
-                    : 'bg-blue-600 text-white hover:bg-blue-700'
-                }`}
-              >
-                {plan.buttonText}
-              </button>
+                {/* Plan Header */}
+                <div className="text-center mb-8 relative z-10">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 dark:bg-blue-900/30 rounded-full mb-4">
+                    <i className="fas fa-bolt text-blue-600 dark:text-blue-400"></i>
+                    <span className="text-sm font-semibold text-blue-700 dark:text-blue-300">Professional</span>
+                  </div>
+                  <h3 className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-2">Monthly Plan</h3>
+                  <div className="mb-4">
+                    <span className="text-4xl font-bold text-blue-600 dark:text-blue-400">₱499</span>
+                    <span className="text-blue-500 dark:text-blue-400">/month</span>
+                  </div>
+                  <p className="text-blue-500 dark:text-blue-400 text-sm">Ideal for growing clinics</p>
+                </div>
+
+                {/* Features List */}
+                <ul className="space-y-4 mb-8 relative z-10">
+                  <li className="flex items-center gap-3">
+                    <i className="fas fa-check-circle text-blue-500 dark:text-blue-400"></i>
+                    <span className="text-blue-700 dark:text-blue-300 font-medium">5 user access</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <i className="fas fa-check-circle text-blue-500 dark:text-blue-400"></i>
+                    <span className="text-blue-700 dark:text-blue-300 font-medium">Full feature access</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <i className="fas fa-check-circle text-blue-500 dark:text-blue-400"></i>
+                    <span className="text-blue-700 dark:text-blue-300 font-medium">Priority support</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <i className="fas fa-check-circle text-blue-500 dark:text-blue-400"></i>
+                    <span className="text-blue-700 dark:text-blue-300 font-medium">Cancel anytime</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <i className="fas fa-check-circle text-blue-500 dark:text-blue-400"></i>
+                    <span className="text-blue-700 dark:text-blue-300 font-medium">Data backup</span>
+                  </li>
+                  <li className="flex items-center gap-3 opacity-50">
+                    <i className="fas fa-times-circle text-blue-300 dark:text-blue-700"></i>
+                    <span className="text-blue-400 dark:text-blue-500">Advanced analytics</span>
+                  </li>
+                </ul>
+
+                {/* CTA Button */}
+                <button className="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 dark:hover:from-blue-700 dark:hover:to-blue-800 transition-all duration-300 shadow-md relative z-10">
+                  <i className="fas fa-play-circle mr-2"></i>
+                  Subscribe Now
+                </button>
+
+                {/* Note */}
+                <p className="text-center text-blue-500 dark:text-blue-400 text-sm mt-4">
+                  Billed monthly, cancel anytime
+                </p>
+              </div>
             </div>
-          ))}
+
+            {/* Annual Plan */}
+            <div className="group">
+              <div className="h-full bg-white dark:bg-gray-800 rounded-2xl border-2 border-blue-100 dark:border-gray-700 p-8 shadow-lg transition-all duration-300 hover:shadow-xl hover:border-blue-200 dark:hover:border-blue-600">
+                {/* Plan Header */}
+                <div className="text-center mb-8">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-900/30 rounded-full mb-4">
+                    <i className="fas fa-award text-blue-500 dark:text-blue-400"></i>
+                    <span className="text-sm font-semibold text-blue-700 dark:text-blue-300">Enterprise</span>
+                  </div>
+                  <h3 className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-2">Annual Plan</h3>
+                  <div className="mb-4">
+                    <span className="text-4xl font-bold text-blue-600 dark:text-blue-400">₱4,999</span>
+                    <span className="text-blue-500 dark:text-blue-400">/year</span>
+                  </div>
+                  <div className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 dark:bg-green-900/30 rounded-full mb-2">
+                    <i className="fas fa-gift text-green-600 dark:text-green-400"></i>
+                    <span className="text-sm font-semibold text-green-700 dark:text-green-300">Save 17%</span>
+                  </div>
+                  <p className="text-blue-500 dark:text-blue-400 text-sm">Best value for established clinics</p>
+                </div>
+
+                {/* Features List */}
+                <ul className="space-y-4 mb-8">
+                  <li className="flex items-center gap-3">
+                    <i className="fas fa-check-circle text-blue-500 dark:text-blue-400"></i>
+                    <span className="text-blue-700 dark:text-blue-300 font-medium">Up to 10 users</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <i className="fas fa-check-circle text-blue-500 dark:text-blue-400"></i>
+                    <span className="text-blue-700 dark:text-blue-300 font-medium">Full feature access + analytics</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <i className="fas fa-check-circle text-blue-500 dark:text-blue-400"></i>
+                    <span className="text-blue-700 dark:text-blue-300 font-medium">24/7 priority support</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <i className="fas fa-check-circle text-blue-500 dark:text-blue-400"></i>
+                    <span className="text-blue-700 dark:text-blue-300 font-medium">2 months free</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <i className="fas fa-check-circle text-blue-500 dark:text-blue-400"></i>
+                    <span className="text-blue-700 dark:text-blue-300 font-medium">Custom integrations</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <i className="fas fa-check-circle text-blue-500 dark:text-blue-400"></i>
+                    <span className="text-blue-700 dark:text-blue-300 font-medium">Dedicated account manager</span>
+                  </li>
+                </ul>
+
+                {/* CTA Button */}
+                <button className="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 dark:hover:from-blue-700 dark:hover:to-blue-800 transition-all duration-300 shadow-md">
+                  <i className="fas fa-calendar-check mr-2"></i>
+                  Subscribe Now
+                </button>
+
+                {/* Note */}
+                <p className="text-center text-blue-500 dark:text-blue-400 text-sm mt-4">
+                  Equivalent to ₱416/month
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Feature Comparison */}
+          <div className="mt-16 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-blue-100 dark:border-gray-700 overflow-hidden">
+            <div className="p-8 border-b border-blue-100 dark:border-gray-700">
+              <h3 className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-4">Feature Comparison</h3>
+              <p className="text-blue-500 dark:text-blue-400">See how our plans stack up against each other</p>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-blue-50 dark:bg-gray-700">
+                    <th className="text-left p-6 text-blue-700 dark:text-blue-300 font-semibold">Features</th>
+                    <th className="p-6 text-center">
+                      <div className="font-bold text-blue-600 dark:text-blue-400">Free Trial</div>
+                      <div className="text-sm text-blue-500 dark:text-blue-400">₱0</div>
+                    </th>
+                    <th className="p-6 text-center">
+                      <div className="font-bold text-blue-600 dark:text-blue-400">Monthly</div>
+                      <div className="text-sm text-blue-500 dark:text-blue-400">₱499/month</div>
+                    </th>
+                    <th className="p-6 text-center">
+                      <div className="font-bold text-blue-600 dark:text-blue-400">Annual</div>
+                      <div className="text-sm text-blue-500 dark:text-blue-400">₱4,999/year</div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b border-blue-50 dark:border-gray-700">
+                    <td className="p-6 text-blue-700 dark:text-blue-300 font-medium">User Access</td>
+                    <td className="p-6 text-center text-blue-600 dark:text-blue-400">1 user</td>
+                    <td className="p-6 text-center text-blue-600 dark:text-blue-400 font-semibold">5 users</td>
+                    <td className="p-6 text-center text-blue-600 dark:text-blue-400 font-semibold">Up to 10 users</td>
+                  </tr>
+                  <tr className="border-b border-blue-50 dark:border-gray-700 bg-blue-50 dark:bg-gray-700">
+                    <td className="p-6 text-blue-700 dark:text-blue-300 font-medium">Support</td>
+                    <td className="p-6 text-center text-blue-600 dark:text-blue-400">Limited</td>
+                    <td className="p-6 text-center text-blue-600 dark:text-blue-400 font-semibold">Priority</td>
+                    <td className="p-6 text-center text-blue-600 dark:text-blue-400 font-semibold">24/7 Priority</td>
+                  </tr>
+                  <tr className="border-b border-blue-50 dark:border-gray-700">
+                    <td className="p-6 text-blue-700 dark:text-blue-300 font-medium">Analytics</td>
+                    <td className="p-6 text-center text-blue-400 dark:text-blue-500"><i className="fas fa-times"></i></td>
+                    <td className="p-6 text-center text-blue-400 dark:text-blue-500"><i className="fas fa-times"></i></td>
+                    <td className="p-6 text-center text-green-500 dark:text-green-400"><i className="fas fa-check"></i></td>
+                  </tr>
+                  <tr className="bg-blue-50 dark:bg-gray-700">
+                    <td className="p-6 text-blue-700 dark:text-blue-300 font-medium">Cancel Anytime</td>
+                    <td className="p-6 text-center text-green-500 dark:text-green-400"><i className="fas fa-check"></i></td>
+                    <td className="p-6 text-center text-green-500 dark:text-green-400"><i className="fas fa-check"></i></td>
+                    <td className="p-6 text-center text-blue-400 dark:text-blue-500"><i className="fas fa-times"></i></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Trust Badges */}
+          <div className="mt-12 flex flex-col md:flex-row items-center justify-center gap-8">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                <i className="fas fa-shield-alt text-blue-600 dark:text-blue-400"></i>
+              </div>
+              <div>
+                <p className="font-semibold text-blue-700 dark:text-blue-300">Secure Payment</p>
+                <p className="text-sm text-blue-500 dark:text-blue-400">256-bit encryption</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                <i className="fas fa-headset text-blue-600 dark:text-blue-400"></i>
+              </div>
+              <div>
+                <p className="font-semibold text-blue-700 dark:text-blue-300">24/7 Support</p>
+                <p className="text-sm text-blue-500 dark:text-blue-400">Always here to help</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                <i className="fas fa-sync-alt text-blue-600 dark:text-blue-400"></i>
+              </div>
+              <div>
+                <p className="font-semibold text-blue-700 dark:text-blue-300">30-day Refund</p>
+                <p className="text-sm text-blue-500 dark:text-blue-400">Money-back guarantee</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>

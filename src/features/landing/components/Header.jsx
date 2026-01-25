@@ -44,7 +44,7 @@ const Header = ({ darkMode, toggleDarkMode, openAuthModal }) => {
             className="md:hidden text-2xl focus:outline-none text-gray-700 dark:text-gray-300"
             onClick={() => setMenuOpen(!menuOpen)}
           >
-            {menuOpen ? "✖" : "☰"}
+            {menuOpen ? <i className="fas fa-times"></i> : <i className="fas fa-bars"></i>}
           </button>
 
           {/* Desktop Navigation */}
@@ -73,7 +73,9 @@ const Header = ({ darkMode, toggleDarkMode, openAuthModal }) => {
                   : "bg-white border-gray-300 text-gray-700 hover:border-blue-600 hover:text-blue-600"
               }`}
             >
-              <span className="text-lg">{darkMode ? "☀️" : "🌙"}</span>
+              <span className="text-lg">
+                {darkMode ? <i className="fas fa-sun"></i> : <i className="fas fa-moon"></i>}
+              </span>
               <span className="font-medium">{darkMode ? "Light" : "Dark"}</span>
             </button>
 
@@ -127,7 +129,9 @@ const Header = ({ darkMode, toggleDarkMode, openAuthModal }) => {
                   : "bg-white border-gray-300 text-gray-700 hover:border-blue-600 hover:text-blue-600"
               }`}
             >
-              <span className="text-lg">{darkMode ? "☀️" : "🌙"}</span>
+              <span className="text-lg">
+                {darkMode ? <i className="fas fa-sun"></i> : <i className="fas fa-moon"></i>}
+              </span>
               <span className="font-medium">
                 {darkMode ? "Light Mode" : "Dark Mode"}
               </span>
@@ -159,6 +163,11 @@ const Header = ({ darkMode, toggleDarkMode, openAuthModal }) => {
           </div>
         )}
       </div>
+
+      {/* Add Font Awesome stylesheet */}
+      <style jsx>{`
+        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+      `}</style>
     </nav>
   );
 };
