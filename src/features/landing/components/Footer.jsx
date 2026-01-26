@@ -51,7 +51,7 @@ const Footer = () => {
 
         <div className="border-t border-gray-800 pt-8 text-center">
           <p className="text-gray-400">
-            © 2025 FinalHealth. All rights reserved. GROUP 1 BSCS-501
+            © 2025 FinalHealth. All rights reserved. GROUP 1 BSCS-601
           </p>
         </div>
       </div>
