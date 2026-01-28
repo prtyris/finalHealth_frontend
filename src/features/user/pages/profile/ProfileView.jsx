@@ -22,16 +22,13 @@ const ProfileView = () => {
   useEffect(() => {
     function loadUserInfo() {
       try {
-        const stored = JSON.parse(localStorage.getItem("user")) || {};
-
-        const fullName = `${stored.firstName || ""} ${
-          stored.middleName || ""
-        } ${stored.lastName || ""}`.trim();
+        const stored =
+          JSON.parse(localStorage.getItem("userInformations")) || {};
 
         setUserInfo({
-          fullName: fullName || "N/A",
+          fullName: stored.fullName || "N/A",
           email: stored.email || "N/A",
-          profileImgUrl: stored.profileImgUrl || null,
+          profileImgUrl: stored.profileImage || null,
         });
       } catch (err) {
         console.error("Failed to load userInformations:", err);
