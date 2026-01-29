@@ -17,16 +17,16 @@ export default function AdminSidebar({ isOpen, setIsOpen, isMobile = false }) {
       icon: <HomeIcon className="h-5" />,
       link: "/admin/admin-dashboard",
     },
-    {
-      name: "Users",
-      icon: <UsersIcon className="h-5" />,
-      link: "/admin/admin-users",
-    },
-    {
-      name: "Verify Doctors",
-      icon: <CheckIcon className="h-5" />, // CheckIcon for verification
-      link: "/admin/admin-verify-doctors",
-    },
+    // {
+    //   name: "Users",
+    //   icon: <UsersIcon className="h-5" />,
+    //   link: "/admin/admin-users",
+    // },
+    // {
+    //   name: "Verify Doctors",
+    //   icon: <CheckIcon className="h-5" />, // CheckIcon for verification
+    //   link: "/admin/admin-verify-doctors",
+    // },
     {
       name: "Subscribers",
       icon: <CreditCardIcon className="h-5" />,

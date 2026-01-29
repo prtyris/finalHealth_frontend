@@ -5,7 +5,6 @@ import ActivityHistory from "./components/ActivityHistory";
 import Layout from "../../components/Layout";
 
 import logo from "../../../../assets/logo.png";
-
 import { resolveImageUrl } from "../../../../utils/resolveImageUrl.js";
 
 const ProfileView = () => {
@@ -25,7 +24,7 @@ const ProfileView = () => {
 
   // Load localStorage safely AFTER first render - UPDATED to check localStorage on every render
   useEffect(() => {
-    function loadUserInfo() {
+    const loadUserInfo = () => {
       try {
         const stored = JSON.parse(localStorage.getItem("user")) || {};
         console.log("Loaded from localStorage:", stored); // Debug log
@@ -39,14 +38,18 @@ const ProfileView = () => {
         console.log("Profile image URL from storage:", profileImgUrl); // Debug log
 
         setUserInfo({
-          fullName: fullName || "N/A",
+          fullName:
+            `${stored.firstName || ""} ${stored.middleName || ""} ${stored.lastName || ""}`.trim() ||
+            "N/A",
           email: stored.email || "N/A",
           profileImgUrl: profileImgUrl,
         });
       } catch (err) {
-        console.error("Failed to load userInformations:", err);
+        console.error("Failed to load user:", err);
       }
-    }
+    };
+
+    loadUserInfo();
 
     loadUserInfo();
   }, []); // Empty dependency array means this runs once on mount

@@ -10,6 +10,7 @@ import {
 } from "@heroicons/react/24/solid";
 
 import Logo from "../../../assets/logo.png";
+import { resolveImageUrl } from "../../../utils/resolveImageUrl";
 
 export default function Sidebar({ isOpen, setIsOpen, isMobile = false }) {
   const [userInfo, setUserInfo] = useState({
@@ -18,30 +19,31 @@ export default function Sidebar({ isOpen, setIsOpen, isMobile = false }) {
     profileImgUrl: null,
   });
 
+  // ✅ SAME LOGIC AS FIXED ProfileView
   useEffect(() => {
-    function loadUserInfo() {
+    const loadUserInfo = () => {
       try {
         const stored = JSON.parse(localStorage.getItem("user")) || {};
 
-        const fullName = `${stored.firstName || ""} ${
-          stored.middleName || ""
-        } ${stored.lastName || ""}`.trim();
-
         setUserInfo({
-          fullName: fullName || "N/A",
+          fullName:
+            `${stored.firstName || ""} ${stored.middleName || ""} ${
+              stored.lastName || ""
+            }`.trim() || "N/A",
           email: stored.email || "N/A",
-          profileImgUrl: stored.profileImgUrl || null,
+          profileImgUrl: stored.profileImage || stored.profileImgPath || null,
         });
       } catch (err) {
-        console.error("Failed to load userInformations:", err);
+        console.error("Failed to load user:", err);
       }
-    }
+    };
 
-    loadUserInfo(); // call the wrapper function
+    loadUserInfo();
+
+    // 🔥 keep Sidebar in sync after profile updates
+    window.addEventListener("storage", loadUserInfo);
+    return () => window.removeEventListener("storage", loadUserInfo);
   }, []);
-
-  // Also load user for email at bottom
-  const user = JSON.parse(localStorage.getItem("user"));
 
   const menu = [
     {
@@ -78,7 +80,6 @@ export default function Sidebar({ isOpen, setIsOpen, isMobile = false }) {
 
   return (
     <>
-      {/* Mobile Overlay */}
       {isMobile && (
         <div
           className={`fixed inset-0 bg-black/40 z-20 md:hidden ${
@@ -88,24 +89,24 @@ export default function Sidebar({ isOpen, setIsOpen, isMobile = false }) {
         />
       )}
 
-      {/* SIDEBAR */}
       <aside
-        className={`
-          bg-white h-full shadow-lg
-          ${
-            isMobile
-              ? `fixed inset-y-0 left-0 w-64 z-30
-                 transform ${isOpen ? "translate-x-0" : "-translate-x-full"}
-                 transition-transform duration-200 md:hidden`
-              : `hidden md:block w-64`
-          }
-        `}
+        className={`bg-white h-full shadow-lg ${
+          isMobile
+            ? `fixed inset-y-0 left-0 w-64 z-30 transform ${
+                isOpen ? "translate-x-0" : "-translate-x-full"
+              } transition-transform duration-200 md:hidden`
+            : `hidden md:block w-64`
+        }`}
       >
         {/* HEADER */}
         <div className="p-4 flex items-center space-x-3">
           <img
-            src={userInfo.profileImgUrl || Logo}
-            className="w-14 h-14 rounded-full"
+            src={
+              userInfo.profileImgUrl
+                ? `${resolveImageUrl(userInfo.profileImgUrl)}?v=${Date.now()}`
+                : Logo
+            }
+            className="w-14 h-14 rounded-full object-cover"
             alt="Profile"
           />
           <p className="font-semibold">{userInfo.fullName}</p>
@@ -131,15 +132,7 @@ export default function Sidebar({ isOpen, setIsOpen, isMobile = false }) {
           <button
             className="flex items-center space-x-3 px-3 py-2 hover:bg-gray-100"
             onClick={() => {
-              localStorage.removeItem("user_token");
-              localStorage.removeItem("user");
-
-              localStorage.removeItem("selectedDoctorId");
-              localStorage.removeItem("selectedClinicId");
-
-              localStorage.removeItem("selectedDoctorIdPatientPage");
-              localStorage.removeItem("selectedClinicIdPatientPage");
-
+              localStorage.clear();
               window.location.href = "/";
             }}
           >

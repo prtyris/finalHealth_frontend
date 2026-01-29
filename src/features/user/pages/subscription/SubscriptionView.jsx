@@ -188,9 +188,18 @@ const SubscriptionView = () => {
                       <li>{p.description}</li>
                     </ul>
 
-                    <button className="w-full py-3 rounded-lg font-semibold bg-white text-blue-600">
+                    <button
+                      disabled={p.planType === "free"}
+                      className={`w-full py-3 rounded-lg font-semibold
+    ${
+      p.planType === "free"
+        ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+        : "bg-white text-blue-600 hover:bg-blue-50"
+    }
+  `}
+                    >
                       {p.planType === "free"
-                        ? "Start Free Trial"
+                        ? "Current Subscription"
                         : "Subscribe Now"}
                     </button>
                   </div>

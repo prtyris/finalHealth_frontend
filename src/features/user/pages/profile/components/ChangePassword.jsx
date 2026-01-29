@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { updateUserSettings } from "../../../../../api/profileApi";
 import AlertModal from "../../../../../components/AlertModal";
+import { useUser } from "../../../context/users/useUser";
 
 const ChangePassword = () => {
   const [showPassword, setShowPassword] = useState({

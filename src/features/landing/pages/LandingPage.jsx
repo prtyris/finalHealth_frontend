@@ -69,7 +69,6 @@ export default function LandingPage() {
       <Contact />
       <Footer />
 
-
       {showAuthModal && (
         <AuthModal
           mode={authMode}
