@@ -68,8 +68,8 @@ export default function LandingPage() {
       <Testimonials />
       <Contact />
       <Footer />
-      <Footer />
-{/* Orence */}
+
+
 
       {showAuthModal && (
         <AuthModal

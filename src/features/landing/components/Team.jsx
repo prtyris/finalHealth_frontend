@@ -6,17 +6,17 @@ const Team = () => {
       name: "Carl Ivan Sampan",
       role: "Team Leader & Full Stack Developer",
       description:
-        "Leading the development team with expertise in healthcare technology solutions and system architecture",
+        "Leading the team with strategic oversight. Focuses on backend development while ensuring full-stack integration and system architecture.",
       gradient: "from-blue-500 to-blue-700",
-      photo: "../../../../team/carl.jpg", // Updated path
+      photo: "../../../../team/carl.jpg",
     },
     {
       name: "Carl Joseph Orence",
-      role: "Backend Developer",
+      role: "Documentation Specialist & UI/UX Designer (Admin)",
       description:
-        "Specializing in server-side development, database design, and API integration for healthcare systems",
+        "Manages all project documentation and designs the admin panel interface using Figma, ensuring clarity and usability.",
       gradient: "from-blue-400 to-blue-600",
-      photo: "../../../../team/carlj.jpg", // Updated path
+      photo: "../../../../team/carlj.jpg",
     },
     {
       name: "Engr. Elvi Lito Ubas",
@@ -24,23 +24,23 @@ const Team = () => {
       description:
         "Guiding the team with technical expertise and industry knowledge in software engineering principles",
       gradient: "from-purple-500 to-purple-700",
-      photo: "../../../../team/teacher.jpg", // Updated path
+      photo: "../../../../team/teacher.jpg",
     },
     {
       name: "Mariz Esparago",
-      role: "Frontend Developer",
+      role: "Frontend & System Design Lead",
       description:
-        "Creating intuitive user interfaces and ensuring seamless user experiences across all platforms",
+        "Leads all frontend development and visual design for the entire platform, excluding backend architecture.",
       gradient: "from-blue-300 to-blue-500",
-      photo: "../../../../team/mariz.jpg", // Updated path
+      photo: "../../../../team/mariz.jpg",
     },
     {
       name: "Elena May Olaivar",
-      role: "UI/UX Designer & QA Specialist",
+      role: "Documentation Lead & UI/UX Designer",
       description:
-        "Designing user-centric interfaces and ensuring product quality through comprehensive testing",
+        "Oversees all project documentation and creates system designs exclusively in Figma for the platform.",
       gradient: "from-blue-200 to-blue-400",
-      photo: "../../../../team/elena.jpg", // Updated path
+      photo: "../../../../team/elena.jpg",
     },
   ];
 
@@ -62,11 +62,11 @@ const Team = () => {
               <div className="relative w-32 h-32 mx-auto mb-6">
                 <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white dark:border-gray-800 shadow-lg group-hover:shadow-xl transition-all duration-300">
                   <img
-                    src={member.photo} // Ensure path works with the public directory
+                    src={member.photo}
                     alt={member.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                     onError={(e) => {
-                      e.target.style.display = "none"; // Handle missing image
+                      e.target.style.display = "none";
                     }}
                   />
                   {/* Fallback Gradient */}
@@ -113,7 +113,7 @@ const Team = () => {
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 dark:bg-blue-900 rounded-full">
             <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
             <span className="text-sm text-blue-700 dark:text-blue-300 font-medium">
-              BSCS 501 - Software Engineering Project
+              BSCS 601 - Software Engineering Project
             </span>
           </div>
         </div>
