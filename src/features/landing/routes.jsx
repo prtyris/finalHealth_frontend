@@ -1,5 +1,5 @@
 import { Routes, Route } from "react-router-dom";
-import LandingPage from "./pages/LandingPage.jsx";
+import LandingPage from "../landing/pages/LandingPage.jsx";
 
 import GuestRoute from "./components/GuestRoutes.jsx";
 
