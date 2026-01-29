@@ -5,37 +5,39 @@ import ActivityHistory from "./components/ActivityHistory";
 import Layout from "../../components/Layout";
 
 import logo from "../../../../assets/logo.png";
-
 import { resolveImageUrl } from "../../../../utils/resolveImageUrl.js";
 
 const ProfileView = () => {
   const [activeTab, setActiveTab] = useState("personal");
 
-  // NEW: Safe state for user info
   const [userInfo, setUserInfo] = useState({
     fullName: "N/A",
     email: "N/A",
     profileImgUrl: null,
   });
 
-  // Load localStorage safely AFTER first render
   useEffect(() => {
-    function loadUserInfo() {
+    const loadUserInfo = () => {
       try {
-        const stored =
-          JSON.parse(localStorage.getItem("userInformations")) || {};
+        const stored = JSON.parse(localStorage.getItem("user")) || {};
 
         setUserInfo({
-          fullName: stored.fullName || "N/A",
+          fullName:
+            `${stored.firstName || ""} ${stored.middleName || ""} ${stored.lastName || ""}`.trim() ||
+            "N/A",
           email: stored.email || "N/A",
-          profileImgUrl: stored.profileImage || null,
+          profileImgUrl: stored.profileImage || stored.profileImgPath || null,
         });
       } catch (err) {
-        console.error("Failed to load userInformations:", err);
+        console.error("Failed to load user:", err);
       }
-    }
+    };
 
-    loadUserInfo(); // call the wrapper function
+    loadUserInfo();
+
+    // 🔥 auto-refresh when localStorage changes
+    window.addEventListener("storage", loadUserInfo);
+    return () => window.removeEventListener("storage", loadUserInfo);
   }, []);
 
   const tabs = [
@@ -49,35 +51,35 @@ const ProfileView = () => {
       <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           {/* Profile Header */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6 mb-6">
+          <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
             <div className="flex flex-col sm:flex-row items-center gap-6">
               <img
-                src={resolveImageUrl(userInfo.profileImgUrl) || logo}
+                src={
+                  userInfo.profileImgUrl
+                    ? `${resolveImageUrl(userInfo.profileImgUrl)}?v=${Date}`
+                    : logo
+                }
                 className="rounded-full w-40 h-40 object-cover border"
                 alt="Profile"
               />
 
               <div className="text-center sm:text-left">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {userInfo.fullName}
-                </h2>
-                <p className="text-gray-600 dark:text-gray-300">
-                  {userInfo.email}
-                </p>
+                <h2 className="text-2xl font-bold">{userInfo.fullName}</h2>
+                <p className="text-gray-600">{userInfo.email}</p>
               </div>
             </div>
           </div>
 
           {/* Tabs */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm px-6 pt-6 mb-6">
-            <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 border-b border-gray-200 dark:border-gray-700">
+          <div className="bg-white rounded-2xl shadow-sm px-6 pt-6 mb-6">
+            <div className="flex gap-8 border-b">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
-                  className={`pb-4 px-1 font-medium text-sm border-b-2 transition-colors ${
+                  className={`pb-4 text-sm font-medium border-b-2 ${
                     activeTab === tab.id
-                      ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                      : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                      ? "border-blue-500 text-blue-600"
+                      : "border-transparent text-gray-500"
                   }`}
                   onClick={() => setActiveTab(tab.id)}
                 >
@@ -88,15 +90,10 @@ const ProfileView = () => {
           </div>
 
           {/* Content */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
+          <div className="bg-white rounded-2xl shadow-sm p-6">
             {activeTab === "personal" && <PersonalInfo />}
             {activeTab === "password" && <ChangePassword />}
             {activeTab === "activity" && <ActivityHistory />}
-          </div>
-
-          {/* Footer */}
-          <div className="mt-8 text-center text-gray-500 dark:text-gray-400 text-sm">
-            © 2025 FinalHealth. All rights reserved. GROUP 1 BSCS-501
           </div>
         </div>
       </div>

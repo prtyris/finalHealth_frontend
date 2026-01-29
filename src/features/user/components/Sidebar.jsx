@@ -19,24 +19,30 @@ export default function Sidebar({ isOpen, setIsOpen, isMobile = false }) {
     profileImgUrl: null,
   });
 
-  // ✅ COPY FROM ProfileView (NO CHANGES)
+  // ✅ SAME LOGIC AS FIXED ProfileView
   useEffect(() => {
-    function loadUserInfo() {
+    const loadUserInfo = () => {
       try {
-        const stored =
-          JSON.parse(localStorage.getItem("userInformations")) || {};
+        const stored = JSON.parse(localStorage.getItem("user")) || {};
 
         setUserInfo({
-          fullName: stored.fullName || "N/A",
+          fullName:
+            `${stored.firstName || ""} ${stored.middleName || ""} ${
+              stored.lastName || ""
+            }`.trim() || "N/A",
           email: stored.email || "N/A",
-          profileImgUrl: stored.profileImage || null, // 👈 SAME KEY
+          profileImgUrl: stored.profileImage || stored.profileImgPath || null,
         });
       } catch (err) {
-        console.error("Failed to load userInformations:", err);
+        console.error("Failed to load user:", err);
       }
-    }
+    };
 
     loadUserInfo();
+
+    // 🔥 keep Sidebar in sync after profile updates
+    window.addEventListener("storage", loadUserInfo);
+    return () => window.removeEventListener("storage", loadUserInfo);
   }, []);
 
   const menu = [
@@ -95,7 +101,11 @@ export default function Sidebar({ isOpen, setIsOpen, isMobile = false }) {
         {/* HEADER */}
         <div className="p-4 flex items-center space-x-3">
           <img
-            src={resolveImageUrl(userInfo.profileImgUrl) || Logo}
+            src={
+              userInfo.profileImgUrl
+                ? `${resolveImageUrl(userInfo.profileImgUrl)}?v=${Date.now()}`
+                : Logo
+            }
             className="w-14 h-14 rounded-full object-cover"
             alt="Profile"
           />
