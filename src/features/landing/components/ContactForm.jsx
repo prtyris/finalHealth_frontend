@@ -82,7 +82,8 @@ const ContactForm = ({ darkMode = false }) => {
                   <div className="bg-blue-100 dark:bg-blue-900/30 w-10 h-10 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
                     <i className="fas fa-map-marker-alt text-blue-600 dark:text-blue-400"></i>
                   </div>
-                  <span className={darkMode ? "text-gray-300" : "text-gray-700"}>123 Healthcare St, Medical District</span>
+                  <span className={darkMode ? "text-gray-300" : "text-gray-700"}>Suite 17, Abreeza Place, J.P. Laurel Avenue, Davao City, 8000
+                    Davao del Sur, Philippines</span>
                 </div>
                 <div className="flex items-center">
                   <div className="bg-blue-100 dark:bg-blue-900/30 w-10 h-10 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
