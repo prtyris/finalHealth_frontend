@@ -94,7 +94,7 @@ export default function ClinicDoctorMngPage() {
             <h2 className="text-lg font-semibold text-blue-700">Clinics</h2>
 
             <button
-              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+              className="bg-blue-700 text-white px-4 py-2 rounded hover:bg-green-700"
               onClick={() => setShowAddClinicModal(true)}
             >
               + Add Clinic
