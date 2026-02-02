@@ -14,23 +14,24 @@ export const registerUser = (payload) =>
   });
 
 export const updateUserSettingsApi = (data) => {
+  return apiRequest("/api/users/update-settings", {
+    method: "PATCH",
+    body: data,
+  });
+};
+export const updateProfileImageApi = (imageFile) => {
   const formData = new FormData();
 
-  if (data.currentPassword) {
-    formData.append("currentPassword", data.currentPassword);
+  if (!imageFile) {
+    throw new Error("No image file provided");
   }
 
-  if (data.newPassword) {
-    formData.append("newPassword", data.newPassword);
-  }
+  formData.append("profileImg", imageFile);
 
-  if (data.imageFile) {
-    formData.append("profileImg", data.imageFile);
-  }
-
-  return apiFormRequest("/api/users/update-settings", {
+  return apiFormRequest("/api/users/update-picture", {
     method: "PATCH",
     body: formData,
   });
 };
+
 export const getPersonalInfoApi = () => apiRequest(`/api/users/personal-info`);

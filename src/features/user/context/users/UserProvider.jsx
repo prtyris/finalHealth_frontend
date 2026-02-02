@@ -5,6 +5,7 @@ import {
   registerUser,
   updateUserSettingsApi,
   getPersonalInfoApi,
+  updateProfileImageApi,
 } from "../../api/userApi.js";
 
 export const UserProvider = ({ children }) => {
@@ -71,7 +72,7 @@ export const UserProvider = ({ children }) => {
       setLoading(false);
       return res;
     }
-
+    console.log(res.data.userInfo);
     setUserInfo(res.data.userInfo);
     setLoading(false);
     return res;
@@ -98,6 +99,34 @@ export const UserProvider = ({ children }) => {
 
     setLoading(false);
     return res;
+  };
+
+  // -------------------------
+  // UPDATE PROFILE IMAGE
+  // -------------------------
+  const updateProfileImage = async (imageFile) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await updateProfileImageApi(imageFile);
+
+      if (!res?.status.success) {
+        throw new Error(res?.error || "Failed to upload image");
+      }
+
+      // 🔁 refresh should NOT break upload success
+      refreshUser().catch(() => {
+        console.warn("User refresh failed after image upload");
+      });
+
+      setLoading(false);
+      return res;
+    } catch (err) {
+      setError(err.message);
+      setLoading(false);
+      return { success: false, error: err.message };
+    }
   };
 
   // -------------------------
@@ -142,6 +171,7 @@ export const UserProvider = ({ children }) => {
         getPersonalInfo,
         refreshUser,
         updateSettings,
+        updateProfileImage,
       }}
     >
       {children}

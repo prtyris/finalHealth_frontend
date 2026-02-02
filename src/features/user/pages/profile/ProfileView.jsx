@@ -4,7 +4,11 @@ import ChangePassword from "./components/ChangePassword";
 import ActivityHistory from "./components/ActivityHistory";
 import Layout from "../../components/Layout";
 
+import { useUser } from "../../context/users/useUser";
+
 const ProfileView = () => {
+  const { updateProfileImage, getPersonalInfo, userInfo } = useUser();
+
   const [activeTab, setActiveTab] = useState("personal");
   const fileInputRef = useRef(null);
   const [isEditingImage, setIsEditingImage] = useState(false);
@@ -12,120 +16,57 @@ const ProfileView = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
 
-  // Safe state for user info
-  const [userInfo, setUserInfo] = useState({
-    fullName: "N/A",
-    email: "N/A",
-    profileImgUrl: null,
-  });
-
-  // Load user info from localStorage
   useEffect(() => {
-    const loadUserInfo = () => {
-      try {
-        const stored = JSON.parse(localStorage.getItem("user")) || {};
-        console.log("ProfileView: Loaded from localStorage:", stored);
-
-        const fullName = `${stored.firstName || ""} ${
-          stored.middleName || ""
-        } ${stored.lastName || ""}`.trim();
-
-        const profileImgUrl = stored.profileImgUrl || null;
-
-        setUserInfo({
-          fullName: fullName || "N/A",
-          email: stored.email || "N/A",
-          profileImgUrl: profileImgUrl,
-        });
-      } catch (err) {
-        console.error("Failed to load user:", err);
-      }
-    };
-
-    loadUserInfo();
+    getPersonalInfo();
   }, []);
 
-  // Handle file selection
+  // Handle file selection (UI responsibility ONLY)
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Validate file type
     const validTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
     if (!validTypes.includes(file.type)) {
-      alert("Please upload a valid image file (JPEG, PNG, GIF, or WebP)");
+      alert("Invalid image type");
       return;
     }
 
-    // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert("Image size should be less than 5MB");
+      alert("Image must be under 5MB");
       return;
     }
 
-    // Create preview
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const imageUrl = event.target.result;
-      setPreviewImage(imageUrl);
-      setIsUploading(true);
-      setUploadProgress(10);
+    // UI optimistic preview
+    setPreviewImage(URL.createObjectURL(file));
+    setIsUploading(true);
+    setUploadProgress(30);
 
-      // Save immediately to localStorage
-      saveImageToStorage(imageUrl);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  // Save image to localStorage
-  const saveImageToStorage = async (imageDataUrl) => {
     try {
-      const storedUser = JSON.parse(localStorage.getItem("user")) || {};
-      storedUser.profileImgUrl = imageDataUrl;
-      localStorage.setItem("user", JSON.stringify(storedUser));
-      console.log("ProfileView: Saved image to localStorage");
+      // Business logic lives in provider
+      await updateProfileImage(file);
+      await getPersonalInfo();
 
-      // Update state
-      setUserInfo((prev) => ({
-        ...prev,
-        profileImgUrl: imageDataUrl,
-      }));
+      setUploadProgress(100);
 
-      // Dispatch custom event for Sidebar
-      window.dispatchEvent(
-        new CustomEvent("profileImageUpdated", {
-          detail: { profileImgUrl: imageDataUrl },
-        }),
-      );
-
-      // Also dispatch storage event
-      window.dispatchEvent(new Event("storage"));
-
-      // Simulate upload progress
       setTimeout(() => {
-        setUploadProgress(50);
-        setTimeout(() => {
-          setUploadProgress(100);
-          setTimeout(() => {
-            setIsUploading(false);
-            setUploadProgress(0);
+        setIsUploading(false);
+        setIsEditingImage(false);
+        setPreviewImage(null);
+        setUploadProgress(0);
 
-            // Auto-close after success
-            setTimeout(() => {
-              setIsEditingImage(false);
-              setPreviewImage(null);
-              if (fileInputRef.current) {
-                fileInputRef.current.value = "";
-              }
-            }, 800);
-          }, 300);
-        }, 300);
-      }, 300);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+      }, 500);
     } catch (err) {
-      console.error("Failed to save image to localStorage:", err);
-      alert("Failed to save image. Please try again.");
+      console.error("Profile image update failed:", err);
+
+      // UI recovery only
       setIsUploading(false);
       setUploadProgress(0);
+      setPreviewImage(null);
+
+      alert("Something went wrong. Please try again.");
     }
   };
 
@@ -143,25 +84,21 @@ const ProfileView = () => {
     fileInputRef.current?.click();
   };
 
-  // Function to get current image source
   const getProfileImageSrc = () => {
-    // First check preview (if editing)
-    if (previewImage) return previewImage;
-
-    // Then check userInfo state (loaded from localStorage)
-    if (userInfo.profileImgUrl) {
-      return userInfo.profileImgUrl;
+    if (userInfo?.profile.profileImgPath) {
+      return userInfo.profile.profileImgPath;
     }
 
-    // Fallback to initials avatar
     const initials =
-      userInfo.fullName !== "N/A"
-        ? userInfo.fullName
+      userInfo?.firstName || userInfo?.lastName
+        ? `${userInfo?.firstName || ""} ${userInfo?.lastName || ""}`
+            .trim()
             .split(" ")
             .map((n) => n[0])
             .join("")
             .toUpperCase()
         : "U";
+
     return `https://ui-avatars.com/api/?name=${initials}&background=3B82F6&color=fff&bold=true&size=256`;
   };
 
@@ -226,7 +163,8 @@ const ProfileView = () => {
               <div className="text-center md:text-left flex-1">
                 {/* Name with Gradient Effect */}
                 <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-blue-700 dark:from-white dark:to-blue-300 bg-clip-text text-transparent mb-3">
-                  {userInfo.fullName}
+                  {`${userInfo?.profile.fName || ""} ${userInfo?.profile.mName || ""} ${userInfo?.profile.lName || ""}`.trim() ||
+                    "N/A"}
                 </h1>
 
                 {/* Email with Icon */}
@@ -240,7 +178,9 @@ const ProfileView = () => {
                       <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
                       <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
                     </svg>
-                    <span className="text-lg">{userInfo.email}</span>
+                    <span className="text-lg">
+                      {userInfo?.user.email || "N/A"}
+                    </span>
                   </div>
                   <span className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-sm font-semibold px-4 py-1.5 rounded-full border border-emerald-200 dark:border-emerald-800">
                     Active Now
@@ -462,7 +402,7 @@ const ProfileView = () => {
                   clipRule="evenodd"
                 />
               </svg>
-              Profile image saved in browser storage
+              Profile image securely stored on the server
             </div>
             <div className="text-gray-500 dark:text-gray-400 text-sm">
               © 2025 FinalHealth. All rights reserved. GROUP 1 BSCS-601

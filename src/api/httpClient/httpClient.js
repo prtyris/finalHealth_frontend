@@ -17,14 +17,14 @@ export async function apiRequest(url, options = {}) {
       },
     });
 
-    if (res.status === 401 || res.status === 403) {
-      localStorage.removeItem("user_token");
-      localStorage.removeItem("admin_token");
-      localStorage.removeItem("user");
-      localStorage.removeItem("admin");
-      window.location.href = "/";
-      return;
-    }
+    // if (res.status === 401 || res.status === 403) {
+    //   localStorage.removeItem("user_token");
+    //   localStorage.removeItem("admin_token");
+    //   localStorage.removeItem("user");
+    //   localStorage.removeItem("admin");
+    //   window.location.href = "/";
+    //   return;
+    // }
 
     const body = await res.json();
 
