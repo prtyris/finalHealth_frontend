@@ -1,23 +1,61 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { getMyLogs } from "../../../../../../src/api/AuditLogs.js";
 import ExportExcel from "../../../../../components/ExportExcel.jsx";
+import {
+  FiActivity,
+  FiCalendar,
+  FiCheckCircle,
+  FiChevronLeft,
+  FiChevronRight,
+  FiDownload,
+  FiEye,
+  FiFilter,
+  FiHash,
+  FiRefreshCw,
+  FiSearch,
+  FiUser,
+  FiUsers,
+  FiAlertCircle,
+  FiAlertTriangle,
+  FiTrash2,
+  FiEdit,
+  FiPlusCircle,
+  FiLogIn,
+  FiKey,
+  FiEyeOff,
+  FiCheckSquare,
+  FiSquare,
+  FiChevronDown,
+  FiChevronUp,
+} from "react-icons/fi";
 
 const ActivityHistory = () => {
   const [activityData, setActivityData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedRows, setSelectedRows] = useState([]);
-  const [sortConfig, setSortConfig] = useState({ key: 'rawDate', direction: 'desc' });
+  const [sortConfig, setSortConfig] = useState({
+    key: "logId",
+    direction: "desc",
+  });
 
   // Filter states
   const [filterUser, setFilterUser] = useState("");
   const [filterLogId, setFilterLogId] = useState("");
+  const [filterAction, setFilterAction] = useState("");
   const [filterDate, setFilterDate] = useState("");
+  const [filterTable, setFilterTable] = useState("");
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Stats
   const [stats, setStats] = useState({
     total: 0,
     today: 0,
-    yourActivity: 0
+    yourActivity: 0,
+    success: 0,
+    warnings: 0,
   });
 
   useEffect(() => {
@@ -30,43 +68,56 @@ const ActivityHistory = () => {
         const mapped = logs.map((log) => ({
           id: log.log_id,
           logId: log.log_id,
-          user: `User #${log.actor_id}`,
-          action: log.action,
-          table: log.table_affected ?? "-",
-          recordId: log.record_id ?? "-",
-          rawDate: log.timestamp,
-          timestamp: new Date(log.timestamp).toLocaleString("en-PH", {
+          user: log.user || `User #${log.actor_id || log.user_id || "Unknown"}`,
+          action: log.action || "Unknown",
+          table: log.table_affected || log.table || "-",
+          recordId: log.record_id ? log.record_id.toString() : "-",
+          rawDate: log.timestamp || new Date().toISOString(),
+          timestamp: new Date(log.timestamp).toLocaleString("en-US", {
             year: "numeric",
-            month: "long",
+            month: "short",
             day: "numeric",
             hour: "2-digit",
             minute: "2-digit",
             hour12: true,
           }),
-          // Determine icon based on action
           icon: getActionIcon(log.action),
-          // Determine status based on action
-          status: getActionStatus(log.action)
+          status: getActionStatus(log.action),
+          statusColor: getStatusColor(getActionStatus(log.action)),
+          isCurrentUser:
+            log.actor_id === 33 ||
+            log.user_id === 33 ||
+            (log.user && log.user.includes("#33")),
         }));
 
         setActivityData(mapped);
-        
+
         // Calculate stats
-        const today = new Date().toISOString().split('T')[0];
-        const todayCount = mapped.filter(entry => 
-          new Date(entry.rawDate).toISOString().split('T')[0] === today
+        const today = new Date().toISOString().split("T")[0];
+        const todayCount = mapped.filter(
+          (entry) =>
+            new Date(entry.rawDate).toISOString().split("T")[0] === today,
         ).length;
-        
-        const yourActivityCount = mapped.filter(entry => 
-          entry.user.toLowerCase().includes('user #') // Adjust based on your user ID logic
+
+        const yourActivityCount = mapped.filter(
+          (entry) => entry.isCurrentUser,
+        ).length;
+
+        const successCount = mapped.filter(
+          (entry) => getActionStatus(entry.action) === "success",
+        ).length;
+
+        const warningCount = mapped.filter(
+          (entry) => getActionStatus(entry.action) === "warning",
         ).length;
 
         setStats({
           total: mapped.length,
           today: todayCount,
-          yourActivity: yourActivityCount
+          yourActivity: yourActivityCount,
+          success: successCount,
+          warnings: warningCount,
         });
-
       } catch (err) {
         console.error("❌ Failed to load activity logs:", err.message);
       } finally {
@@ -77,39 +128,76 @@ const ActivityHistory = () => {
     loadLogs();
   }, []);
 
-  // Helper function to get icon based on action
+  // Helper functions
   const getActionIcon = (action) => {
+    if (!action) return <FiActivity className="text-gray-500" />;
+
     const actionLower = action.toLowerCase();
-    if (actionLower.includes('create') || actionLower.includes('insert')) return 'plus-circle';
-    if (actionLower.includes('update') || actionLower.includes('edit')) return 'edit';
-    if (actionLower.includes('delete') || actionLower.includes('remove')) return 'trash';
-    if (actionLower.includes('login') || actionLower.includes('logout')) return 'sign-in-alt';
-    if (actionLower.includes('password')) return 'key';
-    if (actionLower.includes('read') || actionLower.includes('view')) return 'eye';
-    return 'history';
+    if (actionLower.includes("create") || actionLower.includes("insert"))
+      return <FiPlusCircle className="text-green-500" />;
+    if (actionLower.includes("update") || actionLower.includes("edit"))
+      return <FiEdit className="text-blue-500" />;
+    if (actionLower.includes("delete") || actionLower.includes("remove"))
+      return <FiTrash2 className="text-red-500" />;
+    if (actionLower.includes("login"))
+      return <FiLogIn className="text-indigo-500" />;
+    if (actionLower.includes("logout"))
+      return <FiLogIn className="text-gray-500 transform rotate-180" />;
+    if (actionLower.includes("password"))
+      return <FiKey className="text-purple-500" />;
+    if (
+      actionLower.includes("read") ||
+      actionLower.includes("view") ||
+      actionLower.includes("select")
+    )
+      return <FiEye className="text-teal-500" />;
+    if (actionLower.includes("success"))
+      return <FiCheckCircle className="text-green-500" />;
+    if (actionLower.includes("fail") || actionLower.includes("error"))
+      return <FiAlertCircle className="text-red-500" />;
+    if (actionLower.includes("registration"))
+      return <FiUser className="text-indigo-500" />;
+    return <FiActivity className="text-gray-500" />;
   };
 
-  // Helper function to get status based on action
   const getActionStatus = (action) => {
+    if (!action) return "info";
+
     const actionLower = action.toLowerCase();
-    if (actionLower.includes('fail') || actionLower.includes('error')) return 'warning';
-    if (actionLower.includes('delete')) return 'danger';
-    return 'success';
+    if (
+      actionLower.includes("fail") ||
+      actionLower.includes("error") ||
+      actionLower.includes("denied")
+    )
+      return "warning";
+    if (actionLower.includes("delete")) return "danger";
+    if (
+      actionLower.includes("success") ||
+      actionLower.includes("login_success") ||
+      actionLower.includes("completed")
+    )
+      return "success";
+    if (actionLower.includes("login")) return "info";
+    if (actionLower.includes("registration")) return "info";
+    return "info";
   };
 
-  // Get status color
   const getStatusColor = (status) => {
-    switch(status) {
-      case 'success': return '#34a853';
-      case 'warning': return '#fbbc05';
-      case 'danger': return '#ea4335';
-      default: return '#5f6368';
+    switch (status) {
+      case "success":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "warning":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "danger":
+        return "bg-red-100 text-red-800 border-red-200";
+      case "info":
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
-  // ==========================
-  //      FILTER LOGIC
-  // ==========================
+  // Filter logic
   const filteredData = useMemo(() => {
     let result = activityData.filter((entry) => {
       const matchUser =
@@ -119,53 +207,90 @@ const ActivityHistory = () => {
       const matchLogId =
         filterLogId === "" || entry.logId.toString().includes(filterLogId);
 
+      const matchAction =
+        filterAction === "" ||
+        entry.action.toLowerCase().includes(filterAction.toLowerCase());
+
+      const matchTable =
+        filterTable === "" ||
+        entry.table.toLowerCase().includes(filterTable.toLowerCase());
+
       const matchDate =
         filterDate === "" ||
         new Date(entry.rawDate).toISOString().split("T")[0] === filterDate;
 
-      return matchUser && matchLogId && matchDate;
+      return matchUser && matchLogId && matchAction && matchTable && matchDate;
     });
 
     // Apply sorting
     if (sortConfig.key) {
       result.sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) {
-          return sortConfig.direction === 'asc' ? -1 : 1;
+        let aValue = a[sortConfig.key];
+        let bValue = b[sortConfig.key];
+
+        if (sortConfig.key === "logId") {
+          aValue = parseInt(aValue);
+          bValue = parseInt(bValue);
         }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
-          return sortConfig.direction === 'asc' ? 1 : -1;
+
+        if (sortConfig.key === "rawDate") {
+          aValue = new Date(aValue).getTime();
+          bValue = new Date(bValue).getTime();
+        }
+
+        if (aValue < bValue) {
+          return sortConfig.direction === "asc" ? -1 : 1;
+        }
+        if (aValue > bValue) {
+          return sortConfig.direction === "asc" ? 1 : -1;
         }
         return 0;
       });
     }
 
     return result;
-  }, [activityData, filterUser, filterLogId, filterDate, sortConfig]);
+  }, [
+    activityData,
+    filterUser,
+    filterLogId,
+    filterAction,
+    filterTable,
+    filterDate,
+    sortConfig,
+  ]);
+
+  // Pagination
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const paginatedData = filteredData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage,
+  );
 
   // Handle sort
   const handleSort = (key) => {
-    let direction = 'asc';
-    if (sortConfig.key === key && sortConfig.direction === 'asc') {
-      direction = 'desc';
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
     }
     setSortConfig({ key, direction });
   };
 
   // Handle row selection
   const handleRowSelect = (id) => {
-    setSelectedRows(prev => 
-      prev.includes(id) 
-        ? prev.filter(rowId => rowId !== id)
-        : [...prev, id]
+    setSelectedRows((prev) =>
+      prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id],
     );
   };
 
   // Handle select all
   const handleSelectAll = () => {
-    if (selectedRows.length === filteredData.length) {
+    if (
+      selectedRows.length === paginatedData.length &&
+      paginatedData.length > 0
+    ) {
       setSelectedRows([]);
     } else {
-      setSelectedRows(filteredData.map(activity => activity.id));
+      setSelectedRows(paginatedData.map((activity) => activity.id));
     }
   };
 
@@ -173,565 +298,183 @@ const ActivityHistory = () => {
   const handleReset = () => {
     setFilterUser("");
     setFilterLogId("");
+    setFilterAction("");
+    setFilterTable("");
     setFilterDate("");
     setSelectedRows([]);
+    setCurrentPage(1);
   };
 
-  if (loading) return (
-    <div className="activity-history-container">
-      <div className="loading-spinner">
-        <style jsx>{`
-          .activity-history-container {
-            min-height: 400px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          }
-          
-          .loading-spinner {
-            text-align: center;
-            padding: 40px;
-          }
-          
-          .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid #e8f0fe;
-            border-top: 4px solid #1a73e8;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-          }
-          
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        `}</style>
-        <div className="spinner"></div>
-        <p style={{ color: '#5f6368', fontSize: '16px' }}>Loading activity history...</p>
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
+          <p className="mt-4 text-gray-600">Loading activity history...</p>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 
   return (
-    <div className="activity-history-container">
-      <style jsx>{`
-        .activity-history-container {
-          display: flex;
-          flex-direction: column;
-          gap: 25px;
-          max-width: 1200px;
-          margin: 0 auto;
-        }
-        
-        /* Header Section */
-        .activity-header {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          border-radius: 16px;
-          padding: 30px;
-          color: white;
-          box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
-          position: relative;
-          overflow: hidden;
-        }
-        
-        .activity-header::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
-          opacity: 0.1;
-        }
-        
-        .header-content {
-          position: relative;
-          z-index: 1;
-        }
-        
-        .header-title {
-          font-size: 28px;
-          font-weight: 700;
-          margin-bottom: 10px;
-          display: flex;
-          align-items: center;
-          gap: 15px;
-        }
-        
-        .header-subtitle {
-          font-size: 16px;
-          opacity: 0.9;
-          margin-bottom: 25px;
-        }
-        
-        .stats-container {
-          display: flex;
-          gap: 20px;
-          flex-wrap: wrap;
-        }
-        
-        .stat-card {
-          background: rgba(255, 255, 255, 0.15);
-          backdrop-filter: blur(10px);
-          border-radius: 12px;
-          padding: 15px 20px;
-          min-width: 150px;
-          border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .stat-value {
-          font-size: 24px;
-          font-weight: 700;
-          margin-bottom: 5px;
-        }
-        
-        .stat-label {
-          font-size: 14px;
-          opacity: 0.8;
-        }
-        
-        /* Filters Section */
-        .filters-section {
-          background: white;
-          border-radius: 16px;
-          padding: 25px;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        }
-        
-        .filters-title {
-          font-size: 18px;
-          font-weight: 600;
-          margin-bottom: 20px;
-          color: #202124;
-          display: flex;
-          align-items: center;
-          gap: 10px;
-        }
-        
-        .filters-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-          gap: 20px;
-          margin-bottom: 20px;
-        }
-        
-        .filter-group {
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-        }
-        
-        .filter-label {
-          font-size: 14px;
-          font-weight: 500;
-          color: #5f6368;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-        
-        .filter-input {
-          padding: 12px 16px;
-          border: 2px solid #e0e0e0;
-          border-radius: 10px;
-          font-size: 14px;
-          transition: all 0.3s ease;
-          background-color: #f8f9fa;
-        }
-        
-        .filter-input:focus {
-          outline: none;
-          border-color: #667eea;
-          background-color: white;
-          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        
-        .actions-row {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding-top: 20px;
-          border-top: 2px solid #f1f3f4;
-        }
-        
-        .export-wrapper {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-        }
-        
-        .export-btn {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          padding: 12px 24px;
-          background: linear-gradient(135deg, #34a853 0%, #2e8b47 100%);
-          color: white;
-          border: none;
-          border-radius: 10px;
-          font-weight: 500;
-          cursor: pointer;
-          transition: all 0.3s ease;
-        }
-        
-        .export-btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 12px rgba(52, 168, 83, 0.25);
-        }
-        
-        .reset-btn {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          padding: 10px 20px;
-          background-color: #f1f3f4;
-          color: #5f6368;
-          border: none;
-          border-radius: 10px;
-          font-weight: 500;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-        
-        .reset-btn:hover {
-          background-color: #e8eaed;
-          color: #202124;
-        }
-        
-        .selected-count {
-          font-size: 14px;
-          color: #5f6368;
-          font-weight: 500;
-        }
-        
-        /* Table Section */
-        .table-section {
-          background: white;
-          border-radius: 16px;
-          overflow: hidden;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        }
-        
-        .table-container {
-          overflow-x: auto;
-        }
-        
-        .activity-table {
-          width: 100%;
-          border-collapse: separate;
-          border-spacing: 0;
-          min-width: 1000px;
-        }
-        
-        .table-header {
-          background: linear-gradient(135deg, #f8f9fa 0%, #e8f0fe 100%);
-        }
-        
-        .table-header th {
-          padding: 20px;
-          text-align: left;
-          font-weight: 600;
-          color: #202124;
-          font-size: 14px;
-          border-bottom: 2px solid #e0e0e0;
-          white-space: nowrap;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          position: relative;
-        }
-        
-        .table-header th:hover {
-          background-color: #f1f3f4;
-        }
-        
-        .sort-indicator {
-          margin-left: 5px;
-          font-size: 12px;
-          opacity: 0.6;
-        }
-        
-        .checkbox-header {
-          width: 50px;
-          padding: 20px 10px;
-        }
-        
-        .table-body tr {
-          transition: all 0.2s ease;
-          border-bottom: 1px solid #f1f3f4;
-        }
-        
-        .table-body tr:hover {
-          background-color: #f8f9fa;
-        }
-        
-        .table-body td {
-          padding: 18px 20px;
-          color: #5f6368;
-          font-size: 14px;
-          vertical-align: middle;
-        }
-        
-        .checkbox-cell {
-          width: 50px;
-          padding: 18px 10px;
-        }
-        
-        .checkbox-input {
-          width: 18px;
-          height: 18px;
-          cursor: pointer;
-          accent-color: #667eea;
-        }
-        
-        .user-cell {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
-        
-        .user-avatar {
-          width: 36px;
-          height: 36px;
-          border-radius: 50%;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          font-weight: 600;
-          font-size: 14px;
-        }
-        
-        .action-cell {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-        }
-        
-        .action-icon {
-          width: 32px;
-          height: 32px;
-          border-radius: 8px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 14px;
-          background-color: #e8f0fe;
-          color: #1a73e8;
-        }
-        
-        .status-badge {
-          padding: 6px 12px;
-          border-radius: 20px;
-          font-size: 12px;
-          font-weight: 500;
-          display: inline-block;
-        }
-        
-        .timestamp-cell {
-          font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-          font-size: 13px;
-          white-space: nowrap;
-        }
-        
-        /* No data state */
-        .no-data {
-          text-align: center;
-          padding: 60px 20px;
-          color: #5f6368;
-        }
-        
-        .no-data-icon {
-          font-size: 48px;
-          color: #e0e0e0;
-          margin-bottom: 20px;
-        }
-        
-        /* Pagination */
-        .pagination-section {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 20px;
-          background-color: #f8f9fa;
-          border-top: 2px solid #e0e0e0;
-        }
-        
-        .pagination-info {
-          font-size: 14px;
-          color: #5f6368;
-        }
-        
-        .pagination-controls {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-        }
-        
-        .pagination-btn {
-          padding: 8px 16px;
-          background-color: white;
-          border: 1px solid #e0e0e0;
-          border-radius: 8px;
-          cursor: pointer;
-          font-size: 14px;
-          transition: all 0.2s ease;
-        }
-        
-        .pagination-btn:hover:not(:disabled) {
-          background-color: #f1f3f4;
-          border-color: #c0c0c0;
-        }
-        
-        .pagination-btn:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
-        
-        @media (max-width: 768px) {
-          .activity-header {
-            padding: 20px;
-          }
-          
-          .header-title {
-            font-size: 22px;
-          }
-          
-          .stats-container {
-            flex-direction: column;
-            gap: 15px;
-          }
-          
-          .stat-card {
-            min-width: auto;
-            width: 100%;
-          }
-          
-          .filters-section {
-            padding: 20px;
-          }
-          
-          .filters-grid {
-            grid-template-columns: 1fr;
-          }
-          
-          .actions-row {
-            flex-direction: column;
-            gap: 15px;
-            align-items: stretch;
-          }
-          
-          .export-wrapper {
-            flex-direction: column;
-            gap: 10px;
-          }
-        }
-      `}</style>
-
-      {/* Add Font Awesome */}
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-
+    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
       {/* Header Section */}
-      <div className="activity-header">
-        <div className="header-content">
-          <h1 className="header-title">
-            <i className="fas fa-history"></i>
-            Activity History
-          </h1>
-          <p className="header-subtitle">
-            Track and monitor all system activities and user actions
-          </p>
-          <div className="stats-container">
-            <div className="stat-card">
-              <div className="stat-value">{stats.total}</div>
-              <div className="stat-label">Total Activities</div>
+      <div className="mb-8">
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-700 rounded-2xl shadow-lg overflow-hidden">
+          <div className="p-6 md:p-8 relative">
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute inset-0 bg-gradient-to-r from-white to-transparent"></div>
             </div>
-            <div className="stat-card">
-              <div className="stat-value">{stats.today}</div>
-              <div className="stat-label">Today's Activities</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-value">{stats.yourActivity}</div>
-              <div className="stat-label">Your Activities</div>
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-2">
+                <FiActivity className="text-white text-2xl" />
+                <h1 className="text-2xl md:text-3xl font-bold text-white">
+                  Activity History
+                </h1>
+              </div>
+              <p className="text-indigo-100 mb-8">
+                Track and monitor all system activities and user actions
+              </p>
+
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                  <div className="text-2xl font-bold text-white">
+                    {stats.total}
+                  </div>
+                  <div className="text-sm text-indigo-100">
+                    Total Activities
+                  </div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                  <div className="text-2xl font-bold text-white">
+                    {stats.today}
+                  </div>
+                  <div className="text-sm text-indigo-100">
+                    Today's Activities
+                  </div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                  <div className="text-2xl font-bold text-white">
+                    {stats.yourActivity}
+                  </div>
+                  <div className="text-sm text-indigo-100">Your Activities</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                  <div className="text-2xl font-bold text-white">
+                    {stats.success}
+                  </div>
+                  <div className="text-sm text-indigo-100">Successful</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                  <div className="text-2xl font-bold text-white">
+                    {stats.warnings}
+                  </div>
+                  <div className="text-sm text-indigo-100">Warnings</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Filters Section */}
-      <div className="filters-section">
-        <h2 className="filters-title">
-          <i className="fas fa-filter"></i>
-          Filter Activities
-        </h2>
-        
-        <div className="filters-grid">
-          <div className="filter-group">
-            <label className="filter-label">
-              <i className="fas fa-user"></i>
-              Filter by User
+      <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
+        <div className="flex items-center gap-2 mb-6">
+          <FiFilter className="text-indigo-600 text-xl" />
+          <h2 className="text-xl font-semibold text-gray-800">
+            Filter Activities
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div>
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+              <FiUser className="text-indigo-500" /> User
             </label>
-            <input
-              type="text"
-              className="filter-input"
-              placeholder="Search by user..."
-              value={filterUser}
-              onChange={(e) => setFilterUser(e.target.value)}
-            />
+            <div className="relative">
+              <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+                placeholder="Search user..."
+                value={filterUser}
+                onChange={(e) => setFilterUser(e.target.value)}
+              />
+            </div>
           </div>
-          
-          <div className="filter-group">
-            <label className="filter-label">
-              <i className="fas fa-fingerprint"></i>
-              Filter by Log ID
+
+          <div>
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+              <FiHash className="text-indigo-500" /> Log ID
             </label>
             <input
               type="number"
-              className="filter-input"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
               placeholder="Enter log ID..."
               value={filterLogId}
               onChange={(e) => setFilterLogId(e.target.value)}
             />
           </div>
-          
-          <div className="filter-group">
-            <label className="filter-label">
-              <i className="fas fa-calendar"></i>
-              Filter by Date
+
+          <div>
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+              <FiActivity className="text-indigo-500" /> Action
+            </label>
+            <input
+              type="text"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+              placeholder="Filter by action..."
+              value={filterAction}
+              onChange={(e) => setFilterAction(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+              <FiCalendar className="text-indigo-500" /> Date
             </label>
             <input
               type="date"
-              className="filter-input"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
               value={filterDate}
               onChange={(e) => setFilterDate(e.target.value)}
             />
           </div>
         </div>
-        
-        <div className="actions-row">
-          <div className="selected-count">
-            {selectedRows.length > 0 ? `${selectedRows.length} selected` : 'No items selected'}
+
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-gray-200">
+          <div className="flex items-center gap-3">
+            <div className="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-full text-sm font-medium">
+              {selectedRows.length > 0
+                ? `${selectedRows.length} selected`
+                : `${filteredData.length} activities found`}
+            </div>
           </div>
-          
-          <div className="export-wrapper">
-            <button className="reset-btn" onClick={handleReset}>
-              <i className="fas fa-redo"></i>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleReset}
+              className="flex items-center gap-2 px-5 py-2.5 text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-xl font-medium transition-all duration-200"
+            >
+              <FiRefreshCw className="text-indigo-600" />
               Reset Filters
             </button>
-            
-            <ExportExcel 
-              data={selectedRows.length > 0 
-                ? filteredData.filter(item => selectedRows.includes(item.id))
-                : filteredData
-              } 
+
+            <ExportExcel
+              data={
+                selectedRows.length > 0
+                  ? filteredData.filter((item) =>
+                      selectedRows.includes(item.id),
+                    )
+                  : filteredData
+              }
               filename="activity_logs.xlsx"
               buttonComponent={
-                <button className="export-btn">
-                  <i className="fas fa-file-export"></i>
-                  Export {selectedRows.length > 0 ? `(${selectedRows.length})` : 'All'}
+                <button className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-200">
+                  <FiDownload />
+                  Export{" "}
+                  {selectedRows.length > 0 ? `(${selectedRows.length})` : "All"}
                 </button>
               }
             />
@@ -740,147 +483,326 @@ const ActivityHistory = () => {
       </div>
 
       {/* Table Section */}
-      <div className="table-section">
-        <div className="table-container">
-          {filteredData.length === 0 ? (
-            <div className="no-data">
-              <div className="no-data-icon">
-                <i className="fas fa-inbox"></i>
-              </div>
-              <h3>No activity data found</h3>
-              <p>Try adjusting your filters or check back later for new activities.</p>
+      <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+        {filteredData.length === 0 ? (
+          <div className="text-center py-16">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
+              <FiEyeOff className="text-gray-400 text-2xl" />
             </div>
-          ) : (
-            <table className="activity-table">
-              <thead className="table-header">
-                <tr>
-                  <th className="checkbox-header">
-                    <input
-                      type="checkbox"
-                      className="checkbox-input"
-                      checked={selectedRows.length === filteredData.length && filteredData.length > 0}
-                      onChange={handleSelectAll}
-                      disabled={filteredData.length === 0}
-                    />
-                  </th>
-                  <th onClick={() => handleSort('logId')}>
-                    LOG ID {sortConfig.key === 'logId' && (
-                      <span className="sort-indicator">
-                        {sortConfig.direction === 'asc' ? '↑' : '↓'}
-                      </span>
-                    )}
-                  </th>
-                  <th onClick={() => handleSort('user')}>
-                    USER {sortConfig.key === 'user' && (
-                      <span className="sort-indicator">
-                        {sortConfig.direction === 'asc' ? '↑' : '↓'}
-                      </span>
-                    )}
-                  </th>
-                  <th onClick={() => handleSort('action')}>
-                    ACTION {sortConfig.key === 'action' && (
-                      <span className="sort-indicator">
-                        {sortConfig.direction === 'asc' ? '↑' : '↓'}
-                      </span>
-                    )}
-                  </th>
-                  <th onClick={() => handleSort('table')}>
-                    TABLE AFFECTED {sortConfig.key === 'table' && (
-                      <span className="sort-indicator">
-                        {sortConfig.direction === 'asc' ? '↑' : '↓'}
-                      </span>
-                    )}
-                  </th>
-                  <th onClick={() => handleSort('recordId')}>
-                    RECORD ID {sortConfig.key === 'recordId' && (
-                      <span className="sort-indicator">
-                        {sortConfig.direction === 'asc' ? '↑' : '↓'}
-                      </span>
-                    )}
-                  </th>
-                  <th onClick={() => handleSort('rawDate')}>
-                    TIMESTAMP {sortConfig.key === 'rawDate' && (
-                      <span className="sort-indicator">
-                        {sortConfig.direction === 'asc' ? '↑' : '↓'}
-                      </span>
-                    )}
-                  </th>
-                </tr>
-              </thead>
-              
-              <tbody className="table-body">
-                {filteredData.map((activity) => (
-                  <tr key={activity.id}>
-                    <td className="checkbox-cell">
-                      <input
-                        type="checkbox"
-                        className="checkbox-input"
-                        checked={selectedRows.includes(activity.id)}
-                        onChange={() => handleRowSelect(activity.id)}
-                      />
-                    </td>
-                    <td style={{ fontWeight: '600', color: '#202124' }}>
-                      {activity.logId}
-                    </td>
-                    <td>
-                      <div className="user-cell">
-                        <div className="user-avatar">
-                          {activity.user.charAt(0)}
-                        </div>
-                        <span style={{ fontWeight: '500', color: '#202124' }}>
-                          {activity.user}
+            <h3 className="text-lg font-semibold text-gray-700 mb-2">
+              No activity data found
+            </h3>
+            <p className="text-gray-500">
+              Try adjusting your filters or check back later for new activities.
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-6 py-4 text-left">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={handleSelectAll}
+                          className="text-gray-400 hover:text-indigo-600 transition-colors"
+                        >
+                          {selectedRows.length === paginatedData.length &&
+                          paginatedData.length > 0 ? (
+                            <FiCheckSquare className="text-indigo-600 text-lg" />
+                          ) : (
+                            <FiSquare className="text-lg" />
+                          )}
+                        </button>
+                        <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                          Select
                         </span>
                       </div>
-                    </td>
-                    <td>
-                      <div className="action-cell">
-                        <div className="action-icon">
-                          <i className={`fas fa-${activity.icon}`}></i>
+                    </th>
+                    <th
+                      className="px-6 py-4 text-left cursor-pointer group"
+                      onClick={() => handleSort("logId")}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                          LOG ID
+                        </span>
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                          {sortConfig.key === "logId" ? (
+                            sortConfig.direction === "asc" ? (
+                              <FiChevronUp className="text-indigo-600" />
+                            ) : (
+                              <FiChevronDown className="text-indigo-600" />
+                            )
+                          ) : (
+                            <FiChevronDown className="text-gray-400" />
+                          )}
                         </div>
-                        <span style={{ color: '#202124' }}>{activity.action}</span>
                       </div>
-                    </td>
-                    <td>
-                      <span style={{ 
-                        backgroundColor: '#e8f0fe', 
-                        padding: '4px 12px', 
-                        borderRadius: '12px',
-                        fontSize: '13px',
-                        color: '#1a73e8',
-                        fontWeight: '500'
-                      }}>
-                        {activity.table}
+                    </th>
+                    <th
+                      className="px-6 py-4 text-left cursor-pointer group"
+                      onClick={() => handleSort("user")}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                          USER
+                        </span>
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                          {sortConfig.key === "user" ? (
+                            sortConfig.direction === "asc" ? (
+                              <FiChevronUp className="text-indigo-600" />
+                            ) : (
+                              <FiChevronDown className="text-indigo-600" />
+                            )
+                          ) : (
+                            <FiChevronDown className="text-gray-400" />
+                          )}
+                        </div>
+                      </div>
+                    </th>
+                    <th
+                      className="px-6 py-4 text-left cursor-pointer group"
+                      onClick={() => handleSort("action")}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                          ACTION
+                        </span>
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                          {sortConfig.key === "action" ? (
+                            sortConfig.direction === "asc" ? (
+                              <FiChevronUp className="text-indigo-600" />
+                            ) : (
+                              <FiChevronDown className="text-indigo-600" />
+                            )
+                          ) : (
+                            <FiChevronDown className="text-gray-400" />
+                          )}
+                        </div>
+                      </div>
+                    </th>
+                    <th
+                      className="px-6 py-4 text-left cursor-pointer group"
+                      onClick={() => handleSort("table")}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                          TABLE AFFECTED
+                        </span>
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                          {sortConfig.key === "table" ? (
+                            sortConfig.direction === "asc" ? (
+                              <FiChevronUp className="text-indigo-600" />
+                            ) : (
+                              <FiChevronDown className="text-indigo-600" />
+                            )
+                          ) : (
+                            <FiChevronDown className="text-gray-400" />
+                          )}
+                        </div>
+                      </div>
+                    </th>
+                    <th className="px-6 py-4 text-left">
+                      <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        RECORD ID
                       </span>
-                    </td>
-                    <td style={{ fontFamily: "'Monaco', 'Menlo', monospace", fontSize: '13px' }}>
-                      {activity.recordId}
-                    </td>
-                    <td className="timestamp-cell">
-                      {activity.timestamp}
-                    </td>
+                    </th>
+                    <th
+                      className="px-6 py-4 text-left cursor-pointer group"
+                      onClick={() => handleSort("rawDate")}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                          TIMESTAMP
+                        </span>
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                          {sortConfig.key === "rawDate" ? (
+                            sortConfig.direction === "asc" ? (
+                              <FiChevronUp className="text-indigo-600" />
+                            ) : (
+                              <FiChevronDown className="text-indigo-600" />
+                            )
+                          ) : (
+                            <FiChevronDown className="text-gray-400" />
+                          )}
+                        </div>
+                      </div>
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-        
-        {/* Pagination - You can implement this based on your API */}
-        {filteredData.length > 0 && (
-          <div className="pagination-section">
-            <div className="pagination-info">
-              Showing {filteredData.length} of {activityData.length} activities
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {paginatedData.map((activity) => (
+                    <tr
+                      key={activity.id}
+                      className="hover:bg-gray-50 transition-colors duration-150"
+                    >
+                      <td className="px-6 py-4">
+                        <button
+                          onClick={() => handleRowSelect(activity.id)}
+                          className="text-gray-400 hover:text-indigo-600 transition-colors"
+                        >
+                          {selectedRows.includes(activity.id) ? (
+                            <FiCheckSquare className="text-indigo-600 text-lg" />
+                          ) : (
+                            <FiSquare className="text-lg" />
+                          )}
+                        </button>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="font-mono text-sm font-semibold text-gray-900">
+                          {activity.logId}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <FiUser className="text-indigo-500 text-sm" />
+                            <div className="font-medium text-gray-900">
+                              {activity.user}
+                            </div>
+                            {activity.isCurrentUser && (
+                              <span className="text-xs bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full border border-indigo-200">
+                                You
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-xs text-gray-600 ml-6">
+                            {activity.user.replace("User #", "ID: ")}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="flex-shrink-0">{activity.icon}</div>
+                          <div>
+                            <div className="font-medium text-gray-900">
+                              {activity.action}
+                            </div>
+                            <span
+                              className={`text-xs px-3 py-1 rounded-full border ${getStatusColor(activity.status)}`}
+                            >
+                              {activity.status.charAt(0).toUpperCase() +
+                                activity.status.slice(1)}
+                            </span>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="px-3 py-1.5 bg-indigo-50 text-indigo-700 text-sm font-medium rounded-lg">
+                          {activity.table}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="font-mono text-sm text-gray-600">
+                          {activity.recordId}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="text-sm text-gray-600">
+                          {activity.timestamp}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-            <div className="pagination-controls">
-              <button className="pagination-btn" disabled>
-                <i className="fas fa-chevron-left"></i> Previous
-              </button>
-              <span style={{ padding: '0 10px', color: '#5f6368' }}>Page 1 of 1</span>
-              <button className="pagination-btn" disabled>
-                Next <i className="fas fa-chevron-right"></i>
-              </button>
+
+            {/* Pagination */}
+            <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div className="text-sm text-gray-700">
+                  Showing{" "}
+                  <span className="font-semibold">
+                    {(currentPage - 1) * itemsPerPage + 1}
+                  </span>{" "}
+                  to{" "}
+                  <span className="font-semibold">
+                    {Math.min(currentPage * itemsPerPage, filteredData.length)}
+                  </span>{" "}
+                  of{" "}
+                  <span className="font-semibold">{filteredData.length}</span>{" "}
+                  activities
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
+                    disabled={currentPage === 1}
+                    className="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <FiChevronLeft />
+                  </button>
+
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                      .filter(
+                        (page) =>
+                          page === 1 ||
+                          page === totalPages ||
+                          (page >= currentPage - 1 && page <= currentPage + 1),
+                      )
+                      .map((page, index, array) => {
+                        if (index > 0 && array[index - 1] !== page - 1) {
+                          return (
+                            <span
+                              key={`ellipsis-${page}`}
+                              className="px-3 py-2 text-gray-500"
+                            >
+                              ...
+                            </span>
+                          );
+                        }
+                        return (
+                          <button
+                            key={page}
+                            onClick={() => setCurrentPage(page)}
+                            className={`px-3 py-2 rounded-lg font-medium transition-colors ${
+                              currentPage === page
+                                ? "bg-indigo-600 text-white"
+                                : "text-gray-700 hover:bg-gray-100"
+                            }`}
+                          >
+                            {page}
+                          </button>
+                        );
+                      })}
+                  </div>
+
+                  <button
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                    }
+                    disabled={currentPage === totalPages}
+                    className="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <FiChevronRight />
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-700">Rows per page:</span>
+                  <select
+                    value={itemsPerPage}
+                    onChange={(e) => {
+                      setItemsPerPage(Number(e.target.value));
+                      setCurrentPage(1);
+                    }}
+                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white"
+                  >
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                  </select>
+                </div>
+              </div>
             </div>
-          </div>
+          </>
         )}
       </div>
     </div>
