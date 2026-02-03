@@ -110,7 +110,7 @@ const ProfileView = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-blue-50 bg-white py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto">
           {/* Profile Header */}
           <div className="bg-gradient-to-r from-white to-blue-50 dark:from-gray-800 dark:to-gray-900 rounded-3xl shadow-xl p-8 mb-8 border border-blue-100 dark:border-gray-700">

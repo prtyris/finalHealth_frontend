@@ -51,7 +51,7 @@ export default function AppointmentsPage() {
     return () =>
       window.removeEventListener(
         "appointments:selectionChanged",
-        syncFromStorage
+        syncFromStorage,
       );
   }, []);
 
@@ -103,7 +103,7 @@ export default function AppointmentsPage() {
 
   return (
     <Layout>
-      <div className="p-6 space-y-6">
+      <div className="p-6 space-y-6 bg-white">
         <HeaderFilters search={search} onSearchChange={setSearch} />
 
         <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />

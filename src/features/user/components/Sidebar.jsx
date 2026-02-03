@@ -11,10 +11,15 @@ import {
 
 import { useUser } from "../context/users/useUser";
 
-export default function Sidebar({ isOpen, setIsOpen, isMobile = false }) {
+export default function Sidebar({
+  isOpen,
+  setIsOpen,
+  isMobile = false,
+  isCollapsed,
+  setIsCollapsed,
+}) {
   const { getPersonalInfo, userInfo } = useUser();
 
-  // 🔹 Load user info from backend ONCE
   useEffect(() => {
     getPersonalInfo();
   }, []);
@@ -52,7 +57,6 @@ export default function Sidebar({ isOpen, setIsOpen, isMobile = false }) {
     },
   ];
 
-  // 🔹 Image source from CONTEXT
   const getProfileImageSrc = () => {
     if (userInfo?.profile.profileImgPath)
       return userInfo.profile.profileImgPath;
@@ -77,12 +81,13 @@ export default function Sidebar({ isOpen, setIsOpen, isMobile = false }) {
   const email = userInfo?.user.email || "N/A";
 
   const handleLogout = () => {
-    localStorage.removeItem("user_token");
+    localStorage.clear();
     window.location.href = "/";
   };
 
   return (
     <>
+      {/* MOBILE OVERLAY */}
       {isMobile && (
         <div
           className={`fixed inset-0 bg-black/40 z-20 md:hidden ${isOpen ? "block" : "hidden"}`}
@@ -90,61 +95,74 @@ export default function Sidebar({ isOpen, setIsOpen, isMobile = false }) {
         />
       )}
 
+      {/* SIDEBAR */}
       <aside
         className={`
-          bg-white shadow-lg fixed left-0 h-[calc(100vh-4rem)] top-16 overflow-y-auto
+          bg-white shadow-lg fixed left-0 top-16 z-30
+          h-[calc(100vh-4rem)] overflow-y-auto
+          transition-all duration-200
           ${
             isMobile
-              ? `w-64 z-30 transform ${
-                  isOpen ? "translate-x-0" : "-translate-x-full"
-                } transition-transform duration-200 md:hidden`
-              : `hidden md:block w-64`
+              ? `w-64 transform ${isOpen ? "translate-x-0" : "-translate-x-full"} md:hidden`
+              : isCollapsed
+                ? "hidden md:block w-20"
+                : "hidden md:block w-64"
           }
         `}
       >
         <div className="flex flex-col h-full">
+          {/* PROFILE */}
           <div className="p-4 pb-2 flex items-center space-x-3">
-            <div className="relative flex-shrink-0">
-              <img
-                src={getProfileImageSrc()}
-                className="w-14 h-14 rounded-full border-2 border-white shadow-sm"
-                alt="Profile"
-                style={{ objectFit: "cover" }}
-              />
-              <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full" />
-            </div>
+            <img
+              src={getProfileImageSrc()}
+              className="w-14 h-14 rounded-full border-2 border-white shadow-sm"
+              alt="Profile"
+            />
 
-            <div className="flex flex-col min-w-0">
-              <p className="font-semibold text-gray-800 truncate max-w-[150px]">
-                {fullName}
-              </p>
-              <p className="text-sm text-gray-500 truncate max-w-[150px]">
-                {email}
-              </p>
+            <div className="flex items-start justify-between w-full min-w-0">
+              {!isCollapsed && (
+                <div className="flex flex-col min-w-0">
+                  <p className="font-semibold text-gray-800 truncate">
+                    {fullName}
+                  </p>
+                  <p className="text-sm text-gray-500 truncate">{email}</p>
+                </div>
+              )}
+
+              {!isMobile && (
+                <button
+                  onClick={() => setIsCollapsed(!isCollapsed)}
+                  className="text-gray-400 hover:text-blue-600"
+                >
+                  {isCollapsed ? "▶" : "◀"}
+                </button>
+              )}
             </div>
           </div>
 
+          {/* MENU */}
           <nav className="p-4 space-y-1 flex-grow">
             {menu.map((m, i) => (
               <a
                 key={i}
                 href={m.link}
-                className="flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 text-gray-700"
+                className="flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-blue-50 text-gray-700"
                 onClick={() => isMobile && setIsOpen(false)}
               >
                 <span className="text-blue-500">{m.icon}</span>
-                <span className="font-medium">{m.name}</span>
+                {!isCollapsed && <span>{m.name}</span>}
               </a>
             ))}
           </nav>
 
-          <div className="p-4 mt-auto border-t border-gray-100">
+          {/* LOGOUT */}
+          <div className="p-4 border-t">
             <button
-              className="flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-red-50 hover:text-red-600 transition-colors duration-200 w-full text-gray-700"
+              className="flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-red-50 w-full"
               onClick={handleLogout}
             >
               <ArrowLeftOnRectangleIcon className="h-5 text-red-500" />
-              <span className="font-medium">Logout</span>
+              {!isCollapsed && <span>Logout</span>}
             </button>
           </div>
         </div>

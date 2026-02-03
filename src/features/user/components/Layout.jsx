@@ -4,29 +4,38 @@ import Navbar from "./Navbar";
 
 export default function Layout({ children }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
-    <div className="h-full">
+    // APP SHELL OWNS THE BACKGROUND
+    <div className="min-h-screen ">
       <Navbar setIsSidebarOpen={setIsSidebarOpen} />
 
-      <div className="grid grid-cols-12 pt-16 h-full">
-        {/* SIDEBAR — 2 COLUMNS ON DESKTOP */}
-        <div className="hidden md:block md:col-span-2 ">
-          <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
-        </div>
-
-        {/* MOBILE SIDEBAR (slide-in) */}
+      {/* FIXED DESKTOP SIDEBAR */}
+      <div className="hidden md:block fixed top-16 left-0 h-[calc(100vh-4rem)] z-30">
         <Sidebar
           isOpen={isSidebarOpen}
           setIsOpen={setIsSidebarOpen}
-          isMobile={true}
+          isCollapsed={isCollapsed}
+          setIsCollapsed={setIsCollapsed}
         />
-
-        {/* MAIN CONTENT — 10 COLUMNS */}
-        <main className="col-span-12 p-5 md:col-span-10 md:pl-8 pb-10 h-full">
-          {children}
-        </main>
       </div>
+
+      {/* MOBILE SIDEBAR (SLIDE-IN) */}
+      <Sidebar
+        isOpen={isSidebarOpen}
+        setIsOpen={setIsSidebarOpen}
+        isMobile={true}
+      />
+
+      {/* MAIN CONTENT — FULL WIDTH, TRANSPARENT */}
+      <main
+        className={`pt-16 p-5 pb-10 min-h-screen transition-all duration-200 ${
+          isCollapsed ? "md:pl-20" : "md:pl-64"
+        }`}
+      >
+        {children}
+      </main>
     </div>
   );
 }
