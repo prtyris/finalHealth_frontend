@@ -5,7 +5,7 @@ export default function SubscribersTable({
   subscribers,
   selectedSubscribers,
   onSelectAll,
-  onSelectSubscriber
+  onSelectSubscriber,
 }) {
   const [selectedSubscriber, setSelectedSubscriber] = React.useState(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = React.useState(false);
@@ -28,7 +28,11 @@ export default function SubscribersTable({
                   onChange={onSelectAll}
                   checked={
                     subscribers.length > 0 &&
-                    subscribers.every(s => selectedSubscribers.includes(s.id))
+                    subscribers.every((s) =>
+                      selectedSubscribers.includes(
+                        `${s.user_id}-${s.subscription_id}`,
+                      ),
+                    )
                   }
                 />
               </th>
@@ -40,51 +44,83 @@ export default function SubscribersTable({
               <th className="p-4">End Date</th>
             </tr>
           </thead>
-          
+
           <tbody>
-            {subscribers.map((subscriber) => (
-              <tr 
-                key={subscriber.id} 
-                className="border-b hover:bg-gray-50 cursor-pointer transition-colors duration-150"
-                onClick={() => handleRowClick(subscriber)}
-              >
-                <td className="p-4" onClick={(e) => e.stopPropagation()}>
-                  <input
-                    type="checkbox"
-                    className="rounded"
-                    checked={selectedSubscribers.includes(subscriber.id)}
-                    onChange={() => onSelectSubscriber(subscriber.id)}
-                  />
-                </td>
-                <td className="p-4 font-medium">{subscriber.name}</td>
-                <td className="p-4 text-gray-600">{subscriber.email}</td>
-                <td className="p-4">
-                  <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                    subscriber.subscriptionType === "Premium" 
-                      ? "bg-blue-100 text-blue-800"
-                      : subscriber.subscriptionType === "Enterprise"
-                      ? "bg-purple-100 text-purple-800"
-                      : "bg-gray-100 text-gray-800"
-                  }`}>
-                    {subscriber.subscriptionType}
-                  </span>
-                </td>
-                <td className="p-4">
-                  <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                    subscriber.status === "Active"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-yellow-100 text-yellow-800"
-                  }`}>
-                    {subscriber.status}
-                  </span>
-                </td>
-                <td className="p-4">{subscriber.subscriptionDate}</td>
-                <td className="p-4">{subscriber.subscriptionEnd}</td>
-              </tr>
-            ))}
+            {subscribers.map((subscriber) => {
+              const rowKey = `${subscriber.user_id}-${subscriber.subscription_id}`;
+
+              const fullName = [
+                subscriber.f_name,
+                subscriber.m_name,
+                subscriber.l_name,
+              ]
+                .filter(Boolean)
+                .join(" ");
+
+              return (
+                <tr
+                  key={rowKey}
+                  className="border-b hover:bg-gray-50 cursor-pointer transition-colors duration-150"
+                  onClick={() => handleRowClick(subscriber)}
+                >
+                  <td className="p-4" onClick={(e) => e.stopPropagation()}>
+                    <input
+                      type="checkbox"
+                      className="rounded"
+                      checked={selectedSubscribers.includes(rowKey)}
+                      onChange={() => onSelectSubscriber(rowKey)}
+                    />
+                  </td>
+
+                  <td className="p-4 font-medium">{fullName || "-"}</td>
+
+                  <td className="p-4 text-gray-600">{subscriber.email}</td>
+
+                  <td className="p-4">
+                    {subscriber.plan_name ? (
+                      <span className="px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-800">
+                        {subscriber.plan_name}
+                      </span>
+                    ) : (
+                      "-"
+                    )}
+                  </td>
+
+                  <td className="p-4">
+                    {subscriber.subscription_status ? (
+                      <span
+                        className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                          subscriber.subscription_status === "active"
+                            ? "bg-green-100 text-green-800"
+                            : subscriber.subscription_status === "expired"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-gray-100 text-gray-800"
+                        }`}
+                      >
+                        {subscriber.subscription_status}
+                      </span>
+                    ) : (
+                      "-"
+                    )}
+                  </td>
+
+                  <td className="p-4">
+                    {subscriber.start_date
+                      ? new Date(subscriber.start_date).toLocaleDateString()
+                      : "-"}
+                  </td>
+
+                  <td className="p-4">
+                    {subscriber.end_date
+                      ? new Date(subscriber.end_date).toLocaleDateString()
+                      : "-"}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
-        
+
         {subscribers.length === 0 && (
           <div className="text-center py-12 text-gray-500">
             No subscribers found

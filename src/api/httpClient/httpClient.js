@@ -1,6 +1,7 @@
 const API_BASE = import.meta.env.VITE_API_BASE;
 
-const getAuthToken = () => localStorage.getItem("user_token");
+const getAuthToken = () =>
+  localStorage.getItem("admin_token") || localStorage.getItem("user_token");
 
 export async function apiRequest(url, options = {}) {
   try {

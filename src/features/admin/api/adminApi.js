@@ -11,3 +11,5 @@ export const registerAdmin = (payload) =>
     method: "POST",
     body: JSON.stringify(payload),
   });
+
+export const getAllSubscribersApi = () => apiRequest("/api/admin/subscribers");
