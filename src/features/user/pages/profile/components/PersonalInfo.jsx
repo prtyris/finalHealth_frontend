@@ -2,6 +2,18 @@ import React, { useEffect, useState, useRef } from "react";
 import { useUser } from "../../../context/users/useUser";
 import { updateProfile } from "../../../../../api/profileApi";
 import AlertModal from "../../../../../components/AlertModal";
+import {
+  FiUser,
+  FiMail,
+  FiPhone,
+  FiCalendar,
+  FiHome,
+  FiEdit,
+  FiSave,
+  FiX,
+  FiRefreshCw,
+  FiShield,
+} from "react-icons/fi";
 
 const PersonalInfo = () => {
   const { userInfo, loading, error, getPersonalInfo } = useUser();
@@ -115,71 +127,28 @@ const PersonalInfo = () => {
   // Show loading only when actually loading
   if (loading) {
     return (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: "400px",
-        }}
-      >
-        <div
-          style={{
-            width: "50px",
-            height: "50px",
-            border: "3px solid #f3f3f3",
-            borderTop: "3px solid #667eea",
-            borderRadius: "50%",
-            animation: "spin 1s linear infinite",
-          }}
-        ></div>
-        <style>{`
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        `}</style>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div
-        style={{
-          textAlign: "center",
-          padding: "40px",
-          background: "#fff5f5",
-          borderRadius: "12px",
-          border: "2px solid #fecaca",
-          maxWidth: "500px",
-          margin: "50px auto",
-        }}
-      >
-        <div
-          style={{ color: "#ef4444", fontSize: "48px", marginBottom: "20px" }}
-        >
-          <i className="fas fa-exclamation-triangle"></i>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto p-8">
+          <div className="w-16 h-16 mx-auto mb-6 bg-red-100 rounded-full flex items-center justify-center">
+            <span className="text-red-600 text-3xl font-bold">!</span>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">Error Loading Profile</h2>
+          <p className="text-gray-600 mb-8">{error}</p>
+          <button
+            onClick={getPersonalInfo}
+            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200"
+          >
+            Try Again
+          </button>
         </div>
-        <h2 style={{ color: "#7f1d1d", marginBottom: "10px" }}>
-          Error Loading Profile
-        </h2>
-        <p style={{ color: "#991b1b", marginBottom: "30px" }}>{error}</p>
-        <button
-          onClick={getPersonalInfo}
-          style={{
-            padding: "12px 24px",
-            background: "#667eea",
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
-            cursor: "pointer",
-            fontSize: "16px",
-            fontWeight: "500",
-          }}
-        >
-          Try Again
-        </button>
       </div>
     );
   }
@@ -187,384 +156,14 @@ const PersonalInfo = () => {
   // If no profile data yet (but not loading), show minimal loading
   if (!profileData) {
     return (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: "400px",
-        }}
-      >
-        <div
-          style={{
-            width: "40px",
-            height: "40px",
-            border: "3px solid #f3f3f3",
-            borderTop: "3px solid #667eea",
-            borderRadius: "50%",
-            animation: "spin 1s linear infinite",
-          }}
-        ></div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-600"></div>
       </div>
     );
   }
 
   return (
-    <div className="personal-info-container">
-      <style jsx>{`
-        .personal-info-container {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 30px 20px;
-          font-family:
-            -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-            Ubuntu, sans-serif;
-          animation: fadeIn 0.3s ease-out;
-        }
-
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-
-        .header-section {
-          margin-bottom: 40px;
-        }
-
-        .header-title {
-          font-size: 32px;
-          font-weight: 700;
-          color: #1a202c;
-          margin-bottom: 10px;
-          display: flex;
-          align-items: center;
-          gap: 15px;
-        }
-
-        .header-title i {
-          color: #667eea;
-          background: #e8f0fe;
-          width: 50px;
-          height: 50px;
-          border-radius: 12px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 24px;
-        }
-
-        .header-subtitle {
-          font-size: 16px;
-          color: #718096;
-          line-height: 1.6;
-          max-width: 800px;
-        }
-
-        .content-card {
-          background: white;
-          border-radius: 16px;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-          border: 1px solid #e2e8f0;
-          overflow: hidden;
-        }
-
-        .profile-header {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          padding: 40px;
-          color: white;
-        }
-
-        .profile-name {
-          font-size: 32px;
-          font-weight: 700;
-          margin-bottom: 8px;
-        }
-
-        .profile-email {
-          font-size: 18px;
-          opacity: 0.9;
-          display: flex;
-          align-items: center;
-          gap: 10px;
-        }
-
-        .profile-info {
-          padding: 40px;
-        }
-
-        .info-section {
-          margin-bottom: 40px;
-        }
-
-        .section-title {
-          font-size: 20px;
-          font-weight: 600;
-          color: #2d3748;
-          margin-bottom: 25px;
-          padding-bottom: 15px;
-          border-bottom: 2px solid #e8f0fe;
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
-
-        .section-title i {
-          color: #667eea;
-          font-size: 20px;
-          width: 36px;
-          height: 36px;
-          background: #e8f0fe;
-          border-radius: 8px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .info-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-          gap: 25px;
-        }
-
-        .info-group {
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-        }
-
-        .info-label {
-          font-size: 14px;
-          font-weight: 600;
-          color: #4a5568;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-
-        .info-label i {
-          color: #667eea;
-          font-size: 16px;
-          width: 20px;
-        }
-
-        .info-value {
-          padding: 14px 16px;
-          background: #f8fafc;
-          border: 2px solid #e2e8f0;
-          border-radius: 10px;
-          font-size: 16px;
-          color: #2d3748;
-          min-height: 52px;
-          display: flex;
-          align-items: center;
-        }
-
-        .info-input {
-          padding: 14px 16px;
-          border: 2px solid #e2e8f0;
-          border-radius: 10px;
-          font-size: 16px;
-          color: #2d3748;
-          background: white;
-          width: 100%;
-          font-family: inherit;
-        }
-
-        .info-input:focus {
-          outline: none;
-          border-color: #667eea;
-          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .info-input:disabled {
-          background: #edf2f7;
-          color: #4a5568;
-          cursor: not-allowed;
-        }
-
-        textarea.info-input {
-          min-height: 100px;
-          resize: vertical;
-          line-height: 1.5;
-        }
-
-        .actions-section {
-          display: flex;
-          justify-content: flex-end;
-          gap: 16px;
-          padding: 30px 40px;
-          border-top: 1px solid #e2e8f0;
-          background: #f8fafc;
-        }
-
-        .action-button {
-          padding: 14px 28px;
-          border-radius: 10px;
-          font-weight: 600;
-          font-size: 16px;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 10px;
-          border: 2px solid transparent;
-          min-width: 140px;
-          font-family: inherit;
-        }
-
-        .edit-button {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
-        }
-
-        .edit-button:hover:not(:disabled) {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .cancel-button {
-          background: white;
-          color: #4a5568;
-          border-color: #cbd5e0;
-        }
-
-        .cancel-button:hover:not(:disabled) {
-          background: #f7fafc;
-          border-color: #a0aec0;
-        }
-
-        .save-button {
-          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-          color: white;
-        }
-
-        .save-button:hover:not(:disabled) {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
-        }
-
-        .action-button:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-          transform: none !important;
-          box-shadow: none !important;
-        }
-
-        /* Success Message */
-        .success-message {
-          position: fixed;
-          top: 30px;
-          right: 30px;
-          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-          color: white;
-          padding: 16px 24px;
-          border-radius: 12px;
-          box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          z-index: 1000;
-          animation: slideIn 0.3s ease-out forwards;
-          max-width: 400px;
-        }
-
-        /* Error Message */
-        .error-message {
-          position: fixed;
-          top: 30px;
-          right: 30px;
-          background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-          color: white;
-          padding: 16px 24px;
-          border-radius: 12px;
-          box-shadow: 0 8px 24px rgba(239, 68, 68, 0.3);
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          z-index: 1000;
-          animation: slideIn 0.3s ease-out forwards;
-          max-width: 400px;
-        }
-
-        /* Animations */
-        @keyframes slideIn {
-          from {
-            transform: translateX(100%);
-            opacity: 0;
-          }
-          to {
-            transform: translateX(0);
-            opacity: 1;
-          }
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-          .personal-info-container {
-            padding: 20px 15px;
-          }
-
-          .header-title {
-            font-size: 26px;
-          }
-
-          .profile-header {
-            padding: 30px 20px;
-          }
-
-          .profile-name {
-            font-size: 26px;
-          }
-
-          .profile-info {
-            padding: 30px 20px;
-          }
-
-          .info-grid {
-            grid-template-columns: 1fr;
-            gap: 20px;
-          }
-
-          .actions-section {
-            padding: 25px 20px;
-            flex-direction: column;
-          }
-
-          .action-button {
-            width: 100%;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .header-title {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 10px;
-          }
-
-          .profile-name {
-            font-size: 22px;
-          }
-
-          .profile-email {
-            font-size: 16px;
-          }
-        }
-      `}</style>
-
-      {/* Add Font Awesome */}
-      <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-      />
-
+    <div className="min-h-screen bg-gray-50 p-4 md:p-6 animate-fadeIn">
       {/* Alert Modal */}
       {alert.show && (
         <AlertModal
@@ -574,286 +173,326 @@ const PersonalInfo = () => {
         />
       )}
 
-      {/* Custom Success Message */}
-      {alert.show && alert.type === "success" && (
-        <div className="success-message">
-          <i className="fas fa-check-circle"></i>
-          <span>{alert.message}</span>
-        </div>
-      )}
-
-      {alert.show && alert.type === "error" && (
-        <div className="error-message">
-          <i className="fas fa-exclamation-circle"></i>
-          <span>{alert.message}</span>
-        </div>
-      )}
-
       {/* Header Section */}
-      <div className="header-section">
-        <h1 className="header-title">
-          <i className="fas fa-user-circle"></i>
-          Personal Information
-        </h1>
-        <p className="header-subtitle">
-          Manage your personal details. All information is securely stored and
-          encrypted.
-        </p>
-      </div>
-
-      {/* Main Content Card */}
-      <div className="content-card">
-        {/* Profile Header */}
-        <div className="profile-header">
-          <div className="profile-header-content">
-            <h2 className="profile-name">
-              {profileData?.firstName} {profileData?.middleName}{" "}
-              {profileData?.lastName}
-            </h2>
-            <div className="profile-email">
-              <i className="fas fa-envelope"></i>
-              <span>{profileData?.email}</span>
+      <div className="max-w-6xl mx-auto">
+        <div className="mb-10">
+          <div className="flex items-center gap-4 mb-3">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+              <FiUser className="text-white text-2xl" />
             </div>
+            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 via-blue-500 to-purple-600 bg-clip-text text-transparent">
+              Personal Information
+            </h1>
           </div>
+          <p className="text-gray-600 text-lg max-w-3xl">
+            Manage your personal details. All information is securely stored and encrypted.
+          </p>
+          <div className="h-0.5 w-full bg-gradient-to-r from-blue-500/20 to-purple-600/20 mt-6 rounded-full"></div>
         </div>
 
-        {/* Profile Information */}
-        <div className="profile-info">
-          {/* Name Information Section */}
-          <div className="info-section">
-            <h3 className="section-title">
-              <i className="fas fa-signature"></i>
-              Name Information
-            </h3>
+        {/* Profile Summary */}
+        <div className="mb-10">
+          <div className="mb-4">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
+              {profileData?.firstName} {profileData?.middleName} {profileData?.lastName}
+            </h2>
+          </div>
+          <div className="flex items-center gap-3 text-lg text-gray-600 mb-6">
+            <FiMail className="text-blue-500" />
+            <span>{profileData?.email}</span>
+          </div>
+          <div className="h-0.5 w-full bg-gradient-to-r from-blue-500/20 to-purple-600/20 rounded-full"></div>
+        </div>
 
-            <div className="info-grid">
-              <div className="info-group">
-                <label className="info-label">
-                  <i className="fas fa-user"></i>
-                  First Name
-                </label>
-                {editing ? (
+        {/* Name Information Section */}
+        <div className="mb-12">
+          <h2 className="text-xl font-semibold text-gray-800 mb-6 pb-3 border-b border-gray-200">
+            Name Information
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* First Name */}
+            <div className="space-y-3">
+              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                FIRST NAME
+              </label>
+              {editing ? (
+                <div className="relative">
+                  <FiUser className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-500" />
                   <input
                     type="text"
-                    className="info-input"
+                    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                     value={profileData?.firstName || ""}
-                    onChange={(e) =>
-                      handleInputChange("firstName", e.target.value)
-                    }
+                    onChange={(e) => handleInputChange("firstName", e.target.value)}
                     placeholder="Enter first name"
                   />
-                ) : (
-                  <div className="info-value">
-                    {profileData?.firstName || "Not provided"}
-                  </div>
-                )}
-              </div>
+                </div>
+              ) : (
+                <div className="px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-xl">
+                  <span className="text-gray-800">{profileData?.firstName || "—"}</span>
+                </div>
+              )}
+            </div>
 
-              <div className="info-group">
-                <label className="info-label">
-                  <i className="fas fa-user-tag"></i>
-                  Middle Name
-                </label>
-                {editing ? (
+            {/* Middle Name */}
+            <div className="space-y-3">
+              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                MIDDLE NAME
+              </label>
+              {editing ? (
+                <div className="relative">
+                  <FiUser className="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-500" />
                   <input
                     type="text"
-                    className="info-input"
+                    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"
                     value={profileData?.middleName || ""}
-                    onChange={(e) =>
-                      handleInputChange("middleName", e.target.value)
-                    }
+                    onChange={(e) => handleInputChange("middleName", e.target.value)}
                     placeholder="Enter middle name"
                   />
-                ) : (
-                  <div className="info-value">
-                    {profileData?.middleName || "Not provided"}
-                  </div>
-                )}
-              </div>
+                </div>
+              ) : (
+                <div className="px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-xl">
+                  <span className="text-gray-800">{profileData?.middleName || "—"}</span>
+                </div>
+              )}
+            </div>
 
-              <div className="info-group">
-                <label className="info-label">
-                  <i className="fas fa-users"></i>
-                  Last Name
-                </label>
-                {editing ? (
+            {/* Last Name */}
+            <div className="space-y-3">
+              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                LAST NAME
+              </label>
+              {editing ? (
+                <div className="relative">
+                  <FiUser className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-600" />
                   <input
                     type="text"
-                    className="info-input"
+                    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all duration-200"
                     value={profileData?.lastName || ""}
-                    onChange={(e) =>
-                      handleInputChange("lastName", e.target.value)
-                    }
+                    onChange={(e) => handleInputChange("lastName", e.target.value)}
                     placeholder="Enter last name"
                   />
-                ) : (
-                  <div className="info-value">
-                    {profileData?.lastName || "Not provided"}
-                  </div>
-                )}
-              </div>
+                </div>
+              ) : (
+                <div className="px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-xl">
+                  <span className="text-gray-800">{profileData?.lastName || "—"}</span>
+                </div>
+              )}
             </div>
           </div>
+        </div>
 
-          {/* Contact Information Section */}
-          <div className="info-section">
-            <h3 className="section-title">
-              <i className="fas fa-address-book"></i>
-              Contact Information
-            </h3>
-
-            <div className="info-grid">
-              <div className="info-group">
-                <label className="info-label">
-                  <i className="fas fa-envelope"></i>
-                  Email Address
-                </label>
-                <div className="info-value">
-                  {profileData?.email || "Not provided"}
-                </div>
+        {/* Contact Information Section */}
+        <div className="mb-12">
+          <h2 className="text-xl font-semibold text-gray-800 mb-6 pb-3 border-b border-gray-200">
+            Contact Information
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Email Address */}
+            <div className="space-y-3">
+              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                EMAIL ADDRESS
+              </label>
+              <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-xl">
+                <FiMail className="text-blue-500" />
+                <span className="text-gray-800">{profileData?.email || "—"}</span>
               </div>
+            </div>
 
-              <div className="info-group">
-                <label className="info-label">
-                  <i className="fas fa-phone"></i>
-                  Contact Number
-                </label>
-                {editing ? (
+            {/* Contact Number */}
+            <div className="space-y-3">
+              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                CONTACT NUMBER
+              </label>
+              {editing ? (
+                <div className="relative">
+                  <FiPhone className="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-500" />
                   <input
                     type="tel"
-                    className="info-input"
+                    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"
                     value={profileData?.contactNumber || ""}
-                    onChange={(e) =>
-                      handleInputChange("contactNumber", e.target.value)
-                    }
+                    onChange={(e) => handleInputChange("contactNumber", e.target.value)}
                     placeholder="+63 XXX XXX XXXX"
                   />
-                ) : (
-                  <div className="info-value">
-                    {profileData?.contactNumber || "Not provided"}
-                  </div>
-                )}
-              </div>
+                </div>
+              ) : (
+                <div className="px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-xl">
+                  <span className="text-gray-800">{profileData?.contactNumber || "—"}</span>
+                </div>
+              )}
+            </div>
 
-              <div className="info-group">
-                <label className="info-label">
-                  <i className="fas fa-calendar-alt"></i>
-                  Date of Birth
-                </label>
-                {editing ? (
+            {/* Date of Birth */}
+            <div className="space-y-3">
+              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                DATE OF BIRTH
+              </label>
+              {editing ? (
+                <div className="relative">
+                  <FiCalendar className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-500" />
                   <input
                     type="date"
-                    className="info-input"
+                    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 appearance-none"
                     value={profileData?.dateOfBirth || ""}
-                    onChange={(e) =>
-                      handleInputChange("dateOfBirth", e.target.value)
-                    }
+                    onChange={(e) => handleInputChange("dateOfBirth", e.target.value)}
                   />
-                ) : (
-                  <div className="info-value">
+                </div>
+              ) : (
+                <div className="px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-xl">
+                  <span className="text-gray-800">
                     {profileData?.dateOfBirth
-                      ? new Date(profileData.dateOfBirth).toLocaleDateString(
-                          "en-US",
-                          {
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                          },
-                        )
-                      : "Not provided"}
-                  </div>
-                )}
-              </div>
+                      ? new Date(profileData.dateOfBirth).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })
+                      : "—"}
+                  </span>
+                </div>
+              )}
+            </div>
 
-              <div className="info-group" style={{ gridColumn: "1 / -1" }}>
-                <label className="info-label">
-                  <i className="fas fa-home"></i>
-                  Address
-                </label>
-                {editing ? (
+            {/* Address - Full Width */}
+            <div className="space-y-3 md:col-span-2">
+              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                ADDRESS
+              </label>
+              {editing ? (
+                <div className="relative">
+                  <FiHome className="absolute left-4 top-4 text-blue-500" />
                   <textarea
-                    className="info-input"
+                    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 min-h-[120px] resize-vertical"
                     value={profileData?.address || ""}
-                    onChange={(e) =>
-                      handleInputChange("address", e.target.value)
-                    }
+                    onChange={(e) => handleInputChange("address", e.target.value)}
                     placeholder="Enter your complete address"
+                    rows="3"
                   />
-                ) : (
-                  <div
-                    className="info-value"
-                    style={{ whiteSpace: "pre-wrap" }}
-                  >
-                    {profileData?.address || "Not provided"}
-                  </div>
-                )}
-              </div>
+                </div>
+              ) : (
+                <div className="px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-xl whitespace-pre-wrap">
+                  <span className="text-gray-800">{profileData?.address || "—"}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="actions-section">
-          {!editing ? (
-            <button
-              className="action-button edit-button"
-              onClick={handleEdit}
-              disabled={saving}
-            >
-              <i className="fas fa-edit"></i>
-              Edit Profile
-            </button>
-          ) : (
-            <>
+        <div className="pt-8 border-t border-gray-200">
+          <div className="flex flex-col sm:flex-row justify-end gap-4">
+            {!editing ? (
               <button
-                className="action-button cancel-button"
-                onClick={handleCancel}
+                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl"
+                onClick={handleEdit}
                 disabled={saving}
               >
-                <i className="fas fa-times"></i>
-                Cancel
+                <FiEdit />
+                Edit Profile
               </button>
+            ) : (
+              <>
+                <button
+                  className="px-6 py-3 bg-white text-gray-700 font-medium rounded-xl border border-gray-300 hover:bg-gray-50 transition-all duration-200 flex items-center justify-center gap-3"
+                  onClick={handleCancel}
+                  disabled={saving}
+                >
+                  <FiX />
+                  Cancel
+                </button>
 
-              <button
-                className="action-button save-button"
-                onClick={handleSaveChanges}
-                disabled={saving}
-              >
-                {saving ? (
-                  <>
-                    <i className="fas fa-spinner fa-spin"></i>
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <i className="fas fa-save"></i>
-                    Save Changes
-                  </>
-                )}
-              </button>
-            </>
-          )}
+                <button
+                  className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-medium rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl"
+                  onClick={handleSaveChanges}
+                  disabled={saving}
+                >
+                  {saving ? (
+                    <>
+                      <FiRefreshCw className="animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <FiSave />
+                      Save Changes
+                    </>
+                  )}
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Footer Info */}
+        <div className="mt-12 pt-6 border-t border-gray-200">
+          <div className="flex items-center justify-center gap-3 text-sm text-gray-500">
+            <FiShield className="text-blue-500" />
+            <span>
+              Your information is secured with end-to-end encryption • Last updated:{" "}
+              {new Date().toLocaleDateString()}
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Footer Info */}
-      <div
-        style={{
-          marginTop: "30px",
-          textAlign: "center",
-          fontSize: "14px",
-          color: "#718096",
-        }}
-      >
-        <p>
-          <i
-            className="fas fa-shield-alt"
-            style={{ marginRight: "8px", color: "#667eea" }}
-          ></i>
-          Your information is secured with end-to-end encryption • Last updated:{" "}
-          {new Date().toLocaleDateString()}
-        </p>
-      </div>
+      <style jsx>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+        
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-out;
+        }
+        
+        /* Custom scrollbar */
+        textarea::-webkit-scrollbar {
+          width: 6px;
+        }
+        
+        textarea::-webkit-scrollbar-track {
+          background: #f1f1f1;
+          border-radius: 3px;
+        }
+        
+        textarea::-webkit-scrollbar-thumb {
+          background: #c1c1c1;
+          border-radius: 3px;
+        }
+        
+        textarea::-webkit-scrollbar-thumb:hover {
+          background: #a1a1a1;
+        }
+        
+        /* Date input styling */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+          background: transparent;
+          bottom: 0;
+          color: transparent;
+          cursor: pointer;
+          height: auto;
+          left: 0;
+          position: absolute;
+          right: 0;
+          top: 0;
+          width: auto;
+        }
+        
+        /* Remove arrows from number input */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+        
+        input[type="number"] {
+          -moz-appearance: textfield;
+        }
+      `}</style>
     </div>
   );
 };
