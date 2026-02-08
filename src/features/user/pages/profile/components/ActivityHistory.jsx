@@ -140,11 +140,11 @@ const ActivityHistory = () => {
     if (actionLower.includes("delete") || actionLower.includes("remove"))
       return <FiTrash2 className="text-red-500" />;
     if (actionLower.includes("login"))
-      return <FiLogIn className="text-indigo-500" />;
+      return <FiLogIn className="text-purple-500" />;
     if (actionLower.includes("logout"))
       return <FiLogIn className="text-gray-500 transform rotate-180" />;
     if (actionLower.includes("password"))
-      return <FiKey className="text-purple-500" />;
+      return <FiKey className="text-blue-600" />;
     if (
       actionLower.includes("read") ||
       actionLower.includes("view") ||
@@ -156,7 +156,7 @@ const ActivityHistory = () => {
     if (actionLower.includes("fail") || actionLower.includes("error"))
       return <FiAlertCircle className="text-red-500" />;
     if (actionLower.includes("registration"))
-      return <FiUser className="text-indigo-500" />;
+      return <FiUser className="text-purple-500" />;
     return <FiActivity className="text-gray-500" />;
   };
 
@@ -310,7 +310,7 @@ const ActivityHistory = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
           <p className="mt-4 text-gray-600">Loading activity history...</p>
         </div>
       </div>
@@ -321,7 +321,7 @@ const ActivityHistory = () => {
     <div className="min-h-screen bg-gray-50 p-4 md:p-6">
       {/* Header Section */}
       <div className="mb-8">
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-700 rounded-2xl shadow-lg overflow-hidden">
+        <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-purple-600 rounded-2xl shadow-lg overflow-hidden">
           <div className="p-6 md:p-8 relative">
             <div className="absolute inset-0 opacity-10">
               <div className="absolute inset-0 bg-gradient-to-r from-white to-transparent"></div>
@@ -333,44 +333,44 @@ const ActivityHistory = () => {
                   Activity History
                 </h1>
               </div>
-              <p className="text-indigo-100 mb-8">
+              <p className="text-blue-100 mb-8">
                 Track and monitor all system activities and user actions
               </p>
 
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 backdrop-blur-sm rounded-xl p-4 border border-blue-300/30">
                   <div className="text-2xl font-bold text-white">
                     {stats.total}
                   </div>
-                  <div className="text-sm text-indigo-100">
+                  <div className="text-sm text-blue-100">
                     Total Activities
                   </div>
                 </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                <div className="bg-gradient-to-br from-blue-400/20 to-purple-500/20 backdrop-blur-sm rounded-xl p-4 border border-blue-300/30">
                   <div className="text-2xl font-bold text-white">
                     {stats.today}
                   </div>
-                  <div className="text-sm text-indigo-100">
+                  <div className="text-sm text-blue-100">
                     Today's Activities
                   </div>
                 </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                <div className="bg-gradient-to-br from-purple-500/20 to-blue-500/20 backdrop-blur-sm rounded-xl p-4 border border-purple-300/30">
                   <div className="text-2xl font-bold text-white">
                     {stats.yourActivity}
                   </div>
-                  <div className="text-sm text-indigo-100">Your Activities</div>
+                  <div className="text-sm text-blue-100">Your Activities</div>
                 </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 backdrop-blur-sm rounded-xl p-4 border border-blue-300/30">
                   <div className="text-2xl font-bold text-white">
                     {stats.success}
                   </div>
-                  <div className="text-sm text-indigo-100">Successful</div>
+                  <div className="text-sm text-blue-100">Successful</div>
                 </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                <div className="bg-gradient-to-br from-purple-500/20 to-purple-600/20 backdrop-blur-sm rounded-xl p-4 border border-purple-300/30">
                   <div className="text-2xl font-bold text-white">
                     {stats.warnings}
                   </div>
-                  <div className="text-sm text-indigo-100">Warnings</div>
+                  <div className="text-sm text-blue-100">Warnings</div>
                 </div>
               </div>
             </div>
@@ -381,7 +381,7 @@ const ActivityHistory = () => {
       {/* Filters Section */}
       <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
         <div className="flex items-center gap-2 mb-6">
-          <FiFilter className="text-indigo-600 text-xl" />
+          <FiFilter className="text-blue-600 text-xl" />
           <h2 className="text-xl font-semibold text-gray-800">
             Filter Activities
           </h2>
@@ -390,13 +390,13 @@ const ActivityHistory = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <div>
             <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-              <FiUser className="text-indigo-500" /> User
+              <FiUser className="text-blue-500" /> User
             </label>
             <div className="relative">
               <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                 placeholder="Search user..."
                 value={filterUser}
                 onChange={(e) => setFilterUser(e.target.value)}
@@ -406,11 +406,11 @@ const ActivityHistory = () => {
 
           <div>
             <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-              <FiHash className="text-indigo-500" /> Log ID
+              <FiHash className="text-purple-500" /> Log ID
             </label>
             <input
               type="number"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"
               placeholder="Enter log ID..."
               value={filterLogId}
               onChange={(e) => setFilterLogId(e.target.value)}
@@ -419,11 +419,11 @@ const ActivityHistory = () => {
 
           <div>
             <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-              <FiActivity className="text-indigo-500" /> Action
+              <FiActivity className="text-blue-500" /> Action
             </label>
             <input
               type="text"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
               placeholder="Filter by action..."
               value={filterAction}
               onChange={(e) => setFilterAction(e.target.value)}
@@ -432,11 +432,11 @@ const ActivityHistory = () => {
 
           <div>
             <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-              <FiCalendar className="text-indigo-500" /> Date
+              <FiCalendar className="text-purple-500" /> Date
             </label>
             <input
               type="date"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"
               value={filterDate}
               onChange={(e) => setFilterDate(e.target.value)}
             />
@@ -445,7 +445,7 @@ const ActivityHistory = () => {
 
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-gray-200">
           <div className="flex items-center gap-3">
-            <div className="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-full text-sm font-medium">
+            <div className="px-4 py-2 bg-gradient-to-r from-blue-50 to-purple-50 text-blue-700 rounded-full text-sm font-medium border border-blue-200">
               {selectedRows.length > 0
                 ? `${selectedRows.length} selected`
                 : `${filteredData.length} activities found`}
@@ -455,9 +455,9 @@ const ActivityHistory = () => {
           <div className="flex items-center gap-3">
             <button
               onClick={handleReset}
-              className="flex items-center gap-2 px-5 py-2.5 text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-xl font-medium transition-all duration-200"
+              className="flex items-center gap-2 px-5 py-2.5 text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-xl font-medium transition-all duration-200 border border-blue-200"
             >
-              <FiRefreshCw className="text-indigo-600" />
+              <FiRefreshCw className="text-blue-600" />
               Reset Filters
             </button>
 
@@ -471,7 +471,7 @@ const ActivityHistory = () => {
               }
               filename="activity_logs.xlsx"
               buttonComponent={
-                <button className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-200">
+                <button className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-200">
                   <FiDownload />
                   Export{" "}
                   {selectedRows.length > 0 ? `(${selectedRows.length})` : "All"}
@@ -486,8 +486,8 @@ const ActivityHistory = () => {
       <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
         {filteredData.length === 0 ? (
           <div className="text-center py-16">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
-              <FiEyeOff className="text-gray-400 text-2xl" />
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-50 to-purple-50 rounded-full mb-4">
+              <FiEyeOff className="text-blue-400 text-2xl" />
             </div>
             <h3 className="text-lg font-semibold text-gray-700 mb-2">
               No activity data found
@@ -500,17 +500,17 @@ const ActivityHistory = () => {
           <>
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-gradient-to-r from-blue-50 to-purple-50 border-b border-gray-200">
                   <tr>
                     <th className="px-6 py-4 text-left">
                       <div className="flex items-center gap-2">
                         <button
                           onClick={handleSelectAll}
-                          className="text-gray-400 hover:text-indigo-600 transition-colors"
+                          className="text-gray-400 hover:text-blue-600 transition-colors"
                         >
                           {selectedRows.length === paginatedData.length &&
                           paginatedData.length > 0 ? (
-                            <FiCheckSquare className="text-indigo-600 text-lg" />
+                            <FiCheckSquare className="text-blue-600 text-lg" />
                           ) : (
                             <FiSquare className="text-lg" />
                           )}
@@ -531,9 +531,9 @@ const ActivityHistory = () => {
                         <div className="opacity-0 group-hover:opacity-100 transition-opacity">
                           {sortConfig.key === "logId" ? (
                             sortConfig.direction === "asc" ? (
-                              <FiChevronUp className="text-indigo-600" />
+                              <FiChevronUp className="text-blue-600" />
                             ) : (
-                              <FiChevronDown className="text-indigo-600" />
+                              <FiChevronDown className="text-blue-600" />
                             )
                           ) : (
                             <FiChevronDown className="text-gray-400" />
@@ -552,9 +552,9 @@ const ActivityHistory = () => {
                         <div className="opacity-0 group-hover:opacity-100 transition-opacity">
                           {sortConfig.key === "user" ? (
                             sortConfig.direction === "asc" ? (
-                              <FiChevronUp className="text-indigo-600" />
+                              <FiChevronUp className="text-blue-600" />
                             ) : (
-                              <FiChevronDown className="text-indigo-600" />
+                              <FiChevronDown className="text-blue-600" />
                             )
                           ) : (
                             <FiChevronDown className="text-gray-400" />
@@ -573,9 +573,9 @@ const ActivityHistory = () => {
                         <div className="opacity-0 group-hover:opacity-100 transition-opacity">
                           {sortConfig.key === "action" ? (
                             sortConfig.direction === "asc" ? (
-                              <FiChevronUp className="text-indigo-600" />
+                              <FiChevronUp className="text-purple-600" />
                             ) : (
-                              <FiChevronDown className="text-indigo-600" />
+                              <FiChevronDown className="text-purple-600" />
                             )
                           ) : (
                             <FiChevronDown className="text-gray-400" />
@@ -594,9 +594,9 @@ const ActivityHistory = () => {
                         <div className="opacity-0 group-hover:opacity-100 transition-opacity">
                           {sortConfig.key === "table" ? (
                             sortConfig.direction === "asc" ? (
-                              <FiChevronUp className="text-indigo-600" />
+                              <FiChevronUp className="text-blue-600" />
                             ) : (
-                              <FiChevronDown className="text-indigo-600" />
+                              <FiChevronDown className="text-blue-600" />
                             )
                           ) : (
                             <FiChevronDown className="text-gray-400" />
@@ -620,9 +620,9 @@ const ActivityHistory = () => {
                         <div className="opacity-0 group-hover:opacity-100 transition-opacity">
                           {sortConfig.key === "rawDate" ? (
                             sortConfig.direction === "asc" ? (
-                              <FiChevronUp className="text-indigo-600" />
+                              <FiChevronUp className="text-purple-600" />
                             ) : (
-                              <FiChevronDown className="text-indigo-600" />
+                              <FiChevronDown className="text-purple-600" />
                             )
                           ) : (
                             <FiChevronDown className="text-gray-400" />
@@ -636,15 +636,15 @@ const ActivityHistory = () => {
                   {paginatedData.map((activity) => (
                     <tr
                       key={activity.id}
-                      className="hover:bg-gray-50 transition-colors duration-150"
+                      className="hover:bg-gradient-to-r hover:from-blue-50/30 hover:to-purple-50/30 transition-colors duration-150"
                     >
                       <td className="px-6 py-4">
                         <button
                           onClick={() => handleRowSelect(activity.id)}
-                          className="text-gray-400 hover:text-indigo-600 transition-colors"
+                          className="text-gray-400 hover:text-blue-600 transition-colors"
                         >
                           {selectedRows.includes(activity.id) ? (
-                            <FiCheckSquare className="text-indigo-600 text-lg" />
+                            <FiCheckSquare className="text-blue-600 text-lg" />
                           ) : (
                             <FiSquare className="text-lg" />
                           )}
@@ -658,12 +658,12 @@ const ActivityHistory = () => {
                       <td className="px-6 py-4">
                         <div>
                           <div className="flex items-center gap-2 mb-1">
-                            <FiUser className="text-indigo-500 text-sm" />
+                            <FiUser className="text-blue-500 text-sm" />
                             <div className="font-medium text-gray-900">
                               {activity.user}
                             </div>
                             {activity.isCurrentUser && (
-                              <span className="text-xs bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full border border-indigo-200">
+                              <span className="text-xs bg-gradient-to-r from-blue-50 to-purple-50 text-blue-700 px-2 py-0.5 rounded-full border border-blue-200">
                                 You
                               </span>
                             )}
@@ -690,7 +690,7 @@ const ActivityHistory = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="px-3 py-1.5 bg-indigo-50 text-indigo-700 text-sm font-medium rounded-lg">
+                        <span className="px-3 py-1.5 bg-gradient-to-r from-blue-50 to-purple-50 text-blue-700 text-sm font-medium rounded-lg border border-blue-200">
                           {activity.table}
                         </span>
                       </td>
@@ -711,7 +711,7 @@ const ActivityHistory = () => {
             </div>
 
             {/* Pagination */}
-            <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
+            <div className="px-6 py-4 border-t border-gray-200 bg-gradient-to-r from-blue-50/50 to-purple-50/50">
               <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div className="text-sm text-gray-700">
                   Showing{" "}
@@ -733,7 +733,7 @@ const ActivityHistory = () => {
                       setCurrentPage((prev) => Math.max(prev - 1, 1))
                     }
                     disabled={currentPage === 1}
-                    className="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     <FiChevronLeft />
                   </button>
@@ -763,8 +763,8 @@ const ActivityHistory = () => {
                             onClick={() => setCurrentPage(page)}
                             className={`px-3 py-2 rounded-lg font-medium transition-colors ${
                               currentPage === page
-                                ? "bg-indigo-600 text-white"
-                                : "text-gray-700 hover:bg-gray-100"
+                                ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+                                : "text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50"
                             }`}
                           >
                             {page}
@@ -778,7 +778,7 @@ const ActivityHistory = () => {
                       setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                     }
                     disabled={currentPage === totalPages}
-                    className="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     <FiChevronRight />
                   </button>
@@ -792,7 +792,7 @@ const ActivityHistory = () => {
                       setItemsPerPage(Number(e.target.value));
                       setCurrentPage(1);
                     }}
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white"
+                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
                     <option value="5">5</option>
                     <option value="10">10</option>
