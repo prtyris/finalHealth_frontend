@@ -225,61 +225,6 @@ const Pricing = () => {
             </div>
           </div>
 
-          {/* Feature Comparison */}
-          <div className="mt-16 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-blue-100 dark:border-gray-700 overflow-hidden">
-            <div className="p-8 border-b border-blue-100 dark:border-gray-700">
-              <h3 className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-4">Feature Comparison</h3>
-              <p className="text-blue-500 dark:text-blue-400">See how our plans stack up against each other</p>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="bg-blue-50 dark:bg-gray-700">
-                    <th className="text-left p-6 text-blue-700 dark:text-blue-300 font-semibold">Features</th>
-                    <th className="p-6 text-center">
-                      <div className="font-bold text-blue-600 dark:text-blue-400">Free Trial</div>
-                      <div className="text-sm text-blue-500 dark:text-blue-400">₱0</div>
-                    </th>
-                    <th className="p-6 text-center">
-                      <div className="font-bold text-blue-600 dark:text-blue-400">Monthly</div>
-                      <div className="text-sm text-blue-500 dark:text-blue-400">₱499/month</div>
-                    </th>
-                    <th className="p-6 text-center">
-                      <div className="font-bold text-blue-600 dark:text-blue-400">Annual</div>
-                      <div className="text-sm text-blue-500 dark:text-blue-400">₱4,999/year</div>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="border-b border-blue-50 dark:border-gray-700">
-                    <td className="p-6 text-blue-700 dark:text-blue-300 font-medium">User Access</td>
-                    <td className="p-6 text-center text-blue-600 dark:text-blue-400">1 user</td>
-                    <td className="p-6 text-center text-blue-600 dark:text-blue-400 font-semibold">5 users</td>
-                    <td className="p-6 text-center text-blue-600 dark:text-blue-400 font-semibold">Up to 10 users</td>
-                  </tr>
-                  <tr className="border-b border-blue-50 dark:border-gray-700 bg-blue-50 dark:bg-gray-700">
-                    <td className="p-6 text-blue-700 dark:text-blue-300 font-medium">Support</td>
-                    <td className="p-6 text-center text-blue-600 dark:text-blue-400">Limited</td>
-                    <td className="p-6 text-center text-blue-600 dark:text-blue-400 font-semibold">Priority</td>
-                    <td className="p-6 text-center text-blue-600 dark:text-blue-400 font-semibold">24/7 Priority</td>
-                  </tr>
-                  <tr className="border-b border-blue-50 dark:border-gray-700">
-                    <td className="p-6 text-blue-700 dark:text-blue-300 font-medium">Analytics</td>
-                    <td className="p-6 text-center text-blue-400 dark:text-blue-500"><i className="fas fa-times"></i></td>
-                    <td className="p-6 text-center text-blue-400 dark:text-blue-500"><i className="fas fa-times"></i></td>
-                    <td className="p-6 text-center text-green-500 dark:text-green-400"><i className="fas fa-check"></i></td>
-                  </tr>
-                  <tr className="bg-blue-50 dark:bg-gray-700">
-                    <td className="p-6 text-blue-700 dark:text-blue-300 font-medium">Cancel Anytime</td>
-                    <td className="p-6 text-center text-green-500 dark:text-green-400"><i className="fas fa-check"></i></td>
-                    <td className="p-6 text-center text-green-500 dark:text-green-400"><i className="fas fa-check"></i></td>
-                    <td className="p-6 text-center text-blue-400 dark:text-blue-500"><i className="fas fa-times"></i></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
           {/* Trust Badges */}
           <div className="mt-12 flex flex-col md:flex-row items-center justify-center gap-8">
             <div className="flex items-center gap-3">

@@ -25,7 +25,7 @@ const HowItWorks = () => {
 
           {/* Steps Container */}
           <div className="relative">
-            {/* Step 1 */}
+            {/* Step 1 - Account Creation */}
             <div className="flex flex-col lg:flex-row items-center mb-16 lg:mb-24">
               {/* Step Content */}
               <div className="lg:w-1/2 lg:pr-12 mb-8 lg:mb-0 lg:text-right">
@@ -36,20 +36,20 @@ const HowItWorks = () => {
                   Create Your Account
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
-                  Sign up in just a few minutes with your clinic details
+                  Register as a doctor with your professional information
                 </p>
                 <ul className="space-y-2 text-gray-600 dark:text-gray-400">
                   <li className="flex items-center gap-2">
                     <i className="fas fa-check-circle text-green-500"></i>
-                    <span>Simple registration form</span>
+                    <span>Professional registration</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <i className="fas fa-check-circle text-green-500"></i>
-                    <span>Email verification</span>
+                    <span>Medical license verification</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <i className="fas fa-check-circle text-green-500"></i>
-                    <span>Clinic profile setup</span>
+                    <span>Clinic information setup</span>
                   </li>
                 </ul>
               </div>
@@ -57,7 +57,7 @@ const HowItWorks = () => {
               {/* Step Icon */}
               <div className="lg:absolute lg:left-1/2 lg:transform lg:-translate-x-1/2">
                 <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg relative z-10">
-                  <i className="fas fa-user-plus text-white text-2xl"></i>
+                  <i className="fas fa-user-md text-white text-2xl"></i>
                   <div className="absolute -top-1 -right-1 w-8 h-8 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center shadow-md">
                     <span className="text-sm font-bold text-blue-600 dark:text-blue-400">1</span>
                   </div>
@@ -69,49 +69,59 @@ const HowItWorks = () => {
                 <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-blue-100 dark:border-gray-700">
                   <div className="flex items-center gap-4 mb-4">
                     <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                      <i className="fas fa-user text-blue-600 dark:text-blue-400"></i>
+                      <i className="fas fa-stethoscope text-blue-600 dark:text-blue-400"></i>
                     </div>
                     <div>
-                      <h4 className="font-bold text-gray-800 dark:text-white">Quick Registration</h4>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">2-3 minutes setup</p>
+                      <h4 className="font-bold text-gray-800 dark:text-white">Doctor Account</h4>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Primary account holder</p>
                     </div>
                   </div>
                   <div className="space-y-3">
                     <div className="h-2 bg-blue-100 dark:bg-gray-700 rounded-full overflow-hidden">
                       <div className="h-full bg-blue-500 dark:bg-blue-600 rounded-full w-3/4"></div>
                     </div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 text-center">Registration progress</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 text-center">Doctor profile completion</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Step 2 */}
+            {/* Step 2 - Secretary Account Setup */}
             <div className="flex flex-col lg:flex-row items-center mb-16 lg:mb-24">
               {/* Step Visualization */}
               <div className="lg:w-1/2 lg:pr-12 mb-8 lg:mb-0">
                 <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-purple-100 dark:border-gray-700">
                   <div className="flex items-center gap-4 mb-4">
                     <div className="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                      <i className="fas fa-crown text-purple-600 dark:text-purple-400"></i>
+                      <i className="fas fa-user-tie text-purple-600 dark:text-purple-400"></i>
                     </div>
                     <div>
-                      <h4 className="font-bold text-gray-800 dark:text-white">Plan Selection</h4>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Choose what fits best</p>
+                      <h4 className="font-bold text-gray-800 dark:text-white">Secretary Account</h4>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Delegated management access</p>
                     </div>
                   </div>
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="text-center p-3 rounded-lg border border-purple-200 dark:border-gray-700">
-                      <p className="text-sm font-semibold text-purple-600 dark:text-purple-400">Basic</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">Small clinics</p>
+                  <div className="space-y-4">
+                    <div className="p-3 rounded-lg border border-purple-200 dark:border-gray-700">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                          <i className="fas fa-share-alt text-purple-600 dark:text-purple-400 text-sm"></i>
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-purple-600 dark:text-purple-400">Doctor Delegates Access</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">Grant secretary permissions</p>
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-center p-3 rounded-lg bg-gradient-to-b from-purple-500 to-purple-600 text-white">
-                      <p className="text-sm font-semibold">Pro</p>
-                      <p className="text-xs">Most Popular</p>
-                    </div>
-                    <div className="text-center p-3 rounded-lg border border-purple-200 dark:border-gray-700">
-                      <p className="text-sm font-semibold text-purple-600 dark:text-purple-400">Enterprise</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">Large hospitals</p>
+                    <div className="p-3 rounded-lg bg-gradient-to-b from-purple-500 to-purple-600 text-white">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                          <i className="fas fa-user-check text-white text-sm"></i>
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold">Secretary Receives Access</p>
+                          <p className="text-xs opacity-90">Can manage appointments & records</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -120,7 +130,7 @@ const HowItWorks = () => {
               {/* Step Icon */}
               <div className="lg:absolute lg:left-1/2 lg:transform lg:-translate-x-1/2">
                 <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg relative z-10">
-                  <i className="fas fa-chart-line text-white text-2xl"></i>
+                  <i className="fas fa-users-cog text-white text-2xl"></i>
                   <div className="absolute -top-1 -right-1 w-8 h-8 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center shadow-md">
                     <span className="text-sm font-bold text-purple-600 dark:text-purple-400">2</span>
                   </div>
@@ -133,29 +143,29 @@ const HowItWorks = () => {
                   <span className="text-sm font-semibold text-purple-700 dark:text-purple-300">Step 2</span>
                 </div>
                 <h3 className="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-4">
-                  Select Subscription Plan
+                  Set Up Secretary Access
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
-                  Choose the perfect plan tailored for your clinic's needs
+                  Doctor grants access to secretary for clinic management
                 </p>
                 <ul className="space-y-2 text-gray-600 dark:text-gray-400">
                   <li className="flex items-center gap-2">
                     <i className="fas fa-check-circle text-green-500"></i>
-                    <span>Flexible pricing options</span>
+                    <span>Doctor-controlled access delegation</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <i className="fas fa-check-circle text-green-500"></i>
-                    <span>No hidden fees</span>
+                    <span>Secretary gets appointment management</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <i className="fas fa-check-circle text-green-500"></i>
-                    <span>Easy plan upgrades</span>
+                    <span>Patient records access control</span>
                   </li>
                 </ul>
               </div>
             </div>
 
-            {/* Step 3 */}
+            {/* Step 3 - Subscription */}
             <div className="flex flex-col lg:flex-row items-center mb-16 lg:mb-24">
               {/* Step Content */}
               <div className="lg:w-1/2 lg:pr-12 mb-8 lg:mb-0 lg:text-right">
@@ -163,23 +173,23 @@ const HowItWorks = () => {
                   <span className="text-sm font-semibold text-green-700 dark:text-green-300">Step 3</span>
                 </div>
                 <h3 className="text-2xl font-bold text-green-600 dark:text-green-400 mb-4">
-                  System Auto-Identifies Role
+                  Choose Subscription Plan
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
-                  Automatic role assignment for seamless access and permissions
+                  Subscribe to unlock premium features and advanced capabilities
                 </p>
                 <ul className="space-y-2 text-gray-600 dark:text-gray-400">
                   <li className="flex items-center gap-2">
                     <i className="fas fa-check-circle text-green-500"></i>
-                    <span>Smart role detection</span>
+                    <span>Advanced analytics and reporting</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <i className="fas fa-check-circle text-green-500"></i>
-                    <span>Custom permissions</span>
+                    <span>Extended patient record storage</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <i className="fas fa-check-circle text-green-500"></i>
-                    <span>Secure access control</span>
+                    <span>Priority support and features</span>
                   </li>
                 </ul>
               </div>
@@ -187,7 +197,7 @@ const HowItWorks = () => {
               {/* Step Icon */}
               <div className="lg:absolute lg:left-1/2 lg:transform lg:-translate-x-1/2">
                 <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-lg relative z-10">
-                  <i className="fas fa-user-shield text-white text-2xl"></i>
+                  <i className="fas fa-gem text-white text-2xl"></i>
                   <div className="absolute -top-1 -right-1 w-8 h-8 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center shadow-md">
                     <span className="text-sm font-bold text-green-600 dark:text-green-400">3</span>
                   </div>
@@ -199,67 +209,78 @@ const HowItWorks = () => {
                 <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-green-100 dark:border-gray-700">
                   <div className="flex items-center gap-4 mb-4">
                     <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                      <i className="fas fa-id-card text-green-600 dark:text-green-400"></i>
+                      <i className="fas fa-crown text-green-600 dark:text-green-400"></i>
                     </div>
                     <div>
-                      <h4 className="font-bold text-gray-800 dark:text-white">Smart Role Detection</h4>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Automatic assignment</p>
+                      <h4 className="font-bold text-gray-800 dark:text-white">Premium Features</h4>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Subscription unlocks</p>
                     </div>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <div className="text-center">
-                      <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mx-auto mb-1">
-                        <i className="fas fa-user-md text-blue-600 dark:text-blue-400"></i>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-2">
+                        <i className="fas fa-chart-line text-green-500"></i>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Advanced Analytics</span>
                       </div>
-                      <span className="text-gray-600 dark:text-gray-400">Doctor</span>
+                      <span className="text-xs font-semibold px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded">Premium</span>
                     </div>
-                    <div className="text-center">
-                      <div className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mx-auto mb-1">
-                        <i className="fas fa-user-nurse text-purple-600 dark:text-purple-400"></i>
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-2">
+                        <i className="fas fa-database text-green-500"></i>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Extended Storage</span>
                       </div>
-                      <span className="text-gray-600 dark:text-gray-400">Nurse</span>
+                      <span className="text-xs font-semibold px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded">Premium</span>
                     </div>
-                    <div className="text-center">
-                      <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-1">
-                        <i className="fas fa-user-tie text-green-600 dark:text-green-400"></i>
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-2">
+                        <i className="fas fa-headset text-green-500"></i>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Priority Support</span>
                       </div>
-                      <span className="text-gray-600 dark:text-gray-400">Admin</span>
+                      <span className="text-xs font-semibold px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded">Premium</span>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Step 4 */}
+            {/* Step 4 - Start Managing */}
             <div className="flex flex-col lg:flex-row items-center">
               {/* Step Visualization */}
               <div className="lg:w-1/2 lg:pr-12 mb-8 lg:mb-0">
                 <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-orange-100 dark:border-gray-700">
                   <div className="flex items-center gap-4 mb-4">
                     <div className="w-12 h-12 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
-                      <i className="fas fa-chart-bar text-orange-600 dark:text-orange-400"></i>
+                      <i className="fas fa-tasks text-orange-600 dark:text-orange-400"></i>
                     </div>
                     <div>
-                      <h4 className="font-bold text-gray-800 dark:text-white">Start Managing</h4>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Full system access</p>
+                      <h4 className="font-bold text-gray-800 dark:text-white">Clinic Management</h4>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Doctor & Secretary Collaboration</p>
                     </div>
                   </div>
-                  <div className="space-y-3">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600 dark:text-gray-400">Appointments</span>
-                      <span className="font-semibold text-orange-600 dark:text-orange-400">Ready</span>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-3 rounded-lg bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                          <i className="fas fa-user-md text-blue-600 dark:text-blue-400 text-sm"></i>
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Doctor</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">Medical decisions</p>
+                        </div>
+                      </div>
+                      <i className="fas fa-arrow-right text-gray-400"></i>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600 dark:text-gray-400">Patient Records</span>
-                      <span className="font-semibold text-orange-600 dark:text-orange-400">Ready</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600 dark:text-gray-400">Billing</span>
-                      <span className="font-semibold text-orange-600 dark:text-orange-400">Ready</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600 dark:text-gray-400">Reports</span>
-                      <span className="font-semibold text-orange-600 dark:text-orange-400">Ready</span>
+                    <div className="flex items-center justify-between p-3 rounded-lg bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                          <i className="fas fa-user-tie text-purple-600 dark:text-purple-400 text-sm"></i>
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Secretary</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">Administrative tasks</p>
+                        </div>
+                      </div>
+                      <i className="fas fa-check-circle text-green-500"></i>
                     </div>
                   </div>
                 </div>
@@ -268,7 +289,7 @@ const HowItWorks = () => {
               {/* Step Icon */}
               <div className="lg:absolute lg:left-1/2 lg:transform lg:-translate-x-1/2">
                 <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg relative z-10">
-                  <i className="fas fa-play-circle text-white text-2xl"></i>
+                  <i className="fas fa-clinic-medical text-white text-2xl"></i>
                   <div className="absolute -top-1 -right-1 w-8 h-8 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center shadow-md">
                     <span className="text-sm font-bold text-orange-600 dark:text-orange-400">4</span>
                   </div>
@@ -281,23 +302,23 @@ const HowItWorks = () => {
                   <span className="text-sm font-semibold text-orange-700 dark:text-orange-300">Step 4</span>
                 </div>
                 <h3 className="text-2xl font-bold text-orange-600 dark:text-orange-400 mb-4">
-                  Start Managing
+                  Manage Your Clinic
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
-                  Begin managing your clinic efficiently with all features unlocked
+                  Doctor and secretary work together to manage clinic operations
                 </p>
                 <ul className="space-y-2 text-gray-600 dark:text-gray-400">
                   <li className="flex items-center gap-2">
                     <i className="fas fa-check-circle text-green-500"></i>
-                    <span>Full dashboard access</span>
+                    <span>Doctor focuses on medical care</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <i className="fas fa-check-circle text-green-500"></i>
-                    <span>Real-time analytics</span>
+                    <span>Secretary handles appointments & admin</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <i className="fas fa-check-circle text-green-500"></i>
-                    <span>24/7 support</span>
+                    <span>Subscription unlocks premium features</span>
                   </li>
                 </ul>
               </div>
