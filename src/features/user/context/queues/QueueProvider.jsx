@@ -15,6 +15,11 @@ export const QueueProvider = ({ children }) => {
 
   const [activeDoctorId, setActiveDoctorId] = useState(null);
   const [activeClinicId, setActiveClinicId] = useState(null);
+  
+  const [addQueueLoading, setAddQueueLoading] = useState(null);
+  const [addQueueError, setAddQueueError] = useState(null);
+
+
 
   const getQueueOfDoctorInClinic = async (doctorId, clinicId) => {
     if (!doctorId || !clinicId) {
@@ -68,21 +73,21 @@ export const QueueProvider = ({ children }) => {
   };
 
   const addQueue = async (queueData) => {
-    setLoading(true);
-    setError(null);
+    setAddQueueLoading(true);
+    setAddQueueError(null);
 
     const res = await addQueueApi(queueData);
 
     console.log(!res.ok);
     if (!res.ok) {
       console.log("inside the error");
-      setError(res.message);
-      setLoading(false);
+      setAddQueueError(res.message);
+      setAddQueueLoading(false);
       return;
     }
     await getQueueOfDoctorInClinic(activeDoctorId, activeClinicId);
 
-    setLoading(false);
+    setAddQueueLoading(false);
     return true;
   };
 
@@ -101,6 +106,9 @@ export const QueueProvider = ({ children }) => {
         priorityQueues,
         loading,
         error,
+
+        addQueueError,
+        addQueueLoading,
         getQueueOfDoctorInClinic,
         updateQueueStatus,
         addQueue,

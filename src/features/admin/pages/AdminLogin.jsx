@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginAdmin } from "../api/adminApi.js";
 
+import {Link } from "react-router-dom"
+
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -49,7 +51,17 @@ export default function AdminLogin() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-500 to-teal-400 px-4">
+
+
       <div className="bg-white w-full max-w-md p-10 rounded-xl shadow-lg">
+              {/* Back Button */}
+    <Link to={"/"}>
+    <button
+      className="mb-4 text-blue-700 hover:text-blue-900 text-sm font-semibold flex items-center gap-1"
+    >
+      ← Back
+    </button>
+    </Link>
         {/* Logo + Title */}
         <div className="flex flex-col items-center mb-6">
           <div className="w-12 h-12 bg-blue-600 rounded flex items-center justify-center mb-2">

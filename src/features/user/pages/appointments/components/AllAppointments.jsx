@@ -46,6 +46,20 @@ export default function AllAppointments({ data }) {
     setSelectedAppointment(null);
   };
 
+  if (!data || data.length === 0) {
+  return (
+    <div className="bg-white rounded-lg shadow p-4 mb-6">
+      <h3 className="text-blue-700 font-semibold mb-3">
+        All Appointments
+      </h3>
+      <p className="text-sm text-gray-500">
+        No appointments available.
+      </p>
+    </div>
+  );
+}
+
+
   return (
     <div className="bg-white rounded-lg shadow p-4">
       {/* MODALS */}
@@ -86,8 +100,6 @@ export default function AllAppointments({ data }) {
           <thead className="bg-blue-600 text-white">
             <tr>
               <th className="p-2 text-left whitespace-nowrap">Patient</th>
-              <th className="p-2 text-left whitespace-nowrap">Doctor</th>
-              <th className="p-2 text-left whitespace-nowrap">Clinic</th>
               <th className="p-2 text-left whitespace-nowrap">Date</th>
               <th className="p-2 text-left whitespace-nowrap">Type</th>
               <th className="p-2 text-left whitespace-nowrap">Priority</th>
@@ -105,8 +117,7 @@ export default function AllAppointments({ data }) {
                 <td className="p-2 whitespace-nowrap">
                   {`${a.patient_f_name} ${a.patient_m_name} ${a.patient_l_name}`}
                 </td>
-                <td className="p-2 whitespace-nowrap">{a.doctor_name}</td>
-                <td className="p-2 whitespace-nowrap">{a.clinic_name}</td>
+
                 <td className="p-2 whitespace-nowrap">{a.appointment_date}</td>
                 <td className="p-2 whitespace-nowrap">{a.appointment_type}</td>
                 <td className="p-2 whitespace-nowrap">{a.priority_type}</td>
@@ -118,7 +129,7 @@ export default function AllAppointments({ data }) {
                 <td className="p-2 whitespace-nowrap">
                   <div className="flex gap-2 flex-wrap md:flex-nowrap">
                     <button
-                      className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
+                      className="px-2 py-1 text-xs bg-blue-700 rounded hover:bg-blue-400 text-white"
                       onClick={() => {
                         setSelectedAppointment(a);
                         setShowModal(true);
@@ -128,7 +139,7 @@ export default function AllAppointments({ data }) {
                     </button>
 
                     <button
-                      className="px-2 py-1 text-xs bg-yellow-100 text-yellow-700 rounded hover:bg-yellow-200"
+                      className="px-2 py-1 text-xs bg-blue-700 text-white rounded hover:bg-blue-400"
                       onClick={() => {
                         setSelectedAppointment(a);
                         setRescheduleOpen(true);
@@ -138,7 +149,7 @@ export default function AllAppointments({ data }) {
                     </button>
 
                     <button
-                      className="px-2 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200"
+                      className="px-2 py-1 text-xs bg-red-700 text-white rounded hover:bg-red-200"
                       onClick={() => {
                         setSelectedAppointment(a);
                         setCancelOpen(true);

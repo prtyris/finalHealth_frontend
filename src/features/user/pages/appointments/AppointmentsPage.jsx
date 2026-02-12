@@ -103,11 +103,12 @@ export default function AppointmentsPage() {
 
   return (
     <Layout>
-      <div className="p-6 space-y-6 bg-white">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6 bg-white">
         <HeaderFilters search={search} onSearchChange={setSearch} />
 
         <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
+        
         {activeTab === "appointments" && (
           <>
             <TodayAppointments data={filteredTodayAppointments} />

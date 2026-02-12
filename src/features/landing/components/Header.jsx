@@ -65,7 +65,7 @@ const Header = ({ darkMode, toggleDarkMode, openAuthModal }) => {
           {/* Desktop Buttons */}
           <div className="hidden md:flex items-center space-x-4">
             {/* Dark Mode Toggle */}
-            <button
+            {/* <button
               onClick={toggleDarkMode}
               className={`flex items-center space-x-2 px-4 py-2 rounded-full border transition-colors duration-300 ${
                 darkMode
@@ -77,7 +77,7 @@ const Header = ({ darkMode, toggleDarkMode, openAuthModal }) => {
                 {darkMode ? <i className="fas fa-sun"></i> : <i className="fas fa-moon"></i>}
               </span>
               <span className="font-medium">{darkMode ? "Light" : "Dark"}</span>
-            </button>
+            </button> */}
 
             {/* Auth Buttons */}
             <button

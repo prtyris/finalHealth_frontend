@@ -17,6 +17,8 @@ export default function HeaderFilters({
   const { clearQueues } = useQueues();
 
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showWarningModal, setShowWarningModal] = useState(false);
+
 
   const [doctorId, setDoctorId] = useState(
     localStorage.getItem("selectedDoctorId") || ""
@@ -125,8 +127,13 @@ export default function HeaderFilters({
       <button
         className="bg-blue-600 text-white rounded px-4 py-2"
         type="button"
-        disabled={!doctorId || !clinicId}
-        onClick={() => setShowAddModal(true)}
+        onClick={() => {
+          if (!doctorId || !clinicId) {
+            setShowWarningModal(true);
+          } else {
+            setShowAddModal(true);
+          }
+        }}
       >
         + Add Appointment
       </button>
@@ -137,6 +144,31 @@ export default function HeaderFilters({
         doctor={selectedDoctor || null}
         clinic={selectedClinic || null}
       />
+
+     {/* Warning Modal */}
+    {showWarningModal && (
+      <div className="fixed inset-0 bg-blue-50/60 backdrop-blur-[2px] flex items-center justify-center z-50 px-4">
+        <div className="bg-white w-full max-w-sm p-6 rounded-2xl shadow-xl border-4 border-blue-600 text-center">
+          
+          <h2 className="text-blue-700 font-semibold text-lg mb-3">
+            Selection Required
+          </h2>
+
+          <p className="text-gray-600 text-sm mb-6">
+            Please select a doctor and clinic first before adding an appointment.
+          </p>
+
+          <button
+            onClick={() => setShowWarningModal(false)}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-medium transition"
+          >
+            ← Back
+          </button>
+        </div>
+      </div>
+    )}
+
+
     </div>
   );
 }

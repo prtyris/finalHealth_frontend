@@ -30,55 +30,76 @@ export default function RescheduleAppointmentModal({
   // ✅ Conditional rendering AFTER hooks
   if (!isOpen || !appointment) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+return (
+  <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+    {/* Backdrop */}
+    <div
+      className="absolute inset-0 bg-blue-50/60 backdrop-blur-sm"
+      onClick={onClose}
+    />
 
-      {/* Modal */}
-      <div className="relative bg-white w-full max-w-md rounded-lg shadow-lg p-6 z-10">
-        <h2 className="text-lg font-semibold text-blue-700 mb-4">
-          Reschedule Appointment
-        </h2>
+    {/* Modal */}
+    <div className="relative bg-white w-full max-w-md rounded-2xl shadow-xl border-4 border-blue-600 p-6 z-10">
+     <h2 className="text-lg font-semibold text-blue-700 mb-2 text-center">
+      Reschedule Appointment
+    </h2>
 
-        <div className="space-y-4 text-sm">
-          <div>
-            <label className="block font-medium mb-1">New Date</label>
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="w-full border rounded px-3 py-2"
-            />
-          </div>
+    {/* Patient + Doctor + Clinic Info */}
+    <div className="text-center text-sm text-gray-600 mb-4 space-y-1">
+      <p className="font-medium text-gray-800">
+        {appointment.patient_f_name}{" "}
+        {appointment.patient_m_name || ""}{" "}
+        {appointment.patient_l_name}
+      </p>
 
-          <div>
-            <label className="block font-medium mb-1">Appointment Type</label>
-            <input
-              type="text"
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-              className="w-full border rounded px-3 py-2"
-            />
-          </div>
+      <p>
+        Doctor: <span className="font-medium">{appointment.doctor_name}</span>
+      </p>
+
+      <p>
+        Clinic: <span className="font-medium">{appointment.clinic_name}</span>
+      </p>
+    </div>
+
+      <div className="space-y-4 text-sm">
+        <div>
+          <label className="block font-medium mb-1">New Date</label>
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+          />
         </div>
 
-        <div className="mt-6 flex justify-end gap-2">
-          <button
-            className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
-            onClick={onClose}
-          >
-            Cancel
-          </button>
-
-          <button
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            onClick={() => onConfirm(date, type)}
-          >
-            Confirm
-          </button>
+        <div>
+          <label className="block font-medium mb-1">Appointment Type</label>
+          <input
+            type="text"
+            value={type}
+            onChange={(e) => setType(e.target.value)}
+            className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+          />
         </div>
       </div>
+
+      <div className="mt-6 flex justify-center gap-3">
+        <button
+          className="px-5 py-2 bg-red-700 rounded-lg hover:bg-red-300 transition text-white"
+          onClick={onClose}
+        >
+          Cancel
+        </button>
+
+        <button
+          className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition"
+          onClick={() => onConfirm(date, type)}
+        >
+          Confirm
+        </button>
+      </div>
     </div>
-  );
+  </div>
+);
+
 }
