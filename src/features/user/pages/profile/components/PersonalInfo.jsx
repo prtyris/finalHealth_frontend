@@ -144,7 +144,7 @@ const PersonalInfo = () => {
           <p className="text-gray-600 mb-8">{error}</p>
           <button
             onClick={getPersonalInfo}
-            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200"
+            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200"
           >
             Try Again
           </button>
@@ -177,17 +177,17 @@ const PersonalInfo = () => {
       <div className="max-w-6xl mx-auto">
         <div className="mb-10">
           <div className="flex items-center gap-4 mb-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
               <FiUser className="text-white text-2xl" />
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 via-blue-500 to-purple-600 bg-clip-text text-transparent">
+            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 via-blue-500 to-blue-400 bg-clip-text text-transparent">
               Personal Information
             </h1>
           </div>
           <p className="text-gray-600 text-lg max-w-3xl">
             Manage your personal details. All information is securely stored and encrypted.
           </p>
-          <div className="h-0.5 w-full bg-gradient-to-r from-blue-500/20 to-purple-600/20 mt-6 rounded-full"></div>
+          <div className="h-0.5 w-full bg-gradient-to-r from-blue-500/20 to-blue-400/20 mt-6 rounded-full"></div>
         </div>
 
         {/* Profile Summary */}
@@ -201,7 +201,7 @@ const PersonalInfo = () => {
             <FiMail className="text-blue-500" />
             <span>{profileData?.email}</span>
           </div>
-          <div className="h-0.5 w-full bg-gradient-to-r from-blue-500/20 to-purple-600/20 rounded-full"></div>
+          <div className="h-0.5 w-full bg-gradient-to-r from-blue-500/20 to-blue-400/20 rounded-full"></div>
         </div>
 
         {/* Name Information Section */}
@@ -241,10 +241,10 @@ const PersonalInfo = () => {
               </label>
               {editing ? (
                 <div className="relative">
-                  <FiUser className="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-500" />
+                  <FiUser className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-500" />
                   <input
                     type="text"
-                    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"
+                    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                     value={profileData?.middleName || ""}
                     onChange={(e) => handleInputChange("middleName", e.target.value)}
                     placeholder="Enter middle name"
@@ -307,10 +307,10 @@ const PersonalInfo = () => {
               </label>
               {editing ? (
                 <div className="relative">
-                  <FiPhone className="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-500" />
+                  <FiPhone className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-500" />
                   <input
                     type="tel"
-                    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"
+                    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                     value={profileData?.contactNumber || ""}
                     onChange={(e) => handleInputChange("contactNumber", e.target.value)}
                     placeholder="+63 XXX XXX XXXX"
@@ -383,7 +383,7 @@ const PersonalInfo = () => {
           <div className="flex flex-col sm:flex-row justify-end gap-4">
             {!editing ? (
               <button
-                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl"
+                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl"
                 onClick={handleEdit}
                 disabled={saving}
               >
