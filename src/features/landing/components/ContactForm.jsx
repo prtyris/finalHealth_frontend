@@ -173,7 +173,13 @@ const ContactForm = ({ darkMode = false }) => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`w-full py-3 px-4 rounded-lg font-medium text-white transition-all duration-200 mt-2 ${isSubmitting ? "bg-blue-400" : "bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900"} focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${darkMode ? "focus:ring-offset-gray-800" : "focus:ring-offset-white"}`}
+                className={`w-full py-3 px-4 rounded-lg font-medium text-white transition-all duration-200 mt-2 ${
+                  isSubmitting 
+                    ? "bg-blue-700" 
+                    : "bg-gradient-to-r from-blue-800 to-blue-900 hover:from-blue-900 hover:to-blue-950"
+                } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                  darkMode ? "focus:ring-offset-gray-800" : "focus:ring-offset-white"
+                }`}
               >
                 {isSubmitting ? (
                   <span className="flex items-center justify-center">

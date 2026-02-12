@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-
 import Logo from "../../../assets/logo.png";
 
 const Header = ({ darkMode, toggleDarkMode, openAuthModal }) => {
@@ -92,7 +91,7 @@ const Header = ({ darkMode, toggleDarkMode, openAuthModal }) => {
             </button>
             <button
               onClick={handleRegisterClick}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-300"
+              className="px-6 py-2 bg-gradient-to-r from-blue-800 to-blue-900 text-white rounded-lg hover:from-blue-900 hover:to-blue-950 transition-all duration-300"
             >
               Create Account
             </button>
@@ -156,7 +155,7 @@ const Header = ({ darkMode, toggleDarkMode, openAuthModal }) => {
                 setMenuOpen(false);
                 handleRegisterClick();
               }}
-              className="w-full px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-300"
+              className="w-full px-6 py-2 bg-gradient-to-r from-blue-800 to-blue-900 text-white rounded-lg hover:from-blue-900 hover:to-blue-950 transition-all duration-300"
             >
               Create Account
             </button>

@@ -111,8 +111,8 @@ const Features = () => {
           </p>
           <div style={styles.headerDecoration}>
             <div style={styles.decorationDot}></div>
-            <div style={{...styles.decorationDot, backgroundColor: '#8b5cf6'}}></div>
-            <div style={{...styles.decorationDot, backgroundColor: '#10b981'}}></div>
+            <div style={{...styles.decorationDot, backgroundColor: '#2563eb'}}></div>
+            <div style={{...styles.decorationDot, backgroundColor: '#1e40af'}}></div>
           </div>
         </div>
 
@@ -146,7 +146,7 @@ const Features = () => {
           ))}
         </div>
 
-        {/* CTA Section */}
+        {/* CTA Section - Light Blue Theme */}
         <div style={styles.ctaSection}>
           <div style={styles.ctaOverlayBefore}></div>
           <div style={styles.ctaOverlayAfter}></div>
@@ -192,43 +192,43 @@ const Features = () => {
           transform: translateY(-5px) !important;
           box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15) !important;
           background: #f8fafc !important;
-          color: #2563eb !important;
+          color: #0284c7 !important;
         }
       `}</style>
     </section>
   );
 };
 
-// Helper functions for dynamic styling
+// Helper functions for dynamic styling - ALL BLUE NOW
 const getIconGradient = (index) => {
   const gradients = [
-    'linear-gradient(135deg, #3b82f6, #2563eb)',
-    'linear-gradient(135deg, #8b5cf6, #7c3aed)',
-    'linear-gradient(135deg, #10b981, #059669)',
-    'linear-gradient(135deg, #3b82f6, #1d4ed8)',
-    'linear-gradient(135deg, #8b5cf6, #6d28d9)',
-    'linear-gradient(135deg, #10b981, #047857)'
+    'linear-gradient(135deg, #0284c7, #0369a1)',
+    'linear-gradient(135deg, #0ea5e9, #0284c7)',
+    'linear-gradient(135deg, #38bdf8, #0ea5e9)',
+    'linear-gradient(135deg, #0369a1, #075985)',
+    'linear-gradient(135deg, #0284c7, #1e40af)',
+    'linear-gradient(135deg, #0ea5e9, #2563eb)'
   ];
   return gradients[index];
 };
 
 const getBadgeColor = (index) => {
   const colors = [
-    { bg: 'rgba(59, 130, 246, 0.1)', text: '#3b82f6', border: 'rgba(59, 130, 246, 0.2)' },
-    { bg: 'rgba(139, 92, 246, 0.1)', text: '#8b5cf6', border: 'rgba(139, 92, 246, 0.2)' },
-    { bg: 'rgba(16, 185, 129, 0.1)', text: '#10b981', border: 'rgba(16, 185, 129, 0.2)' },
-    { bg: 'rgba(59, 130, 246, 0.1)', text: '#3b82f6', border: 'rgba(59, 130, 246, 0.2)' },
-    { bg: 'rgba(139, 92, 246, 0.1)', text: '#8b5cf6', border: 'rgba(139, 92, 246, 0.2)' },
-    { bg: 'rgba(16, 185, 129, 0.1)', text: '#10b981', border: 'rgba(16, 185, 129, 0.2)' }
+    { bg: 'rgba(2, 132, 199, 0.1)', text: '#0284c7', border: 'rgba(2, 132, 199, 0.2)' },
+    { bg: 'rgba(14, 165, 233, 0.1)', text: '#0ea5e9', border: 'rgba(14, 165, 233, 0.2)' },
+    { bg: 'rgba(56, 189, 248, 0.1)', text: '#38bdf8', border: 'rgba(56, 189, 248, 0.2)' },
+    { bg: 'rgba(3, 105, 161, 0.1)', text: '#0369a1', border: 'rgba(3, 105, 161, 0.2)' },
+    { bg: 'rgba(2, 132, 199, 0.1)', text: '#0284c7', border: 'rgba(2, 132, 199, 0.2)' },
+    { bg: 'rgba(14, 165, 233, 0.1)', text: '#0ea5e9', border: 'rgba(14, 165, 233, 0.2)' }
   ];
   return colors[index];
 };
 
-// Styles
+// Styles - ALL BLUE THEME
 const styles = {
   featuresSection: {
     fontFamily: "'Poppins', sans-serif",
-    background: 'linear-gradient(135deg, #f0f7ff 0%, #f8fafc 100%)',
+    background: 'linear-gradient(135deg, #f0f9ff 0%, #e6f2ff 100%)',
     color: '#334155',
     lineHeight: 1.6,
     padding: '40px 20px',
@@ -245,7 +245,7 @@ const styles = {
   },
   platformTitle: {
     fontSize: '3.2rem',
-    background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
+    background: 'linear-gradient(135deg, #0369a1 0%, #0284c7 50%, #0ea5e9 100%)',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
     backgroundClip: 'text',
@@ -272,7 +272,7 @@ const styles = {
     width: '10px',
     height: '10px',
     borderRadius: '50%',
-    backgroundColor: '#3b82f6'
+    backgroundColor: '#0284c7'
   },
   featuresGrid: {
     display: 'grid',
@@ -284,10 +284,10 @@ const styles = {
     background: 'white',
     borderRadius: '20px',
     overflow: 'hidden',
-    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.05)',
+    boxShadow: '0 10px 25px rgba(2, 132, 199, 0.08)',
     transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
     position: 'relative',
-    border: '1px solid rgba(59, 130, 246, 0.1)',
+    border: '1px solid rgba(2, 132, 199, 0.1)',
     opacity: 0,
     animation: 'floatIn 0.6s ease forwards',
     position: 'relative'
@@ -296,7 +296,7 @@ const styles = {
     position: 'absolute',
     width: '8px',
     height: '8px',
-    background: '#ef4444',
+    background: '#0ea5e9',
     borderRadius: '50%',
     top: '20px',
     left: '20px',
@@ -327,12 +327,12 @@ const styles = {
     marginBottom: '25px',
     fontSize: '2rem',
     color: 'white',
-    boxShadow: '0 10px 20px rgba(59, 130, 246, 0.2)',
+    boxShadow: '0 10px 20px rgba(2, 132, 199, 0.2)',
     transition: 'transform 0.3s ease'
   },
   featureTitle: {
     fontSize: '1.5rem',
-    color: '#1e293b',
+    color: '#0c4a6e',
     marginBottom: '15px',
     fontWeight: 600,
     position: 'relative',
@@ -343,13 +343,14 @@ const styles = {
     fontSize: '1.05rem',
     lineHeight: 1.7
   },
+  // CTA Section - LIGHT BLUE THEME (no purple)
   ctaSection: {
-    background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+    background: 'linear-gradient(135deg, #0284c7 0%, #0ea5e9 50%, #38bdf8 100%)',
     borderRadius: '25px',
     padding: '60px 40px',
     textAlign: 'center',
     color: 'white',
-    boxShadow: '0 20px 40px rgba(59, 130, 246, 0.25)',
+    boxShadow: '0 20px 40px rgba(2, 132, 199, 0.25)',
     marginTop: '40px',
     position: 'relative',
     overflow: 'hidden'
@@ -392,7 +393,7 @@ const styles = {
   ctaButton: {
     display: 'inline-block',
     background: 'white',
-    color: '#3b82f6',
+    color: '#0284c7',
     padding: '16px 40px',
     borderRadius: '50px',
     textDecoration: 'none',
