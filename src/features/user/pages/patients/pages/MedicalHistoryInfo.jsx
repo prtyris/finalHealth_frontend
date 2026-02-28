@@ -46,24 +46,39 @@ export default function MedicalHistoryInfo() {
 
   return (
     <Layout>
-      <div className="p-6 bg-gray-50 min-h-screen space-y-6">
+    <div className="p-6 bg-blue-50 min-h-screen space-y-6">
+
         <button
           onClick={() => navigate(-1)}
-          className="px-3 py-1 text-sm border rounded hover:bg-gray-100"
+className="px-4 py-2 text-sm bg-white border-2 border-blue-600 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition"
+
         >
           ← Back
         </button>
 
         {/* Header */}
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold">
+<h2 className="text-2xl font-semibold text-blue-700">
+
             Medical Record #{medicalRecord?.record_id}
           </h2>
         </div>
 
         {/* Visit Info */}
         <Section title="Visit Information">
-          <Info label="Date" value={medicalRecord?.record_date} />
+        <Info
+          label="Date"
+          value={
+            medicalRecord?.record_date
+              ? new Date(medicalRecord.record_date).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })
+              : ""
+          }
+        />
+
           <Info label="Doctor" value={medicalRecord?.doctor_name} />
           <Info label="Clinic" value={medicalRecord?.clinic_name} />
           <Info label="Assessment" value={medicalRecord?.assessment} />
@@ -189,11 +204,13 @@ export default function MedicalHistoryInfo() {
 
 function Section({ title, children }) {
   return (
-    <div className="bg-white rounded-lg border p-4 space-y-3">
-      <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+    <div className="bg-white rounded-2xl border-4 border-blue-600 shadow-xl p-6 space-y-4">
+      <h3 className="text-sm font-semibold text-blue-700 uppercase tracking-wide text-center">
         {title}
       </h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">{children}</div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {children}
+      </div>
     </div>
   );
 }
@@ -201,8 +218,10 @@ function Section({ title, children }) {
 function Info({ label, value }) {
   return (
     <div className="text-sm">
-      <p className="text-gray-500">{label}</p>
-      <p className="font-medium text-gray-900">{value || "-"}</p>
+      <p className="text-blue-600 font-medium">{label}</p>
+      <p className="font-semibold text-gray-900">
+        {value || "-"}
+      </p>
     </div>
   );
 }
@@ -216,10 +235,13 @@ function ImagePreview({ src }) {
       <img
         src={resolvedSrc}
         alt="medical document"
-        className="w-32 h-32 object-cover rounded border cursor-pointer hover:opacity-90"
+className="w-32 h-32 object-cover rounded-xl border-2 border-blue-600 cursor-pointer hover:scale-105 transition"
+
         onClick={() => window.open(resolvedSrc, "_blank")}
       />
-      <p className="text-xs text-gray-500 mt-1">Click to view</p>
+<p className="text-xs text-blue-600 mt-1 text-center">
+  Click to view
+</p>
     </div>
   );
 }

@@ -48,13 +48,13 @@ export default function ClinicDoctorMngPage() {
             </button>
           </div>
 
-          <table className="w-full border text-sm">
+        <div className="w-full overflow-x-auto">
+          <table className="min-w-[600px] w-full border text-sm">
             <thead className="bg-blue-600 text-white">
               <tr>
-                <th className="p-2 text-left">Doctor Name</th>
-                <th className="p-2 text-left">Specialization</th>
-                <th className="p-2 text-left">License</th>
-                <th className="p-2 text-left">Status</th>
+                <th className="p-3 text-left whitespace-nowrap">Doctor Name</th>
+                <th className="p-3 text-left whitespace-nowrap">Specialization</th>
+                <th className="p-3 text-left whitespace-nowrap">License</th>
               </tr>
             </thead>
 
@@ -62,30 +62,29 @@ export default function ClinicDoctorMngPage() {
               {doctors.map((d) => (
                 <tr
                   key={d.doctor_id}
-                  className="border-t hover:bg-blue-50 cursor-pointer"
+                  className="border-t hover:bg-blue-50 transition"
                 >
-                  <td className="p-2 text-blue-500">
+                  <td className="p-3 text-blue-600 font-medium whitespace-nowrap">
                     <Link to={`/user/manage-doctor/${d.doctor_id}`}>
                       Dr. {d.f_name} {d.l_name}
                     </Link>
                   </td>
-                  <td className="p-2">{d.specialization}</td>
-                  <td className="p-2">{d.license_number}</td>
-                  <td className="p-2">
-                    <span
-                      className={`px-2 py-1 rounded text-xs ${
-                        d.verification_status === "Approved"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-gray-200 text-gray-700"
-                      }`}
-                    >
-                      {d.verification_status}
-                    </span>
+
+                  <td className="p-3 whitespace-nowrap">
+                    {d.specialization}
                   </td>
+
+                  <td className="p-3 whitespace-nowrap">
+                    {d.license_number}
+                  </td>
+
+                 
                 </tr>
               ))}
             </tbody>
           </table>
+        </div>
+
         </div>
 
         {/* ================= CLINICS ================= */}
@@ -94,38 +93,48 @@ export default function ClinicDoctorMngPage() {
             <h2 className="text-lg font-semibold text-blue-700">Clinics</h2>
 
             <button
-              className="bg-blue-700 text-white px-4 py-2 rounded hover:bg-green-700"
+              className="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800"
               onClick={() => setShowAddClinicModal(true)}
             >
               + Add Clinic
             </button>
           </div>
 
-          <table className="w-full border text-sm">
+        <div className="w-full overflow-x-auto">
+          <table className="min-w-[500px] w-full border text-sm">
             <thead className="bg-blue-600 text-white">
               <tr>
-                <th className="p-2 text-left">Clinic Name</th>
-                <th className="p-2 text-left">Address</th>
-                <th className="p-2 text-left">Status</th>
+                <th className="p-3 text-left whitespace-nowrap">Clinic Name</th>
+                <th className="p-3 text-left whitespace-nowrap">Address</th>
               </tr>
             </thead>
 
             <tbody>
               {allClinics.map((c) => (
-                <tr key={c.clinic_id} className="border-t hover:bg-blue-50">
-                  <Link to={`/user/manage-clinic/${c.clinic_id}`}>
-                    <td className="p-2 text-blue-500">{c.clinic_name}</td>
-                  </Link>
-                  <td className="p-2">{c.address}</td>
-                  <td className="p-2">
-                    <span className="px-2 py-1 rounded text-xs bg-green-100 text-green-700">
-                      {c.verification_status}
-                    </span>
+                <tr
+                  key={c.clinic_id}
+                  className="border-t hover:bg-blue-50 transition"
+                >
+                  <td className="p-3 whitespace-nowrap">
+                    <Link
+                      to={`/user/manage-clinic/${c.clinic_id}`}
+                      className="text-blue-600 font-medium hover:underline"
+                    >
+                      {c.clinic_name}
+                    </Link>
                   </td>
+
+                  <td className="p-3 whitespace-nowrap">
+                    {c.address}
+                  </td>
+
+                
                 </tr>
               ))}
             </tbody>
           </table>
+        </div>
+
         </div>
       </div>
     </Layout>

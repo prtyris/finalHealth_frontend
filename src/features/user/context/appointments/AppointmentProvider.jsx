@@ -13,6 +13,8 @@ export const AppointmentProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+
+
   const getAllAppointments = async (doctorId, clinicId) => {
     setLoading(true);
     setError(null);

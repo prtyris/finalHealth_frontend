@@ -82,47 +82,34 @@ const PersonalInfo = () => {
     setEditing(false);
   };
 
-  const handleSaveChanges = async () => {
-    if (!userInfo) return;
+const handleSaveChanges = async () => {
+  if (!userInfo) return;
 
-    setSaving(true);
+  setSaving(true);
 
-    const payload = {
-      fName: profileData.firstName,
-      mName: profileData.middleName,
-      lName: profileData.lastName,
-      contactNum: profileData.contactNumber,
-      birthDate: profileData.dateOfBirth,
-      address: profileData.address,
-    };
-
-    try {
-      const result = await updateProfile(userInfo.user.userId, payload);
-
-      setSaving(false);
-      setEditing(false);
-
-      setAlert({
-        show: true,
-        type: result.success ? "success" : "error",
-        message: result.success
-          ? "Profile updated successfully!"
-          : "Failed to update profile.",
-      });
-
-      if (result.success) {
-        originalDataRef.current = { ...profileData };
-        getPersonalInfo(); // Refresh data
-      }
-    } catch (error) {
-      setSaving(false);
-      setAlert({
-        show: true,
-        type: "error",
-        message: "An error occurred while updating profile.",
-      });
-    }
+  const payload = {
+    fName: profileData.firstName,
+    mName: profileData.middleName,
+    lName: profileData.lastName,
+    contactNum: profileData.contactNumber,
+    birthDate: profileData.dateOfBirth,
+    address: profileData.address,
   };
+
+  await updateProfile(userInfo.user.userId, payload);
+
+  setSaving(false);
+  setEditing(false);
+
+  originalDataRef.current = { ...profileData };
+  getPersonalInfo();
+
+  setAlert({
+    show: true,
+    type: "success",
+    message: "Profile updated successfully!",
+  });
+};
 
   // Show loading only when actually loading
   if (loading) {

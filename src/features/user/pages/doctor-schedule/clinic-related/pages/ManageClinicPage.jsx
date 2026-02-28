@@ -110,12 +110,6 @@ export default function ManageClinicPage() {
               <p>
                 <b>Owner:</b> {clinic.owner_name}
               </p>
-              <p>
-                <b>Status:</b>{" "}
-                <span className="px-2 py-1 rounded bg-green-100 text-green-700 text-xs">
-                  {clinic.verification_status}
-                </span>
-              </p>
             </div>
           </div>
         ))}
@@ -135,41 +129,45 @@ export default function ManageClinicPage() {
           {clinicSessions.length === 0 ? (
             <p className="text-sm text-gray-500">No sessions found.</p>
           ) : (
-            <table className="w-full border text-sm">
-              <thead className="bg-blue-600 text-white">
-                <tr>
-                  <th className="p-2 text-left">Day</th>
-                  <th className="p-2 text-left">Session</th>
-                  <th className="p-2 text-left">Start</th>
-                  <th className="p-2 text-left">End</th>
-                  <th className="p-2 text-left">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {clinicSessions.map((s) => (
-                  <tr
-                    key={s.clinic_schedule_id}
-                    className="border-t hover:bg-blue-50"
-                  >
-                    <td className="p-2">{s.day_of_week}</td>
-                    <td className="p-2">{s.session_period}</td>
-                    <td className="p-2">{s.open_time}</td>
-                    <td className="p-2">{s.close_time}</td>
-                    <td className="p-2">
-                      <button
-                        type="button"
-                        className="px-2 py-1 text-xs bg-red-100 text-red-700 rounded"
-                        onClick={() =>
-                          handleDeleteSession(s.clinic_schedule_id)
-                        }
-                      >
-                        Delete
-                      </button>
-                    </td>
+            <div className="w-full overflow-x-auto">
+              <table className="min-w-[650px] w-full text-sm border border-blue-200">
+                <thead className="bg-blue-600 text-white">
+                  <tr>
+                    <th className="p-3 text-left">Day</th>
+                    <th className="p-3 text-left">Session</th>
+                    <th className="p-3 text-left">Start</th>
+                    <th className="p-3 text-left">End</th>
+                    <th className="p-3 text-left">Action</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+
+                <tbody>
+                  {clinicSessions.map((s) => (
+                    <tr
+                      key={s.clinic_schedule_id}
+                      className="border-t hover:bg-blue-50 transition"
+                    >
+                      <td className="p-3 whitespace-nowrap">{s.day_of_week}</td>
+                      <td className="p-3 whitespace-nowrap">{s.session_period}</td>
+                      <td className="p-3 whitespace-nowrap">{s.open_time}</td>
+                      <td className="p-3 whitespace-nowrap">{s.close_time}</td>
+                      <td className="p-3 whitespace-nowrap">
+                        <button
+                          type="button"
+                          className="px-3 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200 transition"
+                          onClick={() =>
+                            handleDeleteSession(s.clinic_schedule_id)
+                          }
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
           )}
         </div>
       </div>

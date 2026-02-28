@@ -45,11 +45,13 @@ export default function PatientInfo() {
 
   return (
     <Layout>
-      <EditPatientModal
-        isOpen={showEdit}
-        onClose={() => setShowEdit(false)}
-        patientId={patientId}
-      />
+<EditPatientModal
+  isOpen={showEdit}
+  onClose={() => setShowEdit(false)}
+  patientId={patientId}
+  patient={patientsInfo}
+/>
+
       <AddMedicalRecordModal
         isOpen={showAddMedicalRecords}
         onClose={() => setShowAddMedicalRecords(false)}
@@ -139,7 +141,16 @@ export default function PatientInfo() {
                     )
                   }
                 >
-                  <td className="p-3">{r.record_date}</td>
+                  <td className="p-3">
+                    {r.record_date
+                      ? new Date(r.record_date).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })
+                      : ""}
+                  </td>
+
                   <td className="p-3">{r.diagnosis}</td>
                   <td className="p-3">{r.treatment}</td>
                 </tr>

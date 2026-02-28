@@ -57,7 +57,9 @@ export default function LandingPage() {
         toggleDarkMode={toggleDarkMode}
         openAuthModal={openAuthModal}
       />
-      <Hero />
+      <Hero 
+        openAuthModal={openAuthModal}
+      />
       <About />
       <Team />
       <Journey />

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { useAppointments } from "../../../context/appointments/useAppointments";
 import { useQueues } from "../../../context/queues/useQueues";
@@ -12,7 +12,7 @@ export default function TodayAppointments({ data }) {
   const { loading, error, cancelAppointment, getAllAppointments } =
     useAppointments();
 
-  const { addQueue, loading: loadingQueues, error: errorQueues, addQueueError } = useQueues();
+  const { addQueue, loading: loadingQueues, error: errorQueues, addQueueError, normalQueues, priorityQueues } = useQueues();
 
   const [queueSuccessOpen, setQueueSuccessOpen] = useState(false);
   const [queueErrorOpen, setQueueErrorOpen] = useState(false);
@@ -24,6 +24,21 @@ const [queueErrorMessage, setQueueErrorMessage] = useState("");
   const [showView, setShowView] = useState(false);
   const [showCancel, setShowCancel] = useState(false);
 
+  const [visibleAppointments, setVisibleAppointments] = useState(data);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 2;
+
+ 
+ 
+  useEffect(() => {
+    setVisibleAppointments(data);
+  }, []);
+  
+
+
+
+  
   const refreshAppointments = () => {
     const doctorId = localStorage.getItem("selectedDoctorId");
     const clinicId = localStorage.getItem("selectedClinicId");
@@ -39,6 +54,7 @@ const [queueErrorMessage, setQueueErrorMessage] = useState("");
     setShowCancel(false);
     setSelectedAppointment(null);
   };
+
 
   if (loading) {
     return (
@@ -61,10 +77,12 @@ const handleAddToQueue = async (payload) => {
 
   if (success) {
     setQueueSuccessOpen(true);
-  } else {
-    setQueueErrorMessage(addQueueError || "Unable to add to queue.");
-    setQueueErrorOpen(true);
+
+    setVisibleAppointments((prev) =>
+      prev.filter((a) => a.appointment_id !== payload.appointment_id)
+    );
   }
+
 };
 
 
@@ -88,6 +106,31 @@ const handleAddToQueue = async (payload) => {
       </div>
     );
   }
+  
+  const queuedPatientIds = [
+    ...normalQueues,
+    ...priorityQueues,
+  ].map((q) => q.patientId); // or q.patientId (depends on API)
+
+  const filteredAppointments = data.filter(
+    (a) => !queuedPatientIds.includes(a.patient_id)
+  );
+
+  const totalPages = Math.ceil(filteredAppointments.length / itemsPerPage);
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+
+  const currentItems = filteredAppointments.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
+
+  const goToPage = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
 
 return (
   <div className="bg-white rounded-lg shadow p-4 mb-6">
@@ -111,6 +154,47 @@ return (
       onConfirm={handleCancelConfirm}
     />
 
+    {/* Queue Success Modal */}
+{queueSuccessOpen && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+    {/* Backdrop */}
+    <div
+      className="absolute inset-0 bg-blue-50/60 backdrop-blur-sm"
+      onClick={() => setQueueSuccessOpen(false)}
+    />
+
+    {/* Modal */}
+    <div className="relative bg-white w-full max-w-sm rounded-2xl border-4 border-blue-600 shadow-xl p-6 z-10">
+      
+      {/* Close Button */}
+      <button
+        onClick={() => setQueueSuccessOpen(false)}
+        className="absolute top-3 right-3 text-blue-600 hover:text-blue-800 text-xl font-bold"
+      >
+        ×
+      </button>
+
+      <h2 className="text-lg font-semibold text-blue-700 text-center mb-3">
+        Successfully Added
+      </h2>
+
+      <p className="text-sm text-gray-600 text-center mb-6">
+        The appointment has been successfully added to the queue.
+      </p>
+
+      <div className="flex justify-center">
+        <button
+          onClick={() => setQueueSuccessOpen(false)}
+          className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition"
+        >
+          ← Back
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
     <h3 className="text-blue-700 font-semibold mb-3">
       Today’s Appointments
     </h3>
@@ -130,7 +214,7 @@ return (
         </thead>
 
         <tbody>
-          {data.map((a) => (
+          {currentItems.map((a) => (
             <tr
               key={a.appointment_id}
               className="border-t hover:bg-blue-50"
@@ -191,6 +275,41 @@ return (
           ))}
         </tbody>
       </table>
+      {/* PAGINATION */}
+      <div className="flex justify-between items-center mt-4 text-sm">
+        <button
+          onClick={() => goToPage(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="px-3 py-1 rounded border border-blue-600 text-blue-600 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-blue-50"
+        >
+          Previous
+        </button>
+
+        <div className="flex gap-2">
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i}
+              onClick={() => goToPage(i + 1)}
+              className={`px-3 py-1 rounded border ${
+                currentPage === i + 1
+                  ? "bg-blue-600 text-white border-blue-600"
+                  : "border-blue-600 text-blue-600 hover:bg-blue-50"
+              }`}
+            >
+              {i + 1}
+            </button>
+          ))}
+        </div>
+
+        <button
+          onClick={() => goToPage(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="px-3 py-1 rounded border border-blue-600 text-blue-600 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-blue-50"
+        >
+          Next
+        </button>
+      </div>
+
     </div>
   </div>
 );

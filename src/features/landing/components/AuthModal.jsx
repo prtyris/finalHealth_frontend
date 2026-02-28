@@ -164,11 +164,12 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
   };
 
   return (
-    <div
-      className="fixed inset-0 bg-blue bg-opacity-50 flex items-center justify-center p-4 z-50"
+  <div
+    className="fixed inset-0 bg-blue-50/60 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+
       onClick={handleBackdropClick}
     >
-      <div className="bg-white dark:bg-gray-800 rounded-xl p-8 max-w-md w-full max-h-[90vh] overflow-y-auto relative">
+      <div className="relative bg-white rounded-2xl border-4 border-blue-600 shadow-xl p-8 max-w-md w-full max-h-[90vh] overflow-y-auto">
         {/* Close */}
         <button
           onClick={onClose}

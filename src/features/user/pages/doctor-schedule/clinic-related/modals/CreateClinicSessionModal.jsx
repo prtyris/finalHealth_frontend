@@ -1,6 +1,15 @@
 import { useState } from "react";
-
 import { useClinics } from "../../../../context/clinics/useClinics";
+
+const DAYS = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
 
 export default function CreateClinicSessionModal({
   isOpen,
@@ -9,101 +18,159 @@ export default function CreateClinicSessionModal({
 }) {
   const { createClinicSession, getClinicSessions } = useClinics();
 
-  const [formData, setFormData] = useState({
-    day_of_week: "",
-    open_time: "",
-    close_time: "",
-  });
+  const [sessions, setSessions] = useState(
+    DAYS.map((day) => ({
+      day_of_week: day,
+      open_time: "",
+      close_time: "",
+    }))
+  );
 
-  const handleChange = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+  const [applyAll, setApplyAll] = useState(false);
+
+  if (!isOpen) return null;
+
+  /* ================= HANDLERS ================= */
+
+  const handleTimeChange = (index, field, value) => {
+    const updated = [...sessions];
+    updated[index][field] = value;
+
+    // If Apply All is active → copy to all
+    if (applyAll && (field === "open_time" || field === "close_time")) {
+      updated.forEach((s, i) => {
+        updated[i][field] = value;
+      });
+    }
+
+    setSessions(updated);
   };
 
   const handleSubmit = async () => {
-    // UI only for now
-    console.log("Clinic session data:", formData);
-    await createClinicSession(clinicId, formData);
+    // Filter only days with values
+    const validSessions = sessions.filter(
+      (s) => s.open_time && s.close_time
+    );
+
+    for (const s of validSessions) {
+      await createClinicSession(clinicId, s);
+    }
+
     await getClinicSessions(clinicId);
     onClose();
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-      <div className="bg-white w-full max-w-md rounded-xl shadow-lg p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-blue-700">
-            Add Clinic Session
-          </h3>
-          <button
-            className="text-gray-500 hover:text-gray-700"
-            onClick={onClose}
-          >
-            ✕
-          </button>
-        </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+      {/* Blurred Background */}
+      <div
+        className="absolute inset-0 bg-blue-50/60 backdrop-blur-sm"
+        onClick={onClose}
+      />
 
-        {/* ================= FORM ================= */}
-        <div className="space-y-4 text-sm">
-          {/* Day */}
-          <div>
-            <label className="block font-medium mb-1">Day</label>
-            <select
-              className="w-full border rounded px-3 py-2"
-              value={formData.day_of_week}
-              onChange={(e) => handleChange("day_of_week", e.target.value)}
+      {/* Modal Container */}
+      <div
+        className="
+          relative bg-white 
+          w-full 
+          max-w-4xl 
+          rounded-2xl 
+          border-4 border-blue-600 
+          shadow-xl 
+          z-10
+          max-h-[95vh]
+          overflow-y-auto
+        "
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="p-6 min-w-[700px] sm:min-w-0">
+          {/* Header */}
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-xl font-semibold text-blue-700">
+              Add Clinic Sessions
+            </h3>
+            <button
+              className="text-blue-600 hover:text-blue-800 text-xl font-bold"
+              onClick={onClose}
             >
-              <option value="">Select day</option>
-              <option>Monday</option>
-              <option>Tuesday</option>
-              <option>Wednesday</option>
-              <option>Thursday</option>
-              <option>Friday</option>
-              <option>Saturday</option>
-              <option>Sunday</option>
-            </select>
+              ×
+            </button>
           </div>
 
-          {/* Open Time */}
-          <div>
-            <label className="block font-medium mb-1">Open Time</label>
+          {/* Apply All */}
+          <div className="flex items-center gap-2 mb-6">
             <input
-              type="time"
-              className="w-full border rounded px-3 py-2"
-              value={formData.open_time}
-              onChange={(e) => handleChange("open_time", e.target.value)}
+              type="checkbox"
+              checked={applyAll}
+              onChange={() => setApplyAll(!applyAll)}
+              className="w-4 h-4"
             />
+            <label className="text-sm font-medium text-blue-700">
+              Apply selected time to all days
+            </label>
           </div>
 
-          {/* Close Time */}
-          <div>
-            <label className="block font-medium mb-1">Close Time</label>
-            <input
-              type="time"
-              className="w-full border rounded px-3 py-2"
-              value={formData.close_time}
-              onChange={(e) => handleChange("close_time", e.target.value)}
-            />
+          {/* Scrollable Table Wrapper */}
+          <div className="w-full overflow-x-auto">
+            <table className="min-w-[700px] w-full text-sm border border-blue-200">
+              <thead className="bg-blue-600 text-white">
+                <tr>
+                  <th className="p-3 text-left">Day</th>
+                  <th className="p-3 text-left">Open Time</th>
+                  <th className="p-3 text-left">Close Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sessions.map((s, index) => (
+                  <tr key={s.day_of_week} className="border-t">
+                    <td className="p-3 font-medium text-gray-700 whitespace-nowrap">
+                      {s.day_of_week}
+                    </td>
+                    <td className="p-3">
+                      <input
+                        type="time"
+                        value={s.open_time}
+                        onChange={(e) =>
+                          handleTimeChange(index, "open_time", e.target.value)
+                        }
+                        className="w-full border border-blue-200 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                      />
+                    </td>
+                    <td className="p-3">
+                      <input
+                        type="time"
+                        value={s.close_time}
+                        onChange={(e) =>
+                          handleTimeChange(index, "close_time", e.target.value)
+                        }
+                        className="w-full border border-blue-200 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        </div>
 
-        {/* ================= ACTIONS ================= */}
-        <div className="flex justify-end gap-2 mt-6">
-          <button
-            className="px-4 py-2 text-sm rounded border"
-            onClick={onClose}
-          >
-            Cancel
-          </button>
-          <button
-            className="px-4 py-2 text-sm rounded bg-blue-600 text-white"
-            onClick={handleSubmit}
-          >
-            Save Session
-          </button>
+          {/* Actions */}
+          <div className="flex justify-end gap-3 mt-8">
+            <button
+              className="px-5 py-2 rounded-lg bg-gray-200 hover:bg-gray-300"
+              onClick={onClose}
+            >
+              Cancel
+            </button>
+
+            <button
+              className="px-6 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+              onClick={handleSubmit}
+            >
+              Save Sessions
+            </button>
+          </div>
         </div>
       </div>
     </div>
   );
+
 }

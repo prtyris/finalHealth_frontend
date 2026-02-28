@@ -1,13 +1,63 @@
 import { useState } from "react";
 import { useMedicalRecords } from "../../../context/medical-records/useMedicalRecords";
 
+/* ---------------- HARDCODED OPTIONS ---------------- */
+
+const DIAGNOSIS_OPTIONS = [
+  "Hypertension",
+  "Diabetes Mellitus",
+  "Upper Respiratory Infection",
+  "Gastroenteritis",
+  "Migraine",
+];
+
+const TREATMENT_OPTIONS = [
+  "Medication Therapy",
+  "Physical Therapy",
+  "Lifestyle Modification",
+  "Observation",
+  "Referral to Specialist",
+];
+
+const MEDICATION_OPTIONS = [
+  "Paracetamol",
+  "Amoxicillin",
+  "Metformin",
+  "Losartan",
+  "Ibuprofen",
+];
+
+const TEST_TYPE_OPTIONS = [
+  "CBC",
+  "X-Ray",
+  "Urinalysis",
+  "Blood Sugar Test",
+  "ECG",
+];
+
+const REFERRAL_OPTIONS = [
+  "Cardiologist",
+  "Neurologist",
+  "Orthopedic",
+  "Pediatrician",
+  "Dermatologist",
+];
+
+const CERTIFICATE_OPTIONS = [
+  "Medical Certificate",
+  "Fit to Work",
+  "Fit to Travel",
+  "Sick Leave",
+  "Fitness Clearance",
+];
+
 export default function AddMedicalRecordModal({ isOpen, onClose, patientId }) {
   const {
     createMedicalRecord,
     uploadMedicalRecordDocument,
     getPatientMedRecord,
   } = useMedicalRecords();
-  const [images, setImages] = useState([]);
+
   const [selectedFiles, setSelectedFiles] = useState([]);
 
   const [form, setForm] = useState({
@@ -16,28 +66,22 @@ export default function AddMedicalRecordModal({ isOpen, onClose, patientId }) {
     treatment: "",
     medications: "",
     assessment: "",
-
     blood_pressure: "",
     heart_rate: "",
     temperature: "",
     oxygen_saturation: "",
     weight: "",
-
     medication_name: "",
     dosage: "",
     frequency: "",
     duration: "",
-
     test_type: "",
     result: "",
     interpretation: "",
-
     referred_to: "",
     reason: "",
-
     followup_date: "",
     notes: "",
-
     certificate_type: "",
     remarks: "",
   });
@@ -63,14 +107,9 @@ export default function AddMedicalRecordModal({ isOpen, onClose, patientId }) {
       clinic_id: Number(clinicId),
     };
 
-    // 1️⃣ CREATE RECORD (JSON)
     const record = await createMedicalRecord(patientId, payload);
-
-    // record.record_id must be returned by backend
     const recordId = record.recordId;
-    console.log(recordId);
 
-    // 2️⃣ UPLOAD IMAGES (multipart)
     for (const file of selectedFiles) {
       await uploadMedicalRecordDocument(recordId, file);
     }
@@ -80,12 +119,18 @@ export default function AddMedicalRecordModal({ isOpen, onClose, patientId }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+      <div
+        className="absolute inset-0 bg-blue-50/60 backdrop-blur-sm"
+        onClick={onClose}
+      />
 
-      <div className="relative bg-white w-full max-w-3xl rounded p-6 space-y-6 overflow-y-auto max-h-[90vh]">
-        <h3 className="text-lg font-semibold">Add Medical Record</h3>
+      <div className="relative bg-white w-full max-w-4xl rounded-2xl border-4 border-blue-600 shadow-xl p-6 space-y-6 overflow-y-auto max-h-[90vh] z-10">
+        <h3 className="text-xl font-semibold text-blue-700 text-center">
+          Add Medical Record
+        </h3>
 
+        {/* VISIT INFO */}
         <Section title="Visit Information">
           <Input
             label="Record Date"
@@ -98,73 +143,70 @@ export default function AddMedicalRecordModal({ isOpen, onClose, patientId }) {
           />
         </Section>
 
+        {/* DIAGNOSIS */}
         <Section title="Diagnosis">
-          <Input
+          <SelectInput
             label="Diagnosis"
+            options={DIAGNOSIS_OPTIONS}
             onChange={(v) => handleChange("diagnosis", v)}
           />
-          <Input
+          <SelectInput
             label="Treatment"
+            options={TREATMENT_OPTIONS}
             onChange={(v) => handleChange("treatment", v)}
           />
-          <Input
+          <SelectInput
             label="Medications"
+            options={MEDICATION_OPTIONS}
             onChange={(v) => handleChange("medications", v)}
           />
         </Section>
 
+        {/* IMAGES */}
         <Section title="Medical Record Images">
           <input
             type="file"
             multiple
             accept="image/*"
             onChange={(e) => setSelectedFiles(Array.from(e.target.files))}
-            className="w-full border rounded px-3 py-2"
+            className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
           />
         </Section>
 
+        {/* VITAL SIGNS */}
         <Section title="Vital Signs">
           <Input
             label="Blood Pressure"
+            placeholder="120/80"
             onChange={(v) => handleChange("blood_pressure", v)}
           />
           <Input
             label="Heart Rate"
+            placeholder="72 bpm"
             onChange={(v) => handleChange("heart_rate", v)}
           />
           <Input
             label="Temperature (°C)"
+            placeholder="36.5"
             onChange={(v) => handleChange("temperature", v)}
           />
           <Input
             label="Oxygen Saturation (%)"
+            placeholder="98"
             onChange={(v) => handleChange("oxygen_saturation", v)}
           />
           <Input
             label="Weight (kg)"
+            placeholder="65"
             onChange={(v) => handleChange("weight", v)}
           />
         </Section>
 
-        <Section title="Prescription">
-          <Input
-            label="Medication Name"
-            onChange={(v) => handleChange("medication_name", v)}
-          />
-          <Input label="Dosage" onChange={(v) => handleChange("dosage", v)} />
-          <Input
-            label="Frequency"
-            onChange={(v) => handleChange("frequency", v)}
-          />
-          <Input
-            label="Duration"
-            onChange={(v) => handleChange("duration", v)}
-          />
-        </Section>
-
+        {/* LAB RESULT */}
         <Section title="Lab Result">
-          <Input
+          <SelectInput
             label="Test Type"
+            options={TEST_TYPE_OPTIONS}
             onChange={(v) => handleChange("test_type", v)}
           />
           <Input label="Result" onChange={(v) => handleChange("result", v)} />
@@ -174,38 +216,37 @@ export default function AddMedicalRecordModal({ isOpen, onClose, patientId }) {
           />
         </Section>
 
+        {/* REFERRAL */}
         <Section title="Referral">
-          <Input
+          <SelectInput
             label="Referred To"
+            options={REFERRAL_OPTIONS}
             onChange={(v) => handleChange("referred_to", v)}
           />
           <Input label="Reason" onChange={(v) => handleChange("reason", v)} />
         </Section>
 
-        <Section title="Follow-up">
-          <Input
-            label="Follow-up Date"
-            type="date"
-            onChange={(v) => handleChange("followup_date", v)}
-          />
-          <Input label="Notes" onChange={(v) => handleChange("notes", v)} />
-        </Section>
-
+        {/* CERTIFICATE */}
         <Section title="Certificate">
-          <Input
+          <SelectInput
             label="Certificate Type"
+            options={CERTIFICATE_OPTIONS}
             onChange={(v) => handleChange("certificate_type", v)}
           />
           <Input label="Remarks" onChange={(v) => handleChange("remarks", v)} />
         </Section>
 
-        <div className="flex justify-end gap-2 pt-4">
-          <button onClick={onClose} className="px-4 py-2 border rounded">
+        <div className="flex justify-end gap-3 pt-4">
+          <button
+            onClick={onClose}
+            className="px-5 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition"
+          >
             Cancel
           </button>
+
           <button
             onClick={handleSubmit}
-            className="px-4 py-2 bg-blue-600 text-white rounded"
+            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition"
           >
             Save Record
           </button>
@@ -215,26 +256,55 @@ export default function AddMedicalRecordModal({ isOpen, onClose, patientId }) {
   );
 }
 
-/* ---------- small components ---------- */
+/* ---------- SMALL COMPONENTS ---------- */
 
 function Section({ title, children }) {
   return (
-    <div className="border rounded p-4 space-y-3">
-      <h4 className="font-semibold text-blue-600">{title}</h4>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">{children}</div>
+    <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 space-y-4">
+      <h4 className="font-semibold text-blue-700 text-sm uppercase tracking-wide">
+        {title}
+      </h4>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {children}
+      </div>
     </div>
   );
 }
 
-function Input({ label, type = "text", onChange }) {
+function Input({ label, type = "text", placeholder = "", onChange }) {
   return (
     <div>
-      <label className="text-sm font-medium">{label}</label>
+      <label className="text-sm font-medium text-gray-700">{label}</label>
       <input
         type={type}
-        className="w-full border rounded px-3 py-2"
+        placeholder={placeholder}
+        className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         onChange={(e) => onChange(e.target.value)}
       />
+    </div>
+  );
+}
+
+function SelectInput({ label, options, onChange }) {
+  const listId = label.replace(/\s+/g, "-").toLowerCase();
+
+  return (
+    <div>
+      <label className="text-sm font-medium text-gray-700">{label}</label>
+
+      <input
+        type="text"
+        list={listId}
+        placeholder={`Select or type ${label}`}
+        className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        onChange={(e) => onChange(e.target.value)}
+      />
+
+      <datalist id={listId}>
+        {options.map((o, i) => (
+          <option key={i} value={o} />
+        ))}
+      </datalist>
     </div>
   );
 }

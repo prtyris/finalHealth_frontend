@@ -109,17 +109,23 @@ export default function AddAppointmentModal({
   if (error) return <div>Network Error...</div>;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4 overflow-x-auto overflow-y-auto">
+
+
       <RegisterPatientModal
         isOpen={showRegisterPatient}
         onClose={() => setShowRegisterPatient(false)}
       />
 
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+  <div
+    className="absolute inset-0 bg-blue-50/60 backdrop-blur-sm"
+    onClick={onClose}
+  />
 
       {/* Modal */}
-      <div className="relative bg-white w-full max-w-lg mx-4 rounded-xl shadow-lg p-6">
+<div className="relative bg-white w-full max-w-lg mx-4 rounded-xl shadow-lg p-6 max-h-[90vh] overflow-y-auto overflow-x-auto">
+
         <h2 className="text-xl font-semibold text-blue-700 mb-4">
           Create Appointment
         </h2>
@@ -207,8 +213,8 @@ export default function AddAppointmentModal({
                     })}
                   </span>
 
-                  <span className="text-sm text-gray-600">
-                    {s.start_time} – {s.end_time} ({s.session_period})
+                  <span className="text-sm font-bold text-gray-600">
+                    {s.start_time} – {s.end_time} <span className="font-extrabold">({s.session_period})</span> 
                   </span>
 
                   <span className="text-xs text-gray-500">
@@ -222,18 +228,36 @@ export default function AddAppointmentModal({
 
         {/* Appointment Type */}
         <div className="mb-4">
-          <label className="block font-medium mb-1">Appointment Type</label>
+          <label className="block font-medium mb-1">
+            Appointment Type
+          </label>
 
-          <select
-            className="w-full border rounded-lg px-3 py-2"
+          <input
+            type="text"
+            list="appointment-types"
+            className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             value={appointmentType}
             onChange={(e) => setAppointmentType(e.target.value)}
-          >
-            <option value="Consultation">Consultation</option>
-            <option value="Follow-up">Follow-up</option>
-            <option value="Emergency">Emergency</option>
-          </select>
+            placeholder="Select or type appointment type"
+          />
+
+          <datalist id="appointment-types">
+            <option value="Consultation" />
+            <option value="Follow-up" />
+            <option value="Emergency" />
+            <option value="Routine Check-up" />
+            <option value="New Patient Visit" />
+            <option value="Lab Result Review" />
+            <option value="Medical Certificate" />
+            <option value="Vaccination" />
+            <option value="Pre-employment Exam" />
+            <option value="Physical Examination" />
+            <option value="Chronic Disease Management" />
+            <option value="Teleconsultation" />
+            <option value="Procedure / Minor Surgery" />
+          </datalist>
         </div>
+
 
         {/* Patient */}
         <button

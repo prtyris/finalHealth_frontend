@@ -164,12 +164,6 @@ export default function ManageDoctorPage() {
             <p>
               <b>Address:</b> {doctor.address}
             </p>
-            <p>
-              <b>Status:</b>{" "}
-              <span className="px-2 py-1 rounded bg-gray-100">
-                {doctor.verification_status}
-              </span>
-            </p>
           </div>
         </div>
 
@@ -194,46 +188,47 @@ export default function ManageDoctorPage() {
           {clinics.length === 0 ? (
             <p className="text-sm text-gray-500">No affiliated clinics.</p>
           ) : (
-            <table className="w-full border text-sm">
-              <thead className="bg-blue-600 text-white">
-                <tr>
-                  <th className="p-2 text-left">Clinic Name</th>
-                  <th className="p-2 text-left">Address</th>
-                  <th className="p-2 text-left">Contact</th>
-                  <th className="p-2 text-left">Open Hours</th>
-                  <th className="p-2 text-left">Open Days</th>
-                  <th className="p-2 text-left">Owner</th>
-                  <th className="p-2 text-left">Status</th>
-                  <th className="p-2 text-left">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {clinics.map((c) => (
-                  <tr key={c.clinic_id} className="border-t hover:bg-blue-50">
-                    <td className="p-2">{c.clinic_name}</td>
-                    <td className="p-2">{c.address}</td>
-                    <td className="p-2">{c.contact_num}</td>
-                    <td className="p-2">{c.open_hours}</td>
-                    <td className="p-2">{c.open_days}</td>
-                    <td className="p-2">{c.owner_name}</td>
-                    <td className="p-2">
-                      <span className="px-2 py-1 rounded text-xs bg-green-100 text-green-700">
-                        {c.verification_status}
-                      </span>
-                    </td>
-                    <td className="p-2">
-                      <button
-                        type="button"
-                        className="px-2 py-1 rounded text-xs bg-red-100 text-red-600 "
-                        onClick={() => handleUnaffiliate(doctorId, c.clinic_id)}
-                      >
-                        Unaffiliate Clnic
-                      </button>
-                    </td>
+            <div className="w-full overflow-x-auto">
+              <table className="min-w-[1000px] w-full border text-sm">
+                <thead className="bg-blue-600 text-white">
+                  <tr>
+                    <th className="p-2 text-left whitespace-nowrap">Clinic Name</th>
+                    <th className="p-2 text-left whitespace-nowrap">Address</th>
+                    <th className="p-2 text-left whitespace-nowrap">Contact</th>
+                    <th className="p-2 text-left whitespace-nowrap">Open Hours</th>
+                    <th className="p-2 text-left whitespace-nowrap">Open Days</th>
+                    <th className="p-2 text-left whitespace-nowrap">Owner</th>
+                    <th className="p-2 text-left whitespace-nowrap">Action</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+
+                <tbody>
+                  {clinics.map((c) => (
+                    <tr key={c.clinic_id} className="border-t hover:bg-blue-50">
+                      <td className="p-2 whitespace-nowrap">{c.clinic_name}</td>
+                      <td className="p-2 whitespace-nowrap">{c.address}</td>
+                      <td className="p-2 whitespace-nowrap">{c.contact_num}</td>
+                      <td className="p-2 whitespace-nowrap">{c.open_hours}</td>
+                      <td className="p-2 whitespace-nowrap">{c.open_days}</td>
+                      <td className="p-2 whitespace-nowrap">{c.owner_name}</td>
+
+                    
+
+                      <td className="p-2 whitespace-nowrap">
+                        <button
+                          type="button"
+                          className="px-2 py-1 rounded text-xs bg-red-100 text-red-600 hover:bg-red-200 transition"
+                          onClick={() => handleUnaffiliate(doctorId, c.clinic_id)}
+                        >
+                          Unaffiliate Clinic
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
           )}
         </div>
 
@@ -254,39 +249,42 @@ export default function ManageDoctorPage() {
           ) : allDoctorSessions.length === 0 ? (
             <p className="text-sm text-gray-500">No sessions found.</p>
           ) : (
-            <table className="w-full border text-sm">
-              <thead className="bg-blue-600 text-white">
-                <tr>
-                  <th className="p-2 text-left">Day</th>
-                  <th className="p-2 text-left">Clinic</th>
-                  <th className="p-2 text-left">Session</th>
-                  <th className="p-2 text-left">Start Time</th>
-                  <th className="p-2 text-left">End Time</th>
-                  <th className="p-2 text-left">Actions</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {allDoctorSessions.map((s) => (
-                  <tr key={s.session_id} className="border-t hover:bg-blue-50">
-                    <td className="p-2">{s.day_of_week}</td>
-                    <td className="p-2">{s.clinic_name}</td>
-                    <td className="p-2">{s.session_period}</td>
-                    <td className="p-2">{s.start_time}</td>
-                    <td className="p-2">{s.end_time}</td>
-                    <td className="p-2 space-x-2">
-                      <button
-                        type="button"
-                        className="px-2 py-1 text-xs bg-red-100 text-red-700 rounded"
-                        onClick={() => handleDelete(s.session_id)}
-                      >
-                        Delete
-                      </button>
-                    </td>
+            <div className="w-full overflow-x-auto">
+              <table className="min-w-[900px] w-full border text-sm">
+                <thead className="bg-blue-600 text-white">
+                  <tr>
+                    <th className="p-2 text-left whitespace-nowrap">Day</th>
+                    <th className="p-2 text-left whitespace-nowrap">Clinic</th>
+                    <th className="p-2 text-left whitespace-nowrap">Session</th>
+                    <th className="p-2 text-left whitespace-nowrap">Start Time</th>
+                    <th className="p-2 text-left whitespace-nowrap">End Time</th>
+                    <th className="p-2 text-left whitespace-nowrap">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+
+                <tbody>
+                  {allDoctorSessions.map((s) => (
+                    <tr key={s.session_id} className="border-t hover:bg-blue-50">
+                      <td className="p-2 whitespace-nowrap">{s.day_of_week}</td>
+                      <td className="p-2 whitespace-nowrap">{s.clinic_name}</td>
+                      <td className="p-2 whitespace-nowrap">{s.session_period}</td>
+                      <td className="p-2 whitespace-nowrap">{s.start_time}</td>
+                      <td className="p-2 whitespace-nowrap">{s.end_time}</td>
+                      <td className="p-2 whitespace-nowrap">
+                        <button
+                          type="button"
+                          className="px-2 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200 transition"
+                          onClick={() => handleDelete(s.session_id)}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
           )}
         </div>
       </div>

@@ -16,6 +16,10 @@ export default function AllAppointments({ data }) {
   const [rescheduleOpen, setRescheduleOpen] = useState(false);
   const [cancelOpen, setCancelOpen] = useState(false);
 
+const [currentPage, setCurrentPage] = useState(1);
+const itemsPerPage = 2;
+
+
   const handleRescheduleConfirm = async (date, type) => {
     const doctorId = localStorage.getItem("selectedDoctorId");
     const clinicId = localStorage.getItem("selectedClinicId");
@@ -45,6 +49,19 @@ export default function AllAppointments({ data }) {
     setCancelOpen(false);
     setSelectedAppointment(null);
   };
+
+  const totalPages = Math.ceil(data.length / itemsPerPage);
+
+const indexOfLastItem = currentPage * itemsPerPage;
+const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
+
+const goToPage = (page) => {
+  if (page >= 1 && page <= totalPages) {
+    setCurrentPage(page);
+  }
+};
+
 
   if (!data || data.length === 0) {
   return (
@@ -109,7 +126,7 @@ export default function AllAppointments({ data }) {
           </thead>
 
           <tbody>
-            {data.map((a) => (
+            {currentItems.map((a) => (
               <tr
                 key={a.appointment_id}
                 className="border-t text-black hover:bg-blue-50"
@@ -163,6 +180,41 @@ export default function AllAppointments({ data }) {
             ))}
           </tbody>
         </table>
+        {/* PAGINATION */}
+<div className="flex justify-between items-center mt-4 text-sm">
+  <button
+    onClick={() => goToPage(currentPage - 1)}
+    disabled={currentPage === 1}
+    className="px-3 py-1 rounded border border-blue-600 text-blue-600 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-blue-50"
+  >
+    Previous
+  </button>
+
+  <div className="flex gap-2">
+    {Array.from({ length: totalPages }, (_, i) => (
+      <button
+        key={i}
+        onClick={() => goToPage(i + 1)}
+        className={`px-3 py-1 rounded border ${
+          currentPage === i + 1
+            ? "bg-blue-600 text-white border-blue-600"
+            : "border-blue-600 text-blue-600 hover:bg-blue-50"
+        }`}
+      >
+        {i + 1}
+      </button>
+    ))}
+  </div>
+
+  <button
+    onClick={() => goToPage(currentPage + 1)}
+    disabled={currentPage === totalPages}
+    className="px-3 py-1 rounded border border-blue-600 text-blue-600 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-blue-50"
+  >
+    Next
+  </button>
+</div>
+
       </div>
     </div>
   );

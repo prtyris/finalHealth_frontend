@@ -1,12 +1,33 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePatients } from "../../../context/patients/usePatients";
 import { useMedicalRecords } from "../../../context/medical-records/useMedicalRecords";
 
-export default function EditPatientModal({ isOpen, onClose, patientId }) {
+export default function EditPatientModal({
+  isOpen,
+  onClose,
+  patientId,
+  patient,
+}) {
   const { updatePatientInfo } = usePatients();
   const { getPatientInfo } = useMedicalRecords();
 
   const [form, setForm] = useState({});
+
+  useEffect(() => {
+    if (!isOpen || !patient) return;
+
+    setForm({
+      f_name: patient.f_name || "",
+      m_name: patient.m_name || "",
+      l_name: patient.l_name || "",
+      gender: patient.gender || "",
+      contact_number: patient.contact_number || "",
+      backup_contact: patient.backup_contact || "",
+      email: patient.email || "",
+      address: patient.address || "",
+      priority_id: patient.priority_id || "",
+    });
+  }, [isOpen, patient]);
 
   if (!isOpen) return null;
 
@@ -19,45 +40,60 @@ export default function EditPatientModal({ isOpen, onClose, patientId }) {
   ];
 
   const handleChange = (key, value) => {
-    if (value === "" || value === null || value === undefined) return;
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleSubmit = async () => {
-    if (Object.keys(form).length === 0) {
-      alert("No changes provided");
-      return;
-    }
+    if (!patientId) return;
 
     const success = await updatePatientInfo(patientId, form);
 
     if (success) {
       await getPatientInfo(patientId);
-      setForm({});
       onClose();
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+      <div
+        className="absolute inset-0 bg-blue-50/60 backdrop-blur-sm"
+        onClick={onClose}
+      />
 
-      <div className="relative bg-white w-full max-w-lg rounded p-6 space-y-4">
-        <h3 className="text-lg font-semibold">Update Patient</h3>
+      <div className="relative bg-white w-full max-w-lg rounded-2xl border-4 border-blue-600 shadow-xl p-6 space-y-4 max-h-[90vh] overflow-y-auto z-10">
 
-        <Input label="First Name" onChange={(v) => handleChange("f_name", v)} />
+        <h3 className="text-xl font-semibold text-blue-700 text-center">
+          Update Patient
+        </h3>
+
+        <Input
+          label="First Name"
+          value={form.f_name || ""}
+          onChange={(v) => handleChange("f_name", v)}
+        />
+
         <Input
           label="Middle Name"
+          value={form.m_name || ""}
           onChange={(v) => handleChange("m_name", v)}
         />
-        <Input label="Last Name" onChange={(v) => handleChange("l_name", v)} />
 
+        <Input
+          label="Last Name"
+          value={form.l_name || ""}
+          onChange={(v) => handleChange("l_name", v)}
+        />
+
+        {/* Gender */}
         <div>
-          <label className="text-sm font-medium">Gender</label>
+          <label className="text-sm font-medium text-gray-700">
+            Gender
+          </label>
           <select
-            className="w-full border rounded px-3 py-2"
-            defaultValue=""
+            value={form.gender || ""}
             onChange={(e) => handleChange("gender", e.target.value)}
+            className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="">Select gender</option>
             <option value="Male">Male</option>
@@ -67,23 +103,39 @@ export default function EditPatientModal({ isOpen, onClose, patientId }) {
 
         <Input
           label="Contact Number"
+          value={form.contact_number || ""}
           onChange={(v) => handleChange("contact_number", v)}
         />
+
         <Input
           label="Backup Contact"
+          value={form.backup_contact || ""}
           onChange={(v) => handleChange("backup_contact", v)}
         />
-        <Input label="Email" onChange={(v) => handleChange("email", v)} />
-        <Input label="Address" onChange={(v) => handleChange("address", v)} />
 
+        <Input
+          label="Email"
+          value={form.email || ""}
+          onChange={(v) => handleChange("email", v)}
+        />
+
+        <Input
+          label="Address"
+          value={form.address || ""}
+          onChange={(v) => handleChange("address", v)}
+        />
+
+        {/* Priority */}
         <div>
-          <label className="text-sm font-medium">Priority</label>
+          <label className="text-sm font-medium text-gray-700">
+            Priority
+          </label>
           <select
-            className="w-full border rounded px-3 py-2"
-            defaultValue=""
+            value={form.priority_id || ""}
             onChange={(e) =>
               handleChange("priority_id", Number(e.target.value))
             }
+            className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="">Select priority</option>
             {PRIORITIES.map((p) => (
@@ -94,28 +146,36 @@ export default function EditPatientModal({ isOpen, onClose, patientId }) {
           </select>
         </div>
 
-        <div className="flex justify-end gap-2 pt-2">
-          <button onClick={onClose} className="px-4 py-2 border rounded">
+        <div className="flex justify-end gap-3 pt-4">
+          <button
+            onClick={onClose}
+            className="px-5 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition"
+          >
             Cancel
           </button>
+
           <button
             onClick={handleSubmit}
-            className="px-4 py-2 bg-blue-600 text-white rounded"
+            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition"
           >
             Save Changes
           </button>
         </div>
+
       </div>
     </div>
   );
 }
 
-function Input({ label, onChange }) {
+function Input({ label, value, onChange }) {
   return (
     <div>
-      <label className="text-sm font-medium">{label}</label>
+      <label className="text-sm font-medium text-gray-700">
+        {label}
+      </label>
       <input
-        className="w-full border rounded px-3 py-2"
+        value={value}
+        className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         placeholder={`Enter ${label.toLowerCase()}`}
         onChange={(e) => onChange(e.target.value.trim())}
       />

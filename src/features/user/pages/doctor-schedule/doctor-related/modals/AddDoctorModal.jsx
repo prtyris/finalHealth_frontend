@@ -39,25 +39,34 @@ export default function AddDoctorModal({ isOpen, onClose }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div
+        className="absolute inset-0 bg-blue-50/60 backdrop-blur-sm"
+        onClick={onClose}
+      />
 
       {/* Modal */}
-      <div className="relative bg-white w-full max-w-3xl mx-4 rounded-xl shadow-lg p-6 z-10">
-        <h2 className="text-xl font-semibold text-blue-700 mb-4">Add Doctor</h2>
+      <div className="relative bg-white w-full max-w-3xl rounded-2xl border-4 border-blue-600 shadow-xl p-6 max-h-[90vh] overflow-y-auto z-10">
+
+        <h2 className="text-xl font-semibold text-blue-700 text-center mb-6">
+          Add Doctor
+        </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+
           <Input
             label="First Name"
             value={formData.fName}
             onChange={(v) => handleChange("fName", v)}
           />
+
           <Input
             label="Middle Name"
             value={formData.mName}
             onChange={(v) => handleChange("mName", v)}
           />
+
           <Input
             label="Last Name"
             value={formData.lName}
@@ -69,6 +78,7 @@ export default function AddDoctorModal({ isOpen, onClose }) {
             value={formData.specialization}
             onChange={(v) => handleChange("specialization", v)}
           />
+
           <Input
             label="License Number"
             value={formData.licenseNumber}
@@ -98,32 +108,35 @@ export default function AddDoctorModal({ isOpen, onClose }) {
           <div className="md:col-span-2">
             <label className="font-medium">Address</label>
             <textarea
-              className="w-full border rounded-lg px-3 py-2"
+              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               value={formData.address}
               onChange={(e) => handleChange("address", e.target.value)}
             />
           </div>
+
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end gap-2 mt-6">
+        <div className="flex justify-end gap-3 mt-6">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200"
+            className="px-5 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition"
           >
             Cancel
           </button>
 
           <button
             onClick={handleSubmit}
-            className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition"
           >
             Save Doctor
           </button>
         </div>
+
       </div>
     </div>
   );
+
 }
 
 /* Reusable Inputs */
@@ -134,7 +147,7 @@ const Input = ({ label, value, onChange, type = "text" }) => (
       type={type}
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full border rounded-lg px-3 py-2"
+      className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
     />
   </div>
 );
@@ -145,7 +158,7 @@ const Select = ({ label, value, onChange, options }) => (
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full border rounded-lg px-3 py-2"
+      className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
     >
       {options.map((o) => (
         <option key={o} value={o}>
@@ -155,3 +168,4 @@ const Select = ({ label, value, onChange, options }) => (
     </select>
   </div>
 );
+
