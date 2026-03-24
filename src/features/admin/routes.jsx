@@ -7,6 +7,7 @@ import VerifyDoctors from "./pages/verifydoctor/VerifyDoctors";
 //for dashboard admin
 import ProtectedRoutes from "./components/ProtectedRoutes";
 import AdminDashboard from "./pages/dashboard/AdminDashboard";
+import CustomerRevenue from "./pages/revenue/CustomerRevenue";
 import { AdminProvider } from "./context/AdminProvider";
 
 export default function AdminRoutes() {
@@ -46,6 +47,12 @@ export default function AdminRoutes() {
             </ProtectedRoutes>
           }
         />
+        <Route path="/admin-revenue-customers"
+         element={ <ProtectedRoutes>
+              <CustomerRevenue />
+            </ProtectedRoutes>
+           } 
+           />
       </Routes>
     </AdminProvider>
   );
