@@ -4,9 +4,17 @@ import { apiRequest } from "../../../api/httpClient/httpClient";
 export const getSubscriptionPlansApi = () =>
   apiRequest("/api/subscription-routes/plans");
 
-// GET my subscription (SINGLE SOURCE OF TRUTH)
+// GET my subscription
 export const getMySubscriptionApi = () =>
   apiRequest("/api/subscription-routes/me");
+
+// GET subscription history
+export const getSubscriptionHistoryApi = () =>
+  apiRequest("/api/subscription-routes/history");
+
+// GET payment history
+export const getPaymentHistoryApi = () =>
+  apiRequest("/api/subscription-routes/payments");
 
 // Cancel subscription
 export const cancelMySubscriptionApi = () =>
@@ -14,14 +22,14 @@ export const cancelMySubscriptionApi = () =>
     method: "POST",
   });
 
-// Subscribe (used for free trial OR non-stripe fallback)
+// Subscribe
 export const subscribeToPlanApi = (payload) =>
   apiRequest("/api/subscription-routes/subscribe", {
     method: "POST",
     body: JSON.stringify(payload),
   });
 
-// POST create payment intent
+// Stripe payment intent
 export const createPaymentIntentApi = (planId) =>
   apiRequest("/api/subscription-routes-v2/payments/intent", {
     method: "POST",

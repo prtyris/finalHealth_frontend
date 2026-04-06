@@ -6,9 +6,14 @@ import {
   getMySubscriptionApi,
   cancelMySubscriptionApi,
   createPaymentIntentApi,
+  getSubscriptionHistoryApi,
+  getPaymentHistoryApi,
 } from "../../api/subscriptionApi.js";
 
 export const SubscriptionProvider = ({ children }) => {
+  const [subscriptionHistory, setSubscriptionHistory] = useState([]);
+const [paymentHistory, setPaymentHistory] = useState([]);
+
   const [plans, setPlans] = useState([]);
   const [subscription, setSubscription] = useState(null);
   const [plan, setPlan] = useState(null);
@@ -93,6 +98,38 @@ export const SubscriptionProvider = ({ children }) => {
     setLoading(false);
   };
 
+  const getSubscriptionHistory = async () => {
+  setLoading(true);
+  setError(null);
+
+  const res = await getSubscriptionHistoryApi();
+
+  if (!res.ok) {
+    setError(res.message);
+    setLoading(false);
+    return;
+  }
+
+  setSubscriptionHistory(res.data.subscriptions || []);
+  setLoading(false);
+};
+
+const getPaymentHistory = async () => {
+  setLoading(true);
+  setError(null);
+
+  const res = await getPaymentHistoryApi();
+
+  if (!res.ok) {
+    setError(res.message);
+    setLoading(false);
+    return;
+  }
+
+  setPaymentHistory(res.data.payments || []);
+  setLoading(false);
+};
+
   // -----------------------------
   // Clear (logout / switch user)
   // -----------------------------
@@ -101,6 +138,7 @@ export const SubscriptionProvider = ({ children }) => {
     setPlan(null);
     setPlans([]);
   };
+  
 
   return (
     <SubscriptionContext.Provider
@@ -110,11 +148,15 @@ export const SubscriptionProvider = ({ children }) => {
         plan,
         loading,
         error,
+        subscriptionHistory,
+        paymentHistory,
         loadPlans,
         loadMySubscription,
         createPaymentIntent,
         cancelSubscription,
         clearSubscription,
+        getSubscriptionHistory,
+        getPaymentHistory
       }}
     >
       {children}

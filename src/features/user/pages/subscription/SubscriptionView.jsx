@@ -4,6 +4,9 @@ import PrintButtonPdf from "../../../../components/PrintButtonPdf.jsx";
 import StripeCardPayment from "./components/StripeCardPayment.jsx";
 import { useSubscription } from "../../context/subscriptions/useSubscription.js";
 
+import {useDashboard} from "../../context/dashboard/useDashboard.js"
+
+
 const SubscriptionView = () => {
   const {
     plans,
@@ -12,7 +15,17 @@ const SubscriptionView = () => {
     loadPlans,
     loadMySubscription,
     cancelSubscription,
+    getSubscriptionHistory,
+    getPaymentHistory,
+    subscriptionHistory,
+    paymentHistory,
   } = useSubscription();
+
+  const {
+  usage,
+  getDashboardUsage,
+} = useDashboard();
+
 
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedPlan, setSelectedPlan] = useState(null);
@@ -28,6 +41,7 @@ const SubscriptionView = () => {
     loadPlans();
     loadMySubscription();
 
+    
     // Check if user just completed subscription
     const justSubscribed = localStorage.getItem("justSubscribed");
     const savedStatus = localStorage.getItem("subscriptionStatus");
@@ -39,6 +53,16 @@ const SubscriptionView = () => {
       setSubscriptionStatus(savedStatus);
     }
   }, []);
+
+
+useEffect(() => {
+  getDashboardUsage();
+}, []);
+
+  useEffect(() => {
+  getSubscriptionHistory();
+  getPaymentHistory();
+}, []);
 
   // Save subscription status whenever it changes
   useEffect(() => {
@@ -376,9 +400,59 @@ const SubscriptionView = () => {
       }
     };
 
+    const formatDate = (date) => {
+  if (!date) return "-";
+
+  return new Date(date).toLocaleDateString("en-PH", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+};
+
+
+const calculateMonthsRemaining = (endDate) => {
+  if (!endDate) return 0;
+
+  const today = new Date();
+  const end = new Date(endDate);
+
+  if (end <= today) return 0;
+
+  let months =
+    (end.getFullYear() - today.getFullYear()) * 12 +
+    (end.getMonth() - today.getMonth());
+
+  if (end.getDate() >= today.getDate()) {
+    months += 1;
+  }
+
+  return Math.max(months, 0);
+};
+
+const activeUsersUsed = usage?.activeUsers?.used ?? 0;
+const activeUsersTotal = usage?.activeUsers?.total ?? 0;
+
+const patientsUsed = usage?.patients?.used ?? 0;
+const patientsTotal = usage?.patients?.total;
+
+const monthsUsed = usage?.monthsRemaining?.used ?? 0;
+const monthsTotal = usage?.monthsRemaining?.total ?? 0;
+
+const activeUsersProgress =
+  activeUsersTotal > 0 ? Math.min((activeUsersUsed / activeUsersTotal) * 100, 100) : 0;
+
+const patientsProgress =
+  patientsTotal && patientsTotal > 0
+    ? Math.min((patientsUsed / patientsTotal) * 100, 100)
+    : 100;
+
+const monthsProgress =
+  monthsTotal > 0 ? Math.min((monthsUsed / monthsTotal) * 100, 100) : 0;
+
     return (
       <Layout>
-        <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 p-4">
+        <div className="min-h-screen p-4">
           {/* Subscription Status Header */}
           <div className="max-w-6xl mx-auto">
             {/* Celebration Banner (shown for 7 days after subscription) */}
@@ -555,65 +629,151 @@ const SubscriptionView = () => {
                   </div>
                 </div>
 
-                {/* Usage Statistics */}
-                <div className="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border-2 border-blue-100 dark:border-gray-700">
-                  <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-6">
-                    Your Usage
-                  </h3>
-                  <div className="grid md:grid-cols-3 gap-6">
-                    <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
-                      <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">
-                        {Math.floor(plan?.maxNumberUsers / 2)}/
-                        {plan?.maxNumberUsers}
-                      </div>
-                      <p className="text-gray-600 dark:text-gray-300">
-                        Active Users
-                      </p>
-                      <div className="mt-2 h-2 bg-blue-200 dark:bg-blue-800 rounded-full">
-                        <div className="h-full bg-blue-500 rounded-full w-1/2"></div>
-                      </div>
-                    </div>
-                    <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-xl">
-                      <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">
-                        45/{plan?.maxNumberPatient}
-                      </div>
-                      <p className="text-gray-600 dark:text-gray-300">
-                        Patients
-                      </p>
-                      <div className="mt-2 h-2 bg-green-200 dark:bg-green-800 rounded-full">
-                        <div className="h-full bg-green-500 rounded-full w-1/3"></div>
-                      </div>
-                    </div>
-                    <div className="text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-xl">
-                      <div className="text-3xl font-bold text-purple-600 dark:text-purple-400 mb-2">
-                        {planType === "yearly" ? "12" : "1"}/12
-                      </div>
-                      <p className="text-gray-600 dark:text-gray-300">
-                        Months Remaining
-                      </p>
-                      <div className="mt-2 h-2 bg-purple-200 dark:bg-purple-800 rounded-full">
-                        <div className="h-full bg-purple-500 rounded-full w-full"></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+{/* Usage Statistics */}
+<div className="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border-2 border-blue-100 dark:border-gray-700">
+  <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-6">
+    Your Usage
+  </h3>
+
+  <div className="grid md:grid-cols-3 gap-6">
+    <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
+      <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">
+        {activeUsersUsed}/{activeUsersTotal}
+      </div>
+      <p className="text-gray-600 dark:text-gray-300">Active Users</p>
+      <div className="mt-2 h-2 bg-blue-200 dark:bg-blue-800 rounded-full">
+        <div
+          className="h-full bg-blue-500 rounded-full"
+          style={{ width: `${activeUsersProgress}%` }}
+        ></div>
+      </div>
+    </div>
+
+    <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-xl">
+      <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">
+        {patientsTotal == null ? patientsUsed : `${patientsUsed}/${patientsTotal}`}
+      </div>
+      <p className="text-gray-600 dark:text-gray-300">Patients</p>
+      <div className="mt-2 h-2 bg-green-200 dark:bg-green-800 rounded-full">
+        <div
+          className="h-full bg-green-500 rounded-full"
+          style={{ width: `${patientsProgress}%` }}
+        ></div>
+      </div>
+    </div>
+
+    <div className="text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-xl">
+      <div className="text-3xl font-bold text-purple-600 dark:text-purple-400 mb-2">
+        {monthsUsed}/{monthsTotal}
+      </div>
+      <p className="text-gray-600 dark:text-gray-300">Months Remaining</p>
+      <div className="mt-2 h-2 bg-purple-200 dark:bg-purple-800 rounded-full">
+        <div
+          className="h-full bg-purple-500 rounded-full"
+          style={{ width: `${monthsProgress}%` }}
+        ></div>
+      </div>
+    </div>
+  </div>
+</div>
               </div>
 
-              {/* REMOVED: Upgrade Options Sidebar, Quick Actions - Only keeping Next Billing */}
-              <div className="lg:col-span-1">
-                {/* Only Next Billing remains */}
-                <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl shadow-xl p-6">
-                  <div className="flex items-center mb-4">
-                    <i className="fas fa-calendar-check text-2xl mr-3"></i>
-                    <div>
-                      <h4 className="font-semibold">Next Billing Date</h4>
-                      <p className="text-sm opacity-90">
-                        {subscription?.endDate || "2027-01-22"}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+<div className="lg:col-span-1 space-y-6">
+
+  {/* Next Billing */}
+  <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl shadow-xl p-6">
+    <div className="flex items-center mb-2">
+      <i className="fas fa-calendar-check text-2xl mr-3"></i>
+      <div>
+        <h4 className="font-semibold">Next Billing</h4>
+        <p className="text-sm opacity-90">
+          {formatDate(subscription?.endDate)}
+        </p>
+      </div>
+    </div>
+  </div>
+
+
+  {/* Payment History */}
+  <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-5 border border-gray-100 dark:border-gray-700">
+    <h3 className="font-semibold text-gray-700 dark:text-gray-200 mb-4">
+      Payment History
+    </h3>
+
+    {paymentHistory?.length === 0 && (
+      <p className="text-sm text-gray-500">No payments yet</p>
+    )}
+
+    <div className="space-y-3">
+      {paymentHistory?.map((p) => (
+        <div
+          key={p.paymentId}
+          className="flex justify-between items-center border-b pb-2 text-sm"
+        >
+          <div>
+            <p className="font-bold text-gray-800 dark:text-gray-100">
+              {p.planName}
+            </p>
+            <p className="font-semibold text-gray-800 dark:text-gray-100">
+              ₱{Number(p.amount).toLocaleString()}
+            </p>
+            <p className="text-gray-500 text-xs">
+              {p.paymentMethod}
+            </p>
+          </div>
+
+          <div className="text-right">
+            <p className="text-gray-600 text-xs">
+              {formatDate(p.paymentDate)}
+            </p>
+
+            <span className="text-green-600 text-xs font-semibold">
+              {p.status}
+            </span>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+
+
+  {/* Subscription History */}
+  <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-5 border border-gray-100 dark:border-gray-700">
+    <h3 className="font-semibold text-gray-700 dark:text-gray-200 mb-4">
+      Subscription History
+    </h3>
+
+    <div className="space-y-3">
+      {subscriptionHistory?.map((s) => (
+        <div
+          key={s.subscriptionId}
+          className="flex justify-between items-center border-b pb-2 text-sm"
+        >
+          <div>
+            <p className="font-medium text-gray-800 dark:text-gray-100">
+              {s.planName || "Plan"}
+            </p>
+
+            <p className="text-xs text-gray-500">
+              {formatDate(s.startDate)} → {formatDate(s.endDate)}
+            </p>
+          </div>
+
+          <span
+            className={`text-xs px-2 py-1 rounded ${
+              s.status === "active"
+                ? "bg-green-100 text-green-700"
+                : "bg-gray-100 text-gray-600"
+            }`}
+          >
+            {s.status}
+          </span>
+        </div>
+      ))}
+    </div>
+  </div>
+
+</div>
             </div>
           </div>
 
